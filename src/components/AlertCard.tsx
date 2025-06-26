@@ -7,6 +7,7 @@ import {
   getAlertIconClassName,
   formatTimestamp
 } from '../utils/alertUtils';
+import './AlertCard.css';
 
 interface AlertCardProps {
   alert: Alert;

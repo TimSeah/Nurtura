@@ -135,12 +135,22 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const getPriorityColor = (priority?: string) => {
+  const getStatIconClass = (color: string) => {
+    switch (color) {
+      case '#0f766e': return 'stat-icon--teal';
+      case '#7c3aed': return 'stat-icon--purple';
+      case '#dc2626': return 'stat-icon--red';
+      case '#ea580c': return 'stat-icon--orange';
+      default: return 'stat-icon--teal';
+    }
+  };
+
+  const getPriorityClass = (priority?: string) => {
     switch (priority) {
-      case 'high': return '#dc2626';
-      case 'medium': return '#ea580c';
-      case 'low': return '#16a34a';
-      default: return '#64748b';
+      case 'high': return 'priority-high';
+      case 'medium': return 'priority-medium';
+      case 'low': return 'priority-low';
+      default: return 'priority-default';
     }
   };
 
@@ -157,8 +167,8 @@ const Dashboard: React.FC = () => {
           const Icon = stat.icon;
           return (
             <div key={index} className="stat-card">
-              <div className="stat-icon" style={{ backgroundColor: `${stat.color}20` }}>
-                <Icon style={{ color: stat.color }} />
+              <div className={`stat-icon ${getStatIconClass(stat.color)}`}>
+                <Icon />
               </div>
               <div className="stat-content">
                 <h3>{stat.value}</h3>
@@ -187,8 +197,7 @@ const Dashboard: React.FC = () => {
                   <p className="task-time">{task.time}</p>
                 </div>
                 <div 
-                  className="task-priority" 
-                  style={{ backgroundColor: getPriorityColor(task.priority) }}
+                  className={`task-priority ${getPriorityClass(task.priority)}`}
                 />
               </div>
             ))}
@@ -216,8 +225,7 @@ const Dashboard: React.FC = () => {
                     <span className="activity-time">{activity.time}</span>
                   </div>
                   <div 
-                    className="activity-priority"
-                    style={{ backgroundColor: getPriorityColor(activity.priority) }}
+                    className={`activity-priority ${getPriorityClass(activity.priority)}`}
                   />
                 </div>
               );

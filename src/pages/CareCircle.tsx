@@ -3,6 +3,7 @@ import { Users, Plus, Phone, Mail, MapPin, Clock, Edit, Trash2 } from 'lucide-re
 import type { CareTeamMember } from '../types';
 import { dataService } from '../services/dataService';
 import Modal from '../components/Modal';
+import './CareCircle.css';
 
 const CareCircle: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -78,10 +79,10 @@ const CareCircle: React.FC = () => {
 
   const getRoleColor = (relationship: CareTeamMember['relationship']) => {
     switch (relationship) {
-      case 'Professional': return '#0f766e';
-      case 'Family': return '#7c3aed';
-      case 'Community': return '#ea580c';
-      default: return '#64748b';
+      case 'Professional': return 'relationship-professional';
+      case 'Family': return 'relationship-family';
+      case 'Community': return 'relationship-community';
+      default: return 'relationship-professional';
     }
   };
 
@@ -143,8 +144,7 @@ const CareCircle: React.FC = () => {
                 <div className="member-header">
                   <h3>{member.name}</h3>
                   <span 
-                    className="member-role" 
-                    style={{ backgroundColor: `${getRoleColor(member.relationship)}20`, color: getRoleColor(member.relationship) }}
+                    className={`member-relationship-badge ${getRoleColor(member.relationship)}`}
                   >
                     {member.role}
                   </span>
@@ -209,8 +209,7 @@ const CareCircle: React.FC = () => {
                 <div className="member-header">
                   <h3>{member.name}</h3>
                   <span 
-                    className="member-role" 
-                    style={{ backgroundColor: `${getRoleColor(member.relationship)}20`, color: getRoleColor(member.relationship) }}
+                    className={`member-relationship-badge ${getRoleColor(member.relationship)}`}
                   >
                     {member.role}
                   </span>

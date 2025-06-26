@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import { Save } from 'lucide-react';
 import type { CareNoteData } from '../types';
+import './CareNoteModal.css';
 
 interface CareNoteModalProps {
   isOpen: boolean;
@@ -183,7 +184,7 @@ const CareNoteModal: React.FC<CareNoteModalProps> = ({ isOpen, onClose, onSave }
 
         <div className="form-group full-width">
           <label>Tags</label>
-          <div style={{ marginBottom: '0.5rem' }}>
+          <div className="tag-input-container">
             <input
               type="text"
               value={tagInput}
@@ -195,7 +196,6 @@ const CareNoteModal: React.FC<CareNoteModalProps> = ({ isOpen, onClose, onSave }
               type="button" 
               onClick={() => addTag(tagInput)}
               className="btn btn-sm btn-secondary"
-              style={{ marginLeft: '0.5rem' }}
             >
               Add Tag
             </button>
@@ -203,33 +203,17 @@ const CareNoteModal: React.FC<CareNoteModalProps> = ({ isOpen, onClose, onSave }
           
           {/* Current tags */}
           {formData.tags.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <div className="tags-display">
               {formData.tags.map(tag => (
                 <span 
                   key={tag}
-                  style={{
-                    background: '#0f766e',
-                    color: 'white',
-                    padding: '0.25rem 0.5rem',
-                    borderRadius: '1rem',
-                    fontSize: '0.75rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.25rem'
-                  }}
+                  className="tag-badge"
                 >
                   {tag}
                   <button
                     type="button"
                     onClick={() => removeTag(tag)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: 'white',
-                      cursor: 'pointer',
-                      fontSize: '0.75rem',
-                      padding: 0
-                    }}
+                    className="tag-remove-btn"
                   >
                     ×
                   </button>
@@ -239,22 +223,14 @@ const CareNoteModal: React.FC<CareNoteModalProps> = ({ isOpen, onClose, onSave }
           )}
           
           {/* Suggested tags */}
-          <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+          <div className="suggested-tags">
             <span>Suggested tags: </span>
             {suggestedTags.map(tag => (
               <button
                 key={tag}
                 type="button"
                 onClick={() => addTag(tag)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#0f766e',
-                  cursor: 'pointer',
-                  textDecoration: 'underline',
-                  fontSize: '0.75rem',
-                  margin: '0 0.25rem'
-                }}
+                className="suggested-tag-btn"
               >
                 {tag}
               </button>

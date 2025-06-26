@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import { Save } from 'lucide-react';
 import type { VitalSignsData } from '../types';
+import './VitalSignsModal.css';
 
 interface VitalSignsModalProps {
   isOpen: boolean;
@@ -105,7 +106,7 @@ const VitalSignsModal: React.FC<VitalSignsModalProps> = ({ isOpen, onClose, onSa
         <div className="form-grid">
           <div className="form-group">
             <label>Value</label>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <div className="vital-input-container">
               <input
                 type="text"
                 value={formData.value}
@@ -113,7 +114,7 @@ const VitalSignsModal: React.FC<VitalSignsModalProps> = ({ isOpen, onClose, onSa
                 placeholder={selectedVitalType?.placeholder}
                 required
               />
-              <span style={{ color: '#64748b', fontSize: '0.875rem', minWidth: '40px' }}>
+              <span className="vital-unit-label">
                 {selectedVitalType?.unit}
               </span>
             </div>

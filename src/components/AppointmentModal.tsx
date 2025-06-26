@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import { Save } from 'lucide-react';
 import type { AppointmentData } from '../types';
+import './AppointmentModal.css';
 
 interface AppointmentModalProps {
   isOpen: boolean;

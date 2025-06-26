@@ -4,6 +4,7 @@ import { Heart, Activity, Thermometer, Scale, Plus, TrendingUp, Droplets } from 
 import type { CareRecipient, VitalSignsData } from '../types';
 import { dataService } from '../services/dataService';
 import Modal from '../components/Modal';
+import './HealthTracking.css';
 
 const HealthTracking: React.FC = () => {
   const [selectedRecipient, setSelectedRecipient] = useState<string>('1');

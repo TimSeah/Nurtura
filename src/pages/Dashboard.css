@@ -52,6 +52,39 @@
   height: 1.5rem;
 }
 
+/* Dynamic stat icon colors */
+.stat-icon--teal {
+  background-color: rgba(15, 118, 110, 0.2);
+}
+
+.stat-icon--teal svg {
+  color: #0f766e;
+}
+
+.stat-icon--purple {
+  background-color: rgba(124, 58, 237, 0.2);
+}
+
+.stat-icon--purple svg {
+  color: #7c3aed;
+}
+
+.stat-icon--red {
+  background-color: rgba(220, 38, 38, 0.2);
+}
+
+.stat-icon--red svg {
+  color: #dc2626;
+}
+
+.stat-icon--orange {
+  background-color: rgba(234, 88, 12, 0.2);
+}
+
+.stat-icon--orange svg {
+  color: #ea580c;
+}
+
 .stat-content h3 {
   font-size: 1.875rem;
   font-weight: 700;
@@ -176,6 +209,29 @@
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
+}
+
+/* Priority colors */
+.priority-high {
+  background-color: #dc2626;
+}
+
+.priority-medium {
+  background-color: #ea580c;
+}
+
+.priority-low {
+  background-color: #16a34a;
+}
+
+.priority-default {
+  background-color: #64748b;
+}
+
+.task-priority {
+  width: 0.25rem;
+  height: 100%;
+  border-radius: 0.125rem;
 }
 
 .quick-actions {

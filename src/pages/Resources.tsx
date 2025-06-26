@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Phone, Globe, Clock, Star, Filter } from 'lucide-react';
 import type { Resource } from '../types';
 import { dataService } from '../services/dataService';
+import './Resources.css';
 
 const Resources: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
