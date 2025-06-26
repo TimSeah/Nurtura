@@ -41,21 +41,21 @@ const Alerts: React.FC = () => {
 
   const getPriorityColor = (priority: Alert['priority']) => {
     switch (priority) {
-      case 'critical': return '#dc2626';
-      case 'high': return '#ea580c';
-      case 'medium': return '#ca8a04';
-      case 'low': return '#16a34a';
-      default: return '#64748b';
+      case 'critical': return '#c62828'; // Mayo Clinic red
+      case 'high': return '#ef6c00'; // Mayo Clinic orange
+      case 'medium': return '#f57f17'; // Mayo Clinic amber
+      case 'low': return '#2e7d32'; // Mayo Clinic green
+      default: return '#616161'; // Mayo Clinic gray
     }
   };
 
   const getPriorityBorderColor = (priority: Alert['priority']) => {
     switch (priority) {
-      case 'critical': return '#fef2f2';
-      case 'high': return '#fff7ed';
-      case 'medium': return '#fefce8';
-      case 'low': return '#f0fdf4';
-      default: return '#f8fafc';
+      case 'critical': return '#ffebee'; // Light red background
+      case 'high': return '#fff3e0'; // Light orange background
+      case 'medium': return '#fff8e1'; // Light amber background
+      case 'low': return '#e8f5e8'; // Light green background
+      default: return '#fafafa'; // Light gray background
     }
   };
 
@@ -98,7 +98,7 @@ const Alerts: React.FC = () => {
       {/* Alert Summary */}
       <div className="alert-summary">
         <div className="summary-card">
-          <div className="summary-icon" style={{ backgroundColor: '#fef2f2', color: '#dc2626' }}>
+          <div className="summary-icon" style={{ backgroundColor: '#e1f5fe', color: '#0078d4' }}>
             <Bell />
           </div>
           <div className="summary-info">
@@ -107,7 +107,7 @@ const Alerts: React.FC = () => {
           </div>
         </div>
         <div className="summary-card">
-          <div className="summary-icon" style={{ backgroundColor: '#fef2f2', color: '#dc2626' }}>
+          <div className="summary-icon" style={{ backgroundColor: '#ffebee', color: '#c62828' }}>
             <AlertTriangle />
           </div>
           <div className="summary-info">

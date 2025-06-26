@@ -1,12 +1,46 @@
 :root {
   --header-height: 81px;
+  /* Mayo Clinic inspired color palette */
+  --primary-blue: #0078d4;
+  --primary-blue-hover: #106ebe;
+  --primary-blue-light: #e1f5fe;
+  --secondary-teal: #008080;
+  --secondary-teal-light: #e0f2f1;
+  --accent-green: #4caf50;
+  --accent-green-light: #e8f5e8;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #eeeeee;
+  --gray-300: #e0e0e0;
+  --gray-400: #bdbdbd;
+  --gray-500: #9e9e9e;
+  --gray-600: #757575;
+  --gray-700: #616161;
+  --gray-800: #424242;
+  --gray-900: #212121;
+  --text-primary: #212121;
+  --text-secondary: #616161;
+  --text-muted: #757575;
+  --background-primary: #ffffff;
+  --background-secondary: #fafafa;
+  --background-tertiary: #f5f5f5;
+  --border-light: #e0e0e0;
+  --border-medium: #bdbdbd;
+  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-heavy: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --radius-small: 4px;
+  --radius-medium: 8px;
+  --radius-large: 12px;
 }
 
 .layout {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f8fafc;
+  background-color: var(--background-secondary);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-primary);
 }
 
 .layout-container {
@@ -21,14 +55,14 @@ html, body {
 }
 
 .layout-header {
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
+  background: var(--background-primary);
+  border-bottom: 2px solid var(--primary-blue);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-medium);
   height: var(--header-height);
   display: flex;
   align-items: center;
@@ -47,24 +81,33 @@ html, body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: #0f766e;
+  font-weight: 600;
+  font-size: 1.75rem;
+  color: var(--primary-blue);
+  letter-spacing: -0.025em;
 }
 
 .logo-icon {
-  width: 2rem;
-  height: 2rem;
-  color: #0f766e;
+  width: 2.25rem;
+  height: 2.25rem;
+  color: var(--primary-blue);
 }
 
 .mobile-menu-toggle {
   display: none;
   background: none;
-  border: none;
-  padding: 0.5rem;
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-medium);
+  padding: 0.75rem;
   cursor: pointer;
-  color: #64748b;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.mobile-menu-toggle:hover {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  background-color: var(--primary-blue-light);
 }
 
 .layout-body {
@@ -78,64 +121,80 @@ html, body {
 }
 
 .sidebar {
-  width: 250px;
-  background: white;
-  border-right: 1px solid #e2e8f0;
-  padding: 1.5rem 0;
-  height: calc(100vh - var(--header-height)); /* Use CSS custom property */
-  position: sticky; /* Use sticky positioning to keep it in place */
+  width: 280px;
+  background: var(--background-primary);
+  border-right: 1px solid var(--border-light);
+  padding: 2rem 0;
+  height: calc(100vh - var(--header-height));
+  position: sticky;
   top: 0;
-  overflow-y: auto; /* Allow scrolling if content is too long */
+  overflow-y: auto;
+  box-shadow: var(--shadow-light);
 }
 
 .nav-items {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding: 0 1rem;
+  gap: 0.5rem;
+  padding: 0 1.5rem;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  color: #64748b;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  color: var(--text-secondary);
   text-decoration: none;
-  border-radius: 0.5rem;
-  transition: all 0.2s;
+  border-radius: var(--radius-large);
+  transition: all 0.2s ease;
   font-weight: 500;
+  font-size: 1rem;
+  border: 2px solid transparent;
 }
 
 .nav-item:hover {
-  background-color: #f1f5f9;
-  color: #0f766e;
+  background-color: var(--primary-blue-light);
+  color: var(--primary-blue);
+  border-color: var(--primary-blue-light);
+  transform: translateX(4px);
 }
 
 .nav-item.active {
-  background-color: #0f766e;
-  color: white;
+  background-color: var(--primary-blue);
+  color: var(--background-primary);
+  border-color: var(--primary-blue);
+  box-shadow: var(--shadow-medium);
 }
 
 .nav-item.active:hover {
-  background-color: #115e59;
+  background-color: var(--primary-blue-hover);
+  border-color: var(--primary-blue-hover);
+  transform: translateX(4px);
 }
 
 .nav-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+}
+
+.nav-label {
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .main-content {
   flex: 1;
-  padding: 2rem;
+  padding: 2.5rem;
   overflow-x: auto;
   overflow-y: auto;
   height: calc(100vh - var(--header-height));
   box-sizing: border-box;
+  background-color: var(--background-secondary);
 }
 
-/* Mobile Styles */
+/* Mobile Styles - Mayo Clinic Theme */
 @media (max-width: 768px) {
   .mobile-menu-toggle {
     display: block;
@@ -143,19 +202,23 @@ html, body {
 
   .layout-body {
     position: relative;
-    padding-top: var(--header-height); /* Use CSS custom property */
+    padding-top: var(--header-height);
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 
   .sidebar {
     position: fixed;
     top: var(--header-height);
-    left: -250px;
-    width: 250px;
+    left: -280px;
+    width: 280px;
     height: calc(100vh - var(--header-height));
     z-index: 999;
     transition: left 0.3s ease;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
     overflow-y: auto;
+    background: var(--background-primary);
   }
 
   .sidebar.mobile-open {
@@ -166,7 +229,7 @@ html, body {
     content: '';
     position: fixed;
     top: var(--header-height);
-    left: 250px;
+    left: 280px;
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
@@ -183,28 +246,31 @@ html, body {
 
 /* Card Styles for Content */
 .card {
-  background: white;
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-.card-header {
+  background: var(--background-primary);
+  border-radius: var(--radius-large);
+  padding: 2rem;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-light);
   margin-bottom: 1.5rem;
 }
 
+.card-header {
+  margin-bottom: 2rem;
+}
+
 .card-title {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--text-primary);
   margin: 0;
+  line-height: 1.3;
 }
 
 .card-description {
-  color: #64748b;
-  margin: 0.5rem 0 0 0;
-  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0.75rem 0 0 0;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 /* Button Styles */
@@ -212,38 +278,56 @@ html, body {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: var(--radius-medium);
   font-weight: 500;
   text-decoration: none;
-  border: none;
+  border: 2px solid transparent;
   cursor: pointer;
-  transition: all 0.2s;
-  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+  line-height: 1;
+  text-align: center;
+  justify-content: center;
+  min-height: 44px; /* Accessibility: minimum touch target */
 }
 
 .btn-primary {
-  background-color: #0f766e;
-  color: white;
+  background-color: var(--primary-blue);
+  color: var(--background-primary);
+  border-color: var(--primary-blue);
 }
 
 .btn-primary:hover {
-  background-color: #115e59;
+  background-color: var(--primary-blue-hover);
+  border-color: var(--primary-blue-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-medium);
 }
 
 .btn-secondary {
-  background-color: #f1f5f9;
-  color: #64748b;
+  background-color: var(--background-primary);
+  color: var(--text-secondary);
+  border-color: var(--border-medium);
 }
 
 .btn-secondary:hover {
-  background-color: #e2e8f0;
-  color: #334155;
+  background-color: var(--background-tertiary);
+  color: var(--text-primary);
+  border-color: var(--primary-blue);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-light);
 }
 
 .btn-sm {
-  padding: 0.5rem 1rem;
-  font-size: 0.8125rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  min-height: 36px;
+}
+
+.btn:focus {
+  outline: 2px solid var(--primary-blue);
+  outline-offset: 2px;
 }
 
 /* Improved responsive behavior */
