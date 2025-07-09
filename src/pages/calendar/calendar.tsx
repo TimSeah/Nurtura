@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Calendar.css";
 
 interface Event {
   title: string;
-  hour: string;
+  date: string;
+  startTime: string;
   remark: string;
+  month: string;
 }
 
 interface EventMap {
@@ -19,6 +21,21 @@ const daysOfWeek = [
   "Thursday",
   "Friday",
   "Saturday",
+];
+
+const monthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 function getDaysInMonth(year: number, month: number): number {
@@ -67,18 +84,34 @@ const Calendar: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const saveEvent = () => {
+  const saveEvent = async () => {
     if (!selectedDay) return;
-    const key = dateKey(selectedDay);
+
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const isoDate = new Date(
+      `${year}-${pad(month)}-${pad(selectedDay)}T00:00:00.000Z`
+    ).toISOString();
+
     const newEvent: Event = {
       title: formData.title,
-      hour: formData.hour,
+      date: isoDate,
+      startTime: formData.hour,
       remark: formData.remark,
+      month: monthNames[month],
     };
+
+    await fetch(`http://localhost:5000/api/events/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newEvent),
+    });
+
+    const key = dateKey(selectedDay);
     setEvents((prev) => ({
       ...prev,
       [key]: [...(prev[key] || []), newEvent],
     }));
+
     closeForm();
   };
 
@@ -101,7 +134,7 @@ const Calendar: React.FC = () => {
           <ul className="event-list">
             {(events[key] || []).map((ev, idx) => (
               <li key={idx} className="event-item">
-                {ev.hour} - {ev.title}
+                {ev.startTime} - {ev.title}
               </li>
             ))}
           </ul>
@@ -111,6 +144,39 @@ const Calendar: React.FC = () => {
 
     return cells;
   };
+
+  useEffect(() => {
+    const fetchEventsThisMonth = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/events/${monthNames[month]}`
+        );
+        if (!response.ok)
+          throw new Error("Failed to fetch events for this month");
+
+        const data: Event[] = await response.json();
+        const eventMap: EventMap = {};
+
+        data.forEach((event) => {
+          const day = new Date(event.date).getDate();
+          const key = dateKey(day);
+
+          if (!eventMap[key]) {
+            eventMap[key] = [];
+          }
+
+          eventMap[key].push(event);
+        });
+
+        setEvents(eventMap);
+      } catch (err) {
+        console.log("Error in fetching data for this month", err);
+      }
+    };
+
+    fetchEventsThisMonth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [year, month]);
 
   return (
     <div className="calendar-container">

@@ -103,7 +103,6 @@ app.use(function(err, req, res, next) {
   // Log the error for debugging purposes (server-side)
   console.error(err);
 
-  // Send a JSON error response to the client (React app)
   res.status(err.status || 500).json({
     message: err.message,
     // Only send stack trace in development for security reasons
