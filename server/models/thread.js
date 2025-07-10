@@ -13,7 +13,15 @@ const threadSchema = new mongoose.Schema({
     date:{
         type: Date,
         required: true
-    }
+    },
+    upvotes: {
+        type: Number,
+        default: 0
+    },
 }, {
     timestamps: true
 })
+
+const Thread = mongoose.model('Thread', threadSchema);
+
+module.exports = Thread;
