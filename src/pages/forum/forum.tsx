@@ -1,37 +1,47 @@
-import React, { use, useEffect, useState, type FormEvent, type ChangeEvent } from "react";
+import React, { useEffect, useState, type FormEvent, type ChangeEvent } from "react";
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 import "./forum.css";
 
 interface Thread {
   _id: number;
   title: string;
   content: string;
+  author?: string;
   date: string;
   upvotes: number;
+  replies: number;
 };
+
+const calculateDaysAgo = (date: string): string => {
+  const daysAgo = Math.floor((Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24));
+
+  return `${daysAgo} days ago`;
+}
 
 const Forum: React.FC = () => {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm]   = useState(false);
   const [form, setForm] = useState({ title: "", content: "" });
-
-  useEffect(() => {
-    fetch("/api/threads")
-    .then(res => {
-      if (!res.ok) {
-        throw new Error(`Error: ${res.status} ${res.statusText}`);
-      }
-      return res.json();
-    })
-    .then((data: Thread[]) => {
+  
+  
+  const fetchThreads = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/threads");
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      const data: Thread[] = await res.json();
       setThreads(data);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
       setLoading(false);
-    })
-    .catch(err => {
-      console.error("Failed to fetch threads:", err);
-      setError(err.message);
-      setLoading(false);
-    });
+    }
+  };
+  
+  useEffect(() => {
+    fetchThreads();
   }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -64,8 +74,12 @@ const Forum: React.FC = () => {
       }
       const newThread: Thread = await res.json();
 
+      setShowForm(false);
       setThreads(prev => [...prev, newThread]);
       setForm({ title: "", content: "" });
+
+      await fetchThreads();
+      
     }catch (err: any) {
         console.error("Failed to create thread:", err);
         alert(`Failed to create thread: ${err}`);
@@ -81,37 +95,106 @@ const Forum: React.FC = () => {
   }
 
   return (
-    <div className="forum-container">
-      <h1>Forum</h1>
-      
-      <form className="new-thread-form" onSubmit={handleSubmit}>
-        <input
-          name="title"
-          value={form.title}
-          onChange={handleChange}
-          placeholder="Thread title"
-          required
+    <div className="max-w-5xl mx-auto px-4 py-8 bg-gray-50 min-h-screen">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-800">Forum</h1>
+        <button onClick={() => setShowForm(true)} className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition">
+          + New Thread
+        </button>
+      </div>
+
+      {/* Modal Form */}
+      <Dialog open={showForm} onClose={setShowForm} className="relative z-10">  
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
         />
-        <textarea
-          name="content"
-          value={form.content}
-          onChange={handleChange}
-          placeholder="Thread content"
-          required
-        />
-        <button type="submit">Post Thread</button>
-      </form>
+
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <DialogPanel className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+              <DialogTitle as="h1" className="text-lg font-medium leading-6 text-gray-900 mb-4">
+                Create New Thread
+              </DialogTitle>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
+                  <input
+                    type="text"
+                    name="title"
+                    id="title"
+                    value={form.title}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="content" className="block text-sm font-medium text-gray-700">Content</label>
+                  <textarea
+                    name="content"
+                    id="content"
+                    value={form.content}
+                    onChange={handleChange}
+                    required
+                    rows={4}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
+                  />
+                </div>
+                {error && <p className="text-red-600">{error}</p>}
+                <div className="flex justify-end space-x-2">
+                  <button type="button" onClick={() => setShowForm(false)} className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition">
+                    Cancel
+                  </button>
+                  <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+                    Create Thread
+                  </button>
+                </div>
+              </form>
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Threads List */}
+      <div className="space-y-4">
       {threads.length === 0 ? <p>No threads yet</p> : threads.map(
         (t => (
-          <div key={t._id} className="thread">
-            <h2>{t.title}</h2>
-            <p>{t.content}</p>
-            <p className="thread-meta">
-              Posted on {new Date(t.date).toLocaleDateString()} | Upvotes: {t.upvotes}
-            </p>
+          <div key={t._id} className="flex items-start bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition border">
+            {/* Icon */}
+            {/* <div className={`w-10 h-10 flex items-center justify-center rounded-full mr-4 ${thread.color}`}> */}
+            <div className={`w-10 h-10 flex items-center justify-center rounded-full mr-4 bg-blue-100 text-blue-600`}>
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
+              </svg>
+            </div>
+            {/* Thread Info */}
+            <div className="flex-1">
+              <h2 className="text-md font-semibold text-gray-900">{t.title}</h2>
+              <p className="text-sm text-gray-600">{t.content}</p>
+              <p className="text-sm mt-1 text-blue-500">
+                Re: {"A tired caregiver"} <span className="text-gray-400">• {calculateDaysAgo(t.date)}</span>
+              </p>
+            </div>
+            {/* Upvotes + Replies */}
+            <div className="ml-4 flex flex-col items-center justify-center text-sm text-gray-500 whitespace-nowrap">
+              <div className="flex items-center gap-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M3 10h4v10h6V10h4L10 0 3 10z" />
+                </svg>
+                {t.upvotes}
+              </div>
+              <div className="flex items-center gap-1 mt-1">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
+                </svg>
+                {0}
+              </div>
+            </div>
           </div>
         ))
       )}
+      </div>
     </div>
     )
   };
