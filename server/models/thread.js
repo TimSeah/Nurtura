@@ -10,6 +10,11 @@ const threadSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    author: {
+        type: String,
+        required: true,
+        trim: true
+    },
     date:{
         type: Date,
         required: true

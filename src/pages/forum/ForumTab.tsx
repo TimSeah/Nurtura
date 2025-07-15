@@ -58,7 +58,7 @@ const ForumTab: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Forum</h1>
+        <h1 className="text-3xl text-gray-800">Forum</h1>
         <button className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition">
           + New Thread
         </button>

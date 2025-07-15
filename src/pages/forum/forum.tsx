@@ -2,6 +2,8 @@ import React, { useEffect, useState, type FormEvent, type ChangeEvent } from "re
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 import "./forum.css";
 
+const currentUser = "A good grandkid";
+
 interface Thread {
   _id: number;
   title: string;
@@ -23,8 +25,12 @@ const Forum: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm]   = useState(false);
-  const [form, setForm] = useState({ title: "", content: "" });
-  
+  const [form, setForm] = useState({ title: "", content: ""});
+  const [showUserThreads, setShowUserThreads] = useState(false);
+
+  const visibleThreads = showUserThreads
+  ? threads.filter(t => t.author === currentUser)
+  : threads;
   
   const fetchThreads = async () => {
     setLoading(true);
@@ -64,6 +70,7 @@ const Forum: React.FC = () => {
         body: JSON.stringify({ 
           title: form.title, 
           content: form.content,
+          author: currentUser,
           date: new Date().toISOString(),
           upvotes: 0,
         }),
@@ -76,7 +83,7 @@ const Forum: React.FC = () => {
 
       setShowForm(false);
       setThreads(prev => [...prev, newThread]);
-      setForm({ title: "", content: "" });
+      setForm({ title: "", content: ""});
 
       await fetchThreads();
       
@@ -98,9 +105,14 @@ const Forum: React.FC = () => {
     <div className="max-w-5xl mx-auto px-4 py-8 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Forum</h1>
+        <div className="flex gap-4">
+        <button onClick={() => setShowUserThreads(prev => !prev)} className={`${showUserThreads ? "bg-gray-200 hover:bg-gray-300" : "bg-gray-200 hover:bg-gray-300"} text-sm px-4 py-2 rounded-md shadow-sm transition`}>
+          {showUserThreads ? "Show All Threads" : "My Threads"}
+        </button>
         <button onClick={() => setShowForm(true)} className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition">
           + New Thread
         </button>
+        </div>
       </div>
 
       {/* Modal Form */}
@@ -158,7 +170,7 @@ const Forum: React.FC = () => {
 
       {/* Threads List */}
       <div className="space-y-4">
-      {threads.length === 0 ? <p>No threads yet</p> : threads.map(
+      {visibleThreads.length === 0 ? (<p>No threads yet</p>) : (visibleThreads.map
         (t => (
           <div key={t._id} className="flex items-start bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition border">
             {/* Icon */}
@@ -173,7 +185,7 @@ const Forum: React.FC = () => {
               <h2 className="text-md font-semibold text-gray-900">{t.title}</h2>
               <p className="text-sm text-gray-600">{t.content}</p>
               <p className="text-sm mt-1 text-blue-500">
-                Re: {"A tired caregiver"} <span className="text-gray-400">• {calculateDaysAgo(t.date)}</span>
+                Re: {t.author} <span className="text-gray-400">• {calculateDaysAgo(t.date)}</span>
               </p>
             </div>
             {/* Upvotes + Replies */}
