@@ -69,7 +69,6 @@ const Forum: React.FC = () => {
           author: currentUser,
           date: new Date().toISOString(),
           upvotes: 0,
-          author: "A tired caregiver" // To be replaced with actual user
         }),
       });
       
