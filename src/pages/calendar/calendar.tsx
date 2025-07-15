@@ -223,7 +223,8 @@ const Calendar: React.FC = () => {
                   openEditForm(key, idx);
                 }}
               >
-                {ev.title}
+                <div>{ev.title} </div>
+                <div className="time">{ev.startTime}</div>
               </button>
             ))}
           </ul>

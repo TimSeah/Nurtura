@@ -66,6 +66,7 @@
 
 .calendar-day.empty {
   background: none;
+  border: white 3px solid;
 }
 
 /* Base styles from previous code */
@@ -73,6 +74,9 @@
 .day-number {
   font-weight: bold;
   margin-bottom: 0.25rem;
+  justify-self: left;
+  padding: 5px 12px;
+  font-size: 18px;
 }
 
 .event-list {
@@ -83,38 +87,74 @@
 }
 
 .event-list button {
-  border: none;
+    border-left-style: solid;
+  border-left-width: 5px;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
   font-weight: bold;
 }
 
-.event-item:nth-child(5n+1) { background-color: rgb(255, 171, 171); color: rgb(89, 41, 41)}
-.event-item:nth-child(5n+2) { background-color:  rgb(243, 253, 156); color: rgb(74, 79, 28)}
-.event-item:nth-child(5n+3) { background-color: rgb(152, 255, 169); color: rgb(36, 73, 43)}
-.event-item:nth-child(5n+4) { background-color: rgb(233, 175, 240); color: rgb(68, 30, 73)}
-.event-item:nth-child(5n+5) { background-color: rgb(162, 255, 255); color: rgb(27, 70, 70)}
+.event-item:nth-child(5n+1) { 
+    background-color: rgb(255, 235, 235); 
+    color: rgb(89, 41, 41);
+    border-left-color: rgb(252, 161, 161);
+}
+.event-item:nth-child(5n+2) { 
+    background-color: rgb(250, 255, 209); 
+    color: rgb(94, 101, 36);
+    border-left-color: rgb(201, 209, 124);
+}
+.event-item:nth-child(5n+3) { 
+    background-color: rgb(207, 255, 216); 
+    color: rgb(36, 73, 43);
+    border-left-color: rgb(111, 190, 125);
+}
+.event-item:nth-child(5n+4) { 
+    background-color: rgb(252, 228, 255); 
+    color: rgb(68, 30, 73);
+    border-left-color: rgb(197, 145, 203);
+}
+.event-item:nth-child(5n+5) { 
+    background-color: rgb(189, 255, 255); 
+    color: rgb(27, 70, 70);
+    border-left-color: rgb(110, 176, 176);
+}
 
 .event-item {
   margin-top: 0px;
-  padding: 2px 4px;
-  border-radius: 0px;
+  padding: 4px 12px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   width: 100%;
-  height: 30px;
-  justify-self: center;
+  height: auto;
+  font-size: medium;
+}
+
+.event-item:hover {
+  border-left-width: 8px;
+  padding-left: 15px;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.event-item div {
+  align-self: left;
+  justify-self: left;
+}
+.event-item .time {
+  font-size: small;
 }
 
 /* .event-item::before {
-  content: "";
+  content: "i";
+  color: black;
   left: 0;
-  top: 2px;
-  bottom: 2px;
-  width: 40px;
-  background-color: #000000; /* Dark gray color */
-  /* border-radius: 2px;
-  position: absolute;
-} */ */
+  width: 400px;
+  background-color: #000000; 
+  border-radius: 2px;
+}  */
 
 /* Modal */
 
