@@ -113,11 +113,10 @@ html, body {
 .layout-body {
   display: flex;
   flex: 1;
-  max-width: 1200px;
   margin: 0 auto;
   width: 100%;
-  padding-top: var(--header-height); /* Use CSS custom property */
-  min-height: calc(100vh - var(--header-height));
+  padding-top: calc(var(--header-height) - 20px); /* Use CSS custom property */
+
 }
 
 .sidebar {
@@ -125,7 +124,6 @@ html, body {
   background: var(--background-primary);
   border-right: 1px solid var(--border-light);
   padding: 2rem 0;
-  height: calc(100vh - var(--header-height));
   position: sticky;
   top: 0;
   overflow-y: auto;
@@ -186,10 +184,10 @@ html, body {
 
 .main-content {
   flex: 1;
-  padding: 2.5rem;
+  padding: 0;
   overflow-x: auto;
   overflow-y: auto;
-  height: calc(100vh - var(--header-height));
+  height: 100%;
   box-sizing: border-box;
   background-color: var(--background-secondary);
 }
