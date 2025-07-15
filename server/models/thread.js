@@ -18,6 +18,11 @@ const threadSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    author: {
+        type: String,
+        // ref: 'User',
+        required: true
+    },
 }, {
     timestamps: true
 })

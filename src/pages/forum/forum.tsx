@@ -1,22 +1,18 @@
 import React, { useEffect, useState, type FormEvent, type ChangeEvent } from "react";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 import "./forum.css";
+import { Link } from "react-router-dom";
+import { calculateDaysAgo } from "./utils";
 
 interface Thread {
   _id: number;
   title: string;
   content: string;
-  author?: string;
+  author: string;
   date: string;
   upvotes: number;
   replies: number;
 };
-
-const calculateDaysAgo = (date: string): string => {
-  const daysAgo = Math.floor((Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24));
-
-  return `${daysAgo} days ago`;
-}
 
 const Forum: React.FC = () => {
   const [threads, setThreads] = useState<Thread[]>([]);
@@ -66,9 +62,10 @@ const Forum: React.FC = () => {
           content: form.content,
           date: new Date().toISOString(),
           upvotes: 0,
+          author: "A tired caregiver" // To be replaced with actual user
         }),
       });
-
+      
       if (!res.ok) {
         throw new Error(await res.text());
       }
@@ -160,7 +157,7 @@ const Forum: React.FC = () => {
       <div className="space-y-4">
       {threads.length === 0 ? <p>No threads yet</p> : threads.map(
         (t => (
-          <div key={t._id} className="flex items-start bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition border">
+          <Link key={t._id} to={`/threads/${t._id}`} className="flex items-start bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition border">
             {/* Icon */}
             {/* <div className={`w-10 h-10 flex items-center justify-center rounded-full mr-4 ${thread.color}`}> */}
             <div className={`w-10 h-10 flex items-center justify-center rounded-full mr-4 bg-blue-100 text-blue-600`}>
@@ -173,7 +170,7 @@ const Forum: React.FC = () => {
               <h2 className="text-md font-semibold text-gray-900">{t.title}</h2>
               <p className="text-sm text-gray-600">{t.content}</p>
               <p className="text-sm mt-1 text-blue-500">
-                Re: {"A tired caregiver"} <span className="text-gray-400">• {calculateDaysAgo(t.date)}</span>
+                Re: {t.author} <span className="text-gray-400">• {calculateDaysAgo(t.date)}</span>
               </p>
             </div>
             {/* Upvotes + Replies */}
@@ -188,15 +185,15 @@ const Forum: React.FC = () => {
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
                 </svg>
-                {0}
+                {0} {/* replies */}
               </div>
             </div>
-          </div>
+          </Link>
         ))
       )}
       </div>
     </div>
-    )
-  };
+  )
+};
 
 export default Forum;
