@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router(); // Create a new Express router
-const Thread = require('../models/thread'); // Import your Thread Mongoose model
+const Thread = require('../models/Thread'); // Import the Thread model
 
 // --- GET All Threads ---
 // Route: GET /api/threads

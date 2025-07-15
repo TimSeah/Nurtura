@@ -14,9 +14,10 @@ interface ThreadDetail{
 
 interface ThreadDetailProps {
   thread: ThreadDetail;
+  onCommentClick: () => void;
 }
 
-const ThreadPost: React.FC<ThreadDetailProps> = ({ thread }) => {
+const ThreadPost: React.FC<ThreadDetailProps> = ({ thread, onCommentClick }) => {
     return (
     <article className="max-w-3xl mx-auto bg-white rounded-2xl shadow p-6">
         {/* Header */}
@@ -47,13 +48,12 @@ const ThreadPost: React.FC<ThreadDetailProps> = ({ thread }) => {
                 </span>
             </button>
             <button
+            onClick={onCommentClick}
             className="flex items-center space-x-1 hover:text-blue-600 transition"
-            aria-label="View replies"
+            aria-label="Add Comment"
             >
                 <ChatBubbleBottomCenterIcon className="w-5 h-5" />
-                <span>
-                    {thread.replies} replies
-                </span>
+                <span>Comment</span>
             </button>
         </footer>
     </article>
