@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router(); // Create a new Express router
-const Thread = require('../models/thread'); // Import your Thread Mongoose model
+const Thread = require('../models/Thread'); // Import the Thread model
 
 // --- GET All Threads ---
 // Route: GET /api/threads
@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 // This route will create a new thread document in the database.
 router.post('/', async (req, res) => {
   // Extract thread data from the request body
-  const { title, content, author, date, upvotes} = req.body;
+  const { title, content, date, upvotes, author} = req.body;
 
   // Create a new Thread instance using the Mongoose model
   // Mongoose will automatically validate the data against the schema.
@@ -31,7 +31,8 @@ router.post('/', async (req, res) => {
     content,
     author,
     date: new Date(date), // Convert the date string from frontend to a Date object
-    upvotes
+    upvotes,
+    author
   });
 
   try {
@@ -45,6 +46,26 @@ router.post('/', async (req, res) => {
     // log it and send a 400 (Bad Request) or 500 (Internal Server Error) response.
     console.error('Error creating thread:', err);
     res.status(400).json({ message: err.message }); // 400 for validation errors
+  }
+});
+
+router.get('/:id', async (req, res) => {
+  const threadId = req.params.id; // Get the thread ID from the request parameters
+  try {
+    // Find the thread by ID
+    const thread = await Thread.findById(threadId);
+    
+    // If the thread is not found, send a 404 (Not Found) response
+    if (!thread) {
+      return res.status(404).json({ message: 'Thread not found' });
+    }
+
+    // Send the found thread as a JSON response
+    res.json(thread);
+  } catch (err) {
+    // If an error occurs, log it and send a 500 (Internal Server Error) response
+    console.error('Error fetching thread:', err);
+    res.status(500).json({ message: err.message });
   }
 });
 

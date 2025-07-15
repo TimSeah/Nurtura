@@ -17,11 +17,16 @@ const threadSchema = new mongoose.Schema({
     },
     date:{
         type: Date,
-        required: true
+        default: Date.now
     },
     upvotes: {
         type: Number,
         default: 0
+    },
+    author: {
+        type: String,
+        // ref: 'User',
+        required: true
     },
 }, {
     timestamps: true
