@@ -27,7 +27,7 @@ const ThreadPost: React.FC<ThreadDetailProps> = ({ thread, onCommentClick }) => 
             </h1>
             <div className="flex items-center text-sm text-gray-500 mt-1">
                 <span>
-                    By <span className="font-medium text-gray-700">{thread.author}</span>
+                    By <span className="font-medium text-gray-700">{thread.author}</span> {calculateDaysAgo(thread.date)}
                 </span>
             </div>
         </header>

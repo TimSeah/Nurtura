@@ -10,6 +10,7 @@ require('dotenv').config();
 const indexRouter = require('./routes/index');
 const eventsRouter = require('./routes/events');
 const threadsRouter = require('./routes/thread');
+const commentRouter = require('./routes/comment');
 
 const app = express();
 
@@ -60,7 +61,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // API routes
 app.use('/', indexRouter);
 app.use('/api/events', eventsRouter);
-app.use('/api/threads', threadsRouter); //  connects to your frontend fetch('/api/threads')
+app.use('/api/threads', threadsRouter); 
+app.use('/api/threads/:threadId/comments', commentRouter);
 
 // 404 handler
 app.use((req, res, next) => {
