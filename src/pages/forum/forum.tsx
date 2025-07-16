@@ -181,7 +181,7 @@ const Forum: React.FC = () => {
               <h2 className="text-md font-semibold text-gray-900">{t.title}</h2>
               <p className="text-sm text-gray-600">{t.content}</p>
               <p className="text-sm mt-1 text-blue-500">
-                Re: {t.author} <span className="text-gray-400">• {calculateDaysAgo(t.date)}</span>
+                By: {t.author} <span className="text-gray-400">• {calculateDaysAgo(t.date)}</span>
               </p>
             </div>
             {/* Upvotes + Replies */}

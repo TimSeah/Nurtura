@@ -5,6 +5,8 @@ import { useParams } from "react-router-dom";
 import ThreadPost from "./threadPost";
 import Comment from "./comment";
 
+const currentUser = "Good Commenter";
+
 interface ThreadDetail{
     _id: number;
     title: string;
@@ -86,7 +88,7 @@ const ThreadDetail: React.FC = () => {
                 body: JSON.stringify({
                     threadId: id,
                     content: form.content,
-                    author: "A tired caregiver", // To be replaced with actual user
+                    author: currentUser, // To be replaced with actual user
                     date: new Date().toISOString()
                 }),
             });
@@ -138,12 +140,18 @@ const ThreadDetail: React.FC = () => {
                             placeholder="Write a comment…"
                             required
                             />
+                            <div className="flex justify-end space-x-2">
+                            <button type="button" onClick={() => setShowForm(false)} className="self-end px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300 transition"
+                            >
+                                Cancel
+                            </button>
                             <button
                             type="submit"
                             className="self-end px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-800 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none"
                             >
                                 Post comment
                             </button>
+                            </div>
                         </form>
                     )}
                     {/* --- Comments List --- */}
