@@ -28,6 +28,10 @@ const eventSchema = new mongoose.Schema({
     type: String,     // Data type is String
     required: true    // This field is mandatory
   },
+  month: {
+    type: String,
+    required: true
+  },
   // Optional remarks or notes about the event
   remark: {
     type: String,     // Data type is String
@@ -46,5 +50,13 @@ const eventSchema = new mongoose.Schema({
 // Mongoose will automatically pluralize this to 'events' for the collection name in MongoDB.
 // The second argument is the schema we just defined.
 const Event = mongoose.model('Event', eventSchema);
+
+eventSchema.methods.getDay = function () {
+  return this.date.getDate(); // returns 1–31
+};
+
+eventSchema.methods.getMonth = function () {
+  return this.date.getMonth();
+};
 
 module.exports = Event;

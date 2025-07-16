@@ -1,0 +1,145 @@
+/* AppointmentModal Component Styles */
+
+.appointment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.appointment-form .form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.appointment-form .form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.appointment-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.appointment-form .form-group label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.appointment-form .form-group input,
+.appointment-form .form-group select,
+.appointment-form .form-group textarea {
+  padding: 0.625rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.appointment-form .form-group input:focus,
+.appointment-form .form-group select:focus,
+.appointment-form .form-group textarea:focus {
+  outline: none;
+  border-color: #0f766e;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+}
+
+.duration-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.duration-input-group input {
+  flex: 1;
+}
+
+.duration-unit {
+  color: #64748b;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.reminder-section {
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.reminder-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.reminder-checkbox input {
+  margin: 0;
+  width: auto;
+  height: auto;
+}
+
+.reminder-checkbox label {
+  font-weight: 600 !important;
+  color: #1e293b;
+  cursor: pointer;
+  margin: 0;
+}
+
+.reminder-time-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.reminder-time-group select {
+  flex: 1;
+}
+
+.appointment-providers {
+  max-height: 120px;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  background: #f8fafc;
+}
+
+.provider-option {
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background: none;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #4b5563;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.provider-option:hover {
+  background: #e2e8f0;
+}
+
+.provider-option:focus {
+  outline: none;
+  background: #e2e8f0;
+}
+
+@media (max-width: 768px) {
+  .appointment-form .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .duration-input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .reminder-time-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
