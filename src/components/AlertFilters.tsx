@@ -1,5 +1,5 @@
 import React from 'react';
-import { Filter } from 'lucide-react';
+// import { Filter } from 'lucide-react';
 import { ALERT_FILTER_TYPES } from '../utils/alertUtils';
 
 interface AlertFiltersProps {
@@ -19,7 +19,7 @@ const AlertFilters: React.FC<AlertFiltersProps> = ({
     <div className="card">
       <div className="alert-filters">
         <div className="filter-group">
-          <Filter className="filter-icon" />
+          {/* <Filter className="filter-icon" /> */}
           <select 
             value={filterType} 
             onChange={(e) => onFilterTypeChange(e.target.value)}
