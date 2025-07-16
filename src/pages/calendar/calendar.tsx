@@ -8,6 +8,7 @@ interface Event {
   startTime: string;
   remark: string;
   month: string;
+  userId: string;
 }
 
 interface EventMap {
@@ -161,6 +162,7 @@ const Calendar: React.FC = () => {
       startTime: formData.hour,
       remark: formData.remark,
       month: monthNames[month],
+      userId: defaultId, // CHANGE TO ACTUAL USER ID LATER
     };
 
     await fetch(`http://localhost:5000/api/events/`, {
@@ -235,11 +237,13 @@ const Calendar: React.FC = () => {
     return cells;
   };
 
+  const defaultId = "123";
+
   useEffect(() => {
     const fetchEventsThisMonth = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/events/${monthNames[month]}`
+          `http://localhost:5000/api/events/month/${monthNames[month]}/${defaultId}`
         );
         if (!response.ok)
           throw new Error("Failed to fetch events for this month");
