@@ -13,6 +13,7 @@ import Settings from "./pages/Settings.tsx";
 import Forum from "./pages/forum/forum";
 import ForumTab from './pages/forum/ForumTab';
 import ThreadDetail from "./pages/forum/threadDetail";
+import ResourcesAlt from "./pages/ResorucesAlt.tsx";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/health" element={<HealthTracking />} />
         <Route path="/care-circle" element={<CareCircle />} />
         <Route path="/resources" element={<Resources />} />
+        <Route path="/resourcesAlt" element={<ResourcesAlt />} />
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
