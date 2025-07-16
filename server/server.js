@@ -1,39 +1,34 @@
-const createError = require('http-errors'); // For creating HTTP error objects
-const express = require('express');       // The core Express.js framework
-const path = require('path');             // For working with file and directory paths
-const cookieParser = require('cookie-parser'); // Middleware for parsing cookies
-const logger = require('morgan');         // HTTP request logger middleware
-const mongoose = require('mongoose');     // Mongoose for MongoDB object modeling
-const cors = require('cors');             // CORS middleware for cross-origin requests
-require('dotenv').config();               // Load environment variables from .env file
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const mongoose = require('mongoose');
+const cors = require('cors');
+require('dotenv').config();
 
+const app = express();
 
-process.on('SIGINT', cleanup);  
-process.on('SIGTERM', cleanup); 
+// Handle graceful shutdown
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);
 
-// Function to clean up resources before exiting
 async function cleanup() {
   console.log('Server shutting down...');
   try {
-    if (mongoose.connection.readyState === 1) { // Check if connection is open
-      await mongoose.disconnect(); // Disconnect from MongoDB
+    if (mongoose.connection.readyState === 1) {
+      await mongoose.disconnect();
       console.log('MongoDB disconnected due to app termination');
     }
-    process.exit(0); // Exit successfully
+    process.exit(0);
   } catch (err) {
     console.error('Error during cleanup:', err);
-    process.exit(1); // Exit with error
+    process.exit(1);
   }
 }
 
-// --- Initialize Express Application ---
-const app = express();
-
-// --- MongoDB Connection ---
-// Mongoose connects to your MongoDB database using the connection string
-// provided in the MONGO_URI environment variable from your .env file.
+// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
-  // Recommended options for stable connections with the latest MongoDB driver
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -47,8 +42,6 @@ mongoose.connect(process.env.MONGO_URI, {
 })
 .catch(err => {
   console.error('MongoDB connection error:', err);
-  // If the database connection fails, exit the process as the server
-  // cannot function without it.
   process.exit(1);
 });
 
@@ -80,12 +73,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Import your route handlers.
 // You will create these files (e.g., './routes/index.js', './routes/events.js')
 // to define your API endpoints for different resources.
-const indexRouter = require('./routes/index'); 
+const indexRouter = require('./routes/index');
 const eventsRouter = require('./routes/events');
+const threadsRouter = require('./routes/thread');
+const commentRouter = require('./routes/comment');
 
 // Assign imported routers to specific URL paths.
 app.use('/', indexRouter);
 app.use('/api/events', eventsRouter); 
+app.use('/api/threads', threadsRouter); 
+app.use('/api/threads/:threadId/comments', commentRouter);
 
 // --- Error Handling Middleware ---
 
