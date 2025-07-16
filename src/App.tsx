@@ -10,9 +10,6 @@ import CareCircle from "./pages/CareCircle.tsx";
 import Resources from "./pages/Resources.tsx";
 import Alerts from "./pages/Alerts.tsx";
 import Settings from "./pages/Settings.tsx";
-
-import Calendar from "./pages/calendar/calendar";
-import Home from "./pages/home";
 import Forum from "./pages/forum/forum";
 import ForumTab from './pages/forum/ForumTab';
 import ThreadDetail from "./pages/forum/threadDetail";
