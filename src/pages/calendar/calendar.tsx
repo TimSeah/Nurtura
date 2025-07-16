@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Calendar.css";
 
 interface Event {
+  _id?: string;
   title: string;
-  hour: string;
+  date: string;
+  startTime: string;
   remark: string;
+  month: string;
+  userId: string;
 }
 
 interface EventMap {
@@ -19,6 +23,21 @@ const daysOfWeek = [
   "Thursday",
   "Friday",
   "Saturday",
+];
+
+const monthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 function getDaysInMonth(year: number, month: number): number {
@@ -38,6 +57,17 @@ const Calendar: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [formData, setFormData] = useState({ title: "", hour: "", remark: "" });
 
+  const [editingEvent, setEditingEvent] = useState<{
+    key: string;
+    index: number;
+  } | null>(null);
+
+  const [editFormData, setEditFormData] = useState({
+    title: "",
+    hour: "",
+    remark: "",
+  });
+
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
@@ -56,8 +86,20 @@ const Calendar: React.FC = () => {
     setFormData({ title: "", hour: "", remark: "" });
   };
 
+  const openEditForm = (key: string, index: number) => {
+    const event = events[key][index];
+    console.log("Editing event:", event);
+    setEditingEvent({ key, index });
+    setEditFormData({
+      title: event.title,
+      hour: event.startTime,
+      remark: event.remark,
+    });
+  };
+
   const closeForm = () => {
     setSelectedDay(null);
+    setEditingEvent(null);
   };
 
   const handleInputChange = (
@@ -67,19 +109,94 @@ const Calendar: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const saveEvent = () => {
+  const handleEditInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const updateEvent = async () => {
+    if (!editingEvent) return;
+    const { key, index } = editingEvent;
+    const event = events[key][index];
+
+    const updatedEvent: Event = {
+      ...event,
+      title: editFormData.title,
+      startTime: editFormData.hour,
+      remark: editFormData.remark,
+    };
+
+    try {
+      await fetch(`http://localhost:5000/api/events/${event._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedEvent),
+      });
+
+      setEvents((prev) => {
+        const updatedEvents = [...prev[key]];
+        updatedEvents[index] = updatedEvent;
+        return { ...prev, [key]: updatedEvents };
+      });
+      setEditingEvent(null);
+    } catch (error) {
+      console.error("Error updating event: ", error);
+    }
+
+    closeForm();
+  };
+
+  const saveEvent = async () => {
     if (!selectedDay) return;
-    const key = dateKey(selectedDay);
+
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const isoDate = new Date(
+      `${year}-${pad(month + 1)}-${pad(selectedDay)}T00:00:00.000Z`
+    ).toISOString();
+
     const newEvent: Event = {
       title: formData.title,
-      hour: formData.hour,
+      date: isoDate,
+      startTime: formData.hour,
       remark: formData.remark,
+      month: monthNames[month],
+      userId: defaultId, // CHANGE TO ACTUAL USER ID LATER
     };
+
+    await fetch(`http://localhost:5000/api/events/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newEvent),
+    });
+
+    const key = dateKey(selectedDay);
     setEvents((prev) => ({
       ...prev,
       [key]: [...(prev[key] || []), newEvent],
     }));
+
     closeForm();
+  };
+
+  const deleteEvent = async (key: string, index: number) => {
+    const event = events[key][index];
+    try {
+      await fetch(`http://localhost:5000/api/events/${event._id}`, {
+        method: "DELETE",
+        // headers: { "Content-Type": "application/json"},
+        // body: JSON.stringify(event),
+      });
+      setEvents((prev) => {
+        const updatedEvents = [...prev[key]];
+        updatedEvents.splice(index, 1);
+        return { ...prev, [key]: updatedEvents };
+      });
+      setEditingEvent(null);
+    } catch (error) {
+      console.error("Error deleting event: ", error);
+    }
   };
 
   const generateCalendarCells = () => {
@@ -100,9 +217,17 @@ const Calendar: React.FC = () => {
           <div className="day-number">{day}</div>
           <ul className="event-list">
             {(events[key] || []).map((ev, idx) => (
-              <li key={idx} className="event-item">
-                {ev.hour} - {ev.title}
-              </li>
+              <button
+                key={idx}
+                className={`event-item`}
+                style={{ "--color-index": day % 5 } as React.CSSProperties}
+                onClick={() => {
+                  openEditForm(key, idx);
+                }}
+              >
+                <div>{ev.title} </div>
+                <div className="time">{ev.startTime}</div>
+              </button>
             ))}
           </ul>
         </div>
@@ -111,6 +236,41 @@ const Calendar: React.FC = () => {
 
     return cells;
   };
+
+  const defaultId = "123";
+
+  useEffect(() => {
+    const fetchEventsThisMonth = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/events/month/${monthNames[month]}/${defaultId}`
+        );
+        if (!response.ok)
+          throw new Error("Failed to fetch events for this month");
+
+        const data: Event[] = await response.json();
+        const eventMap: EventMap = {};
+
+        data.forEach((event) => {
+          const day = new Date(event.date).getDate();
+          const key = dateKey(day);
+
+          if (!eventMap[key]) {
+            eventMap[key] = [];
+          }
+
+          eventMap[key].push(event);
+        });
+
+        setEvents(eventMap);
+      } catch (err) {
+        console.log("Error in fetching data for this month", err);
+      }
+    };
+
+    fetchEventsThisMonth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [year, month]);
 
   return (
     <div className="calendar-container">
@@ -145,28 +305,55 @@ const Calendar: React.FC = () => {
       {selectedDay && (
         <div className="modal-backdrop" onClick={closeForm}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Schedule Event in {dateKey(selectedDay)}</h3>
+            <h3>
+              {editingEvent ? "Edit Event" : "Schedule Event"} in{" "}
+              {dateKey(selectedDay)}
+            </h3>
             <input
               type="text"
               name="title"
-              placeholder="Event title"
-              value={formData.title}
-              onChange={handleInputChange}
+              placeholder={
+                editingEvent ? editFormData.title : "e.g. Doctor's Appointment"
+              }
+              value={editingEvent ? editFormData.title : formData.title}
+              onChange={
+                editingEvent ? handleEditInputChange : handleInputChange
+              }
             />
             <input
               type="time"
               name="hour"
-              value={formData.hour}
-              onChange={handleInputChange}
+              value={editingEvent ? editFormData.hour : formData.hour}
+              onChange={
+                editingEvent ? handleEditInputChange : handleInputChange
+              }
             />
             <textarea
               name="remark"
-              placeholder="Remarks..."
-              value={formData.remark}
-              onChange={handleInputChange}
+              placeholder={
+                editingEvent
+                  ? editFormData.remark
+                  : "Add remarks e.g. bring documents"
+              }
+              value={editingEvent ? editFormData.remark : formData.remark}
+              onChange={
+                editingEvent ? handleEditInputChange : handleInputChange
+              }
             ></textarea>
             <div className="modal-buttons">
-              <button onClick={saveEvent}>Save</button>
+              <button onClick={editingEvent ? updateEvent : saveEvent}>
+                Save
+              </button>
+              {editingEvent && (
+                <button
+                  onClick={() => {
+                    deleteEvent(editingEvent.key, editingEvent.index);
+                    closeForm();
+                  }}
+                >
+                  Delete
+                </button>
+              )}
               <button onClick={closeForm}>Cancel</button>
             </div>
           </div>
