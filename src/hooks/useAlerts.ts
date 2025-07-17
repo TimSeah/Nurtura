@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Alert } from '../types';
-import { dataService } from '../services/dataService';
+import { apiService } from '../services/apiService';
 import { filterAlerts, calculateAlertCounts } from '../utils/alertUtils';
 
 interface UseAlertsReturn {
@@ -26,12 +26,13 @@ export const useAlerts = (): UseAlertsReturn => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load alerts from data service
+  // Load alerts from backend API  
   const loadAlerts = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const alertsData = dataService.getAlerts();
+      // Using a default recipient ID - in a real app, this would come from auth context
+      const alertsData = await apiService.getAlerts('1'); // Default recipient ID
       setAlerts(alertsData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load alerts');
@@ -46,24 +47,26 @@ export const useAlerts = (): UseAlertsReturn => {
   }, [loadAlerts]);
 
   // Mark alert as read
-  const handleMarkAsRead = useCallback((id: string) => {
+  const handleMarkAsRead = useCallback(async (id: string) => {
     try {
-      dataService.markAlertAsRead(id);
-      setAlerts(dataService.getAlerts());
+      await apiService.markAlertAsRead(id);
+      // Reload alerts after marking as read
+      loadAlerts();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to mark alert as read');
     }
-  }, []);
+  }, [loadAlerts]);
 
   // Remove alert
-  const handleRemoveAlert = useCallback((id: string) => {
+  const handleRemoveAlert = useCallback(async (id: string) => {
     try {
-      dataService.removeAlert(id);
-      setAlerts(dataService.getAlerts());
+      await apiService.deleteAlert(id);
+      // Reload alerts after deletion
+      loadAlerts();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to remove alert');
     }
-  }, []);
+  }, [loadAlerts]);
 
   // Refresh alerts manually
   const refreshAlerts = useCallback(() => {

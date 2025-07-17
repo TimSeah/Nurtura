@@ -82,6 +82,9 @@ const eventsRouter = require('./routes/events');
 const threadsRouter = require('./routes/thread');
 const commentRouter = require('./routes/comment');
 const userSettingsRouter = require('./routes/userSettings');
+const vitalSignsRouter = require('./routes/vitalSigns');
+const careRecipientsRouter = require('./routes/careRecipients');
+const alertsRouter = require('./routes/alerts');
 
 // Import and start email reminder service
 const { startReminderService } = require('./services/emailReminderService');
@@ -92,6 +95,9 @@ app.use('/api/events', eventsRouter);
 app.use('/api/threads', threadsRouter); 
 app.use('/api/threads/:threadId/comments', commentRouter);
 app.use('/api/user-settings', userSettingsRouter);
+app.use('/api/vital-signs', vitalSignsRouter);
+app.use('/api/care-recipients', careRecipientsRouter);
+app.use('/api/alerts', alertsRouter);
 
 // --- Error Handling Middleware ---
 

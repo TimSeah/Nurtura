@@ -18,6 +18,27 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get today's events for dashboard
+router.get('/today', async (req, res) => {
+  try {
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    
+    const events = await Event.find({
+      date: {
+        $gte: startOfDay,
+        $lt: endOfDay
+      }
+    }).sort({ startTime: 1 });
+    
+    res.json(events);
+  } catch (err) {
+    console.error('❌ Error fetching today\'s events:', err.message);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 router.post('/', async (req, res) => {
   const { title, date, startTime, month, remark, userId } = req.body;
 
