@@ -31,3 +31,6 @@ dist
 *.env
 frontend/.env
 backend/.env
+
+# Misc Folders
+misc
