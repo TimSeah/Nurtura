@@ -7,9 +7,20 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Build
-node_modules
-dist
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Build directories
+node_modules/
+dist/
+build/
 *.local
 
 # Editor directories and files
@@ -24,13 +35,48 @@ dist
 *.sw?
 
 # Environment variables
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-*.env
+server/.env
 frontend/.env
 backend/.env
 
+# Email service secrets
+**/gmail_credentials.json
+**/oauth_tokens.json
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+data/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# OS generated files
+Thumbs.db
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
 # Misc Folders
-misc
+misc/
+uploads/
+public/uploads/
+
+# Production builds
+/dist
+/build
+
+# Local development
+.cache/
+server/.env

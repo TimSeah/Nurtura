@@ -1,194 +1,216 @@
-# EmailJS Demo - Appointment Booking System
+# Nurtura Care Management System
 
-A modern full-stack appointment booking system built with **TypeScript**, **React**, and **Node.js/Express** with EmailJS integration for automated email confirmations and reminders.
-
-## 🏗️ Project Structure
-
-```
-EmailDemo/
-├── frontend/          # React frontend application (TypeScript)
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── AppointmentBooking.tsx
-│   │   │   └── AppointmentBooking.css
-│   │   ├── config/
-│   │   │   └── emailjs-config.ts
-│   │   ├── types/
-│   │   │   └── api.ts
-│   │   ├── App.tsx
-│   │   ├── App.css
-│   │   ├── index.tsx
-│   │   └── index.css
-│   ├── tsconfig.json
-│   └── package.json
-├── backend/           # Node.js/Express backend (TypeScript)
-│   ├── src/
-│   │   └── server.ts
-│   ├── dist/          # Compiled JavaScript output
-│   ├── tsconfig.json
-│   ├── nodemon.json
-│   ├── package.json
-│   └── .env
-└── README.md
-```
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn
-- EmailJS account with configured service and template
-
-### Backend Setup
-
-1. **Navigate to backend directory:**
-   ```bash
-   cd backend
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Configure environment variables:**
-   - Update `backend/.env` with your EmailJS credentials
-   ```
-   EMAILJS_SERVICE_ID=your_service_id
-   EMAILJS_TEMPLATE_ID=your_template_id
-   EMAILJS_PUBLIC_KEY=your_public_key
-   EMAILJS_PRIVATE_KEY=your_private_key
-   PORT=3001
-   ```
-
-4. **Start the backend server:**
-   ```bash
-   npm start
-   ```
-   Backend will run on http://localhost:3001
-
-### Frontend Setup
-
-1. **Navigate to frontend directory:**
-   ```bash
-   cd frontend
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Configure EmailJS:**
-   - Update `frontend/src/config/emailjs-config.ts` with your EmailJS credentials
-
-4. **Start the React app:**
-   ```bash
-   npm start
-   ```
-   Frontend will run on http://localhost:3000
-
-## 🛠️ Development
-
-### TypeScript
-This project is fully built with TypeScript for better type safety and developer experience:
-- Frontend: React with TypeScript (`.tsx` files)
-- Backend: Node.js/Express with TypeScript (`.ts` files)
-- Type definitions included for EmailJS and API interfaces
-
-### Building for Production
-**Backend:**
-```bash
-cd backend
-npm run build  # Compiles TypeScript to JavaScript in dist/
-npm run start  # Runs the compiled server
-```
-
-**Frontend:**
-```bash
-cd frontend
-npm run build  # Creates optimized production build
-```
-
-## 📧 EmailJS Template Requirements
-
-Your EmailJS template should include these variables:
-- `{{to_name}}` - Recipient name
-- `{{email}}` - Recipient email address
-- `{{reminder_message}}` - Dynamic message content
-- `{{appointment_date}}` - Appointment date
-- `{{appointment_time}}` - Appointment time
-- `{{patient_name}}` - Patient name
-- `{{notes}}` - Appointment notes
+A comprehensive care management application with automated email reminders for appointments and events.
 
 ## 🎯 Features
 
-- **Appointment Booking**: Web form to schedule appointments
-- **Email Confirmations**: Immediate confirmation emails via EmailJS
-- **Automated Reminders**: Cron job sends reminders 1 hour before appointments
-- **Test Functionality**: Built-in EmailJS configuration testing
-- **Responsive Design**: Mobile-friendly interface
+- 📅 Calendar management for appointments and events
+- 📧 Automated email reminders (1 hour before appointments)
+- 🧪 Test reminder functionality
+- ⚙️ User settings and preferences
+- 🔧 Configurable email service
+- 💊 Medication tracking
+- 👥 Community forum and discussions
 
-## 🔧 API Endpoints
+## 🚀 Quick Start
 
-- `POST /api/appointments` - Create new appointment
-- `GET /api/appointments` - Get all appointments
-- `POST /api/appointments/:id/send-reminder` - Manually send reminder
-- `GET /api/health` - Health check
+### Prerequisites
 
-## 🛠️ Development
+- Node.js (v16 or higher)
+- MongoDB database
+- Gmail account with App Password enabled
 
-### Backend Development
+### 1. Clone and Setup
+
 ```bash
-cd backend
-npm run dev  # Uses nodemon for auto-restart
+git clone <repository-url>
+cd Nurtura
+
+# Install frontend dependencies
+npm install
+
+# Install backend dependencies
+cd server
+npm install
 ```
 
-### Frontend Development
-```bash
-cd frontend
-npm start    # React development server with hot reload
-```
+### 2. Environment Configuration
 
-## 📦 Production Build
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Update the `.env` file with your configuration:
+   ```env
+   # MongoDB Connection
+   MONGO_URI=your_mongodb_connection_string
+   
+   # Server Configuration
+   PORT=5000
+   
+   # Gmail Configuration
+   GMAIL_USER=your-email@gmail.com
+   GMAIL_APP_PASSWORD=your_16_character_app_password
+   
+   # Email Service Configuration
+   EMAIL_FROM_NAME=Your Service Name
+   EMAIL_FROM_ADDRESS=your-email@gmail.com
+   ```
+
+### 3. Gmail App Password Setup
+
+1. Enable 2-Factor Authentication on your Google Account
+2. Go to [Google Account Settings](https://myaccount.google.com/)
+3. Navigate to Security > App passwords
+4. Generate a new app password for "Mail"
+5. Use the 16-character password in your `.env` file
+
+### 4. Start the Application
+
+1. Start the backend server:
+   ```bash
+   cd server
+   npm start
+   ```
+
+2. Start the frontend (in a new terminal):
+   ```bash
+   cd .. # Go back to root directory
+   npm run dev
+   ```
+
+### 5. Access the Application
+
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:5000
+
+## 📧 Email Reminder System
+
+The application includes an automated email reminder service that:
+
+- **Checks every 5 minutes** for upcoming appointments
+- **Sends reminders 1 hour before** the scheduled time
+- **Prevents duplicate emails** using tracking system
+- **Uses professional HTML templates** with responsive design
+
+### Email Template Configuration
+
+Email templates are stored in `server/templates/emailTemplates.js` and include:
+- Professional HTML styling
+- Responsive design
+- Customizable service name
+- Appointment details and instructions
+
+### Testing Email Functionality
+
+Use the "Send Test Reminder" button in the application to verify your email configuration is working correctly.
+
+## 🛠️ Tech Stack
 
 ### Frontend
-```bash
-cd frontend
-npm run build
-```
+- **React 19.1.0** with TypeScript
+- **Vite 6.3.5** for fast development
+- **CSS3** with modern styling
+- **Responsive design** for all devices
 
 ### Backend
+- **Node.js** with Express.js
+- **MongoDB** for data persistence
+- **Nodemailer** for email delivery
+- **Gmail SMTP** integration
+- **Cron jobs** for automated reminders
+
+## 📁 Project Structure
+
+```
+Nurtura/
+├── README.md
+├── package.json                 # Frontend dependencies
+├── src/                        # React application
+│   ├── App.tsx
+│   ├── components/
+│   ├── config/
+│   └── types/
+└── server/                     # Backend application
+    ├── package.json
+    ├── server.js              # Entry point
+    ├── .env                   # Environment variables (not in git)
+    ├── .env.example           # Environment template
+    ├── src/
+    │   └── server.ts          # TypeScript server code
+    ├── services/
+    │   └── emailReminderService.js
+    └── templates/
+        └── emailTemplates.js
+```
+
+## � Development
+
+### Available Scripts
+
+**Frontend (root directory):**
 ```bash
-cd backend
-npm start
+npm run dev      # Start development server
+npm run build    # Build for production
+npm run preview  # Preview production build
 ```
 
-## 🔒 Environment Variables
-
-### Backend (.env)
-```
-EMAILJS_SERVICE_ID=service_xxxxxxx
-EMAILJS_TEMPLATE_ID=template_xxxxxxx
-EMAILJS_PUBLIC_KEY=xxxxxxxxxxxxxxx
-EMAILJS_PRIVATE_KEY=xxxxxxxxxxxxxxx
-PORT=3001
+**Backend (server directory):**
+```bash
+npm start        # Start production server
+npm run dev      # Start with nodemon (development)
 ```
 
-### Frontend
-EmailJS config is in `src/config/emailjs-config.js`
+### Environment Variables
 
-## 🧪 Testing
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `MONGO_URI` | MongoDB connection string | `mongodb://localhost:27017/nurtura` |
+| `PORT` | Server port | `5000` |
+| `GMAIL_USER` | Gmail account for sending emails | `your-email@gmail.com` |
+| `GMAIL_APP_PASSWORD` | Gmail App Password (16 characters) | `abcd efgh ijkl mnop` |
+| `EMAIL_FROM_NAME` | Display name for emails | `Nurtura Care System` |
+| `EMAIL_FROM_ADDRESS` | From email address | `your-email@gmail.com` |
 
-1. Start both backend and frontend servers
-2. Visit http://localhost:3000
-3. Click "Test EmailJS Configuration" to verify setup
-4. Book a test appointment to verify full workflow
+## 🚨 Troubleshooting
 
-## 📝 Notes
+### Common Issues
 
-- The old `index.html` file was a standalone version for quick testing
-- This new structure separates concerns properly
-- Frontend communicates with backend via REST API
-- EmailJS is used for both immediate confirmations and scheduled reminders
+1. **"Invalid login" error with Gmail**
+   - Ensure 2FA is enabled
+   - Use App Password, not regular password
+   - Check Gmail security settings
+
+2. **MongoDB connection issues**
+   - Verify MongoDB is running
+   - Check connection string format
+   - Ensure database exists
+
+3. **Email reminders not sending**
+   - Check server logs for errors
+   - Verify cron job is running
+   - Test email configuration with test button
+
+### Server Logs
+
+Check the server console for detailed error messages and email delivery status.
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📞 Support
+
+For issues and questions:
+- Check the troubleshooting section above
+- Review server logs for error details
+- Ensure all environment variables are properly configured

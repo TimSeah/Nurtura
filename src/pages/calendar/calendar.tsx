@@ -9,6 +9,9 @@ interface Event {
   remark: string;
   month: string;
   userId: string;
+  reminderSent?: boolean;
+  reminderEmail?: string;
+  enableReminder?: boolean;
 }
 
 interface EventMap {
@@ -163,19 +166,31 @@ const Calendar: React.FC = () => {
       remark: formData.remark,
       month: monthNames[month],
       userId: defaultId, // CHANGE TO ACTUAL USER ID LATER
+      enableReminder: true, // Enable reminders by default
+      reminderSent: false
     };
 
-    await fetch(`http://localhost:5000/api/events/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newEvent),
-    });
+    try {
+      const response = await fetch(`http://localhost:5000/api/events/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newEvent),
+      });
 
-    const key = dateKey(selectedDay);
-    setEvents((prev) => ({
-      ...prev,
-      [key]: [...(prev[key] || []), newEvent],
-    }));
+      if (response.ok) {
+        const savedEvent = await response.json();
+        
+        const key = dateKey(selectedDay);
+        setEvents((prev) => ({
+          ...prev,
+          [key]: [...(prev[key] || []), savedEvent],
+        }));
+      } else {
+        console.error('Failed to save event');
+      }
+    } catch (error) {
+      console.error('Error saving event:', error);
+    }
 
     closeForm();
   };
@@ -199,8 +214,8 @@ const Calendar: React.FC = () => {
     }
   };
 
-  const generateCalendarCells = () => {
-    const cells = [];
+  const generateCalendarCells = (): React.ReactElement[] => {
+    const cells: React.ReactElement[] = [];
 
     for (let i = 0; i < firstDay; i++) {
       cells.push(<div key={`empty-${i}`} className="calendar-day empty" />);
@@ -345,14 +360,36 @@ const Calendar: React.FC = () => {
                 Save
               </button>
               {editingEvent && (
-                <button
-                  onClick={() => {
-                    deleteEvent(editingEvent.key, editingEvent.index);
-                    closeForm();
-                  }}
-                >
-                  Delete
-                </button>
+                <>
+                  <button
+                    onClick={() => {
+                      deleteEvent(editingEvent.key, editingEvent.index);
+                      closeForm();
+                    }}
+                  >
+                    Delete
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const event = events[editingEvent.key][editingEvent.index];
+                        const response = await fetch(`http://localhost:5000/api/events/${event._id}/send-reminder`, {
+                          method: 'POST'
+                        });
+                        if (response.ok) {
+                          alert('Test reminder sent successfully!');
+                        } else {
+                          alert('Failed to send test reminder');
+                        }
+                      } catch (error) {
+                        console.error('Error sending test reminder:', error);
+                        alert('Error sending test reminder');
+                      }
+                    }}
+                  >
+                    Test Reminder
+                  </button>
+                </>
               )}
               <button onClick={closeForm}>Cancel</button>
             </div>

@@ -34,7 +34,11 @@ mongoose.connect(process.env.MONGO_URI, {
 })
 .then(() => {
   console.log('MongoDB connected successfully!');
-  const PORT = process.env.PORT || 5000; // Make sure PORT is defined here or globally
+  
+  // Start email reminder service
+  startReminderService();
+  
+  const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log('You can test the server by navigating to http://localhost:5000 in your browser.');
@@ -77,12 +81,17 @@ const indexRouter = require('./routes/index');
 const eventsRouter = require('./routes/events');
 const threadsRouter = require('./routes/thread');
 const commentRouter = require('./routes/comment');
+const userSettingsRouter = require('./routes/userSettings');
+
+// Import and start email reminder service
+const { startReminderService } = require('./services/emailReminderService');
 
 // Assign imported routers to specific URL paths.
 app.use('/', indexRouter);
 app.use('/api/events', eventsRouter); 
 app.use('/api/threads', threadsRouter); 
 app.use('/api/threads/:threadId/comments', commentRouter);
+app.use('/api/user-settings', userSettingsRouter);
 
 // --- Error Handling Middleware ---
 
