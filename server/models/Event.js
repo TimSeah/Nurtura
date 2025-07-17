@@ -1,14 +1,10 @@
 const mongoose = require('mongoose');
 
-// Define the schema for your Event model
-// A schema defines the structure of the documents within a MongoDB collection,
-// including field names, their data types, and validation rules.
 const eventSchema = new mongoose.Schema({
-  // Title of the event (e.g., "Meeting", "Doctor's Appointment")
   title: {
-    type: String,     // Data type is String
-    required: true,   // This field is mandatory
-    trim: true        // Remove whitespace from both ends of the string
+    type: String,     
+    required: true,   
+    trim: true        
   },
 
   date: {

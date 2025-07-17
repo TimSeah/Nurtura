@@ -1,0 +1,31 @@
+h1 {
+    margin-top: 30px;
+}
+
+.journal-post-container {
+    border: 3px solid black;
+    border-radius: 30px;
+    padding: 20px 60px;
+    margin: 20px 60px;
+}
+
+.journal-post {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 40px;
+    gap: 10px;
+    width: 1000px;
+    justify-self: center;
+}
+
+.journal-post textarea {
+    height: 200px;
+}
+
+.journal-post button {
+    background-color: rgb(19, 188, 255);
+    border-radius: 10px;
+    padding: 8px 5px;
+    color: white;
+    font-weight: bold;
+}

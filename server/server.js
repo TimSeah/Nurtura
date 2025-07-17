@@ -75,12 +75,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 // to define your API endpoints for different resources.
 const indexRouter = require('./routes/index');
 const eventsRouter = require('./routes/events');
+const journalsRouter = require('./routes/journal'); 
 const threadsRouter = require('./routes/thread');
 const commentRouter = require('./routes/comment');
 
 // Assign imported routers to specific URL paths.
 app.use('/', indexRouter);
 app.use('/api/events', eventsRouter); 
+app.use('/api/journal', journalsRouter); 
 app.use('/api/threads', threadsRouter); 
 app.use('/api/threads/:threadId/comments', commentRouter);
 
