@@ -2,8 +2,10 @@ import "./Forum.css";
 import "./Forum"
 import { useState, useEffect, type ChangeEvent } from "react";
 import { useParams } from "react-router-dom";
-import ThreadPost from "./ThreadPost";
-import Comment from "./Comment";
+import ThreadPost from "./threadPost";
+import Comment from "./comment";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 const currentUser = "Good Commenter";
 
@@ -26,6 +28,7 @@ interface CommentDetail {
 }
 
 const ThreadDetail: React.FC = () => {
+    const navigate = useNavigate();
     const [thread, setThread] = useState<ThreadDetail | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -122,6 +125,11 @@ const ThreadDetail: React.FC = () => {
     return (
         <div className="min-h-screen bg-gray-50 antialiased">
             <div className="max-w-3xl mx-auto px-4 py-8">
+                {/* Back Button */}
+                <div className="mb-4 flex items-center space-x-2 text-blue-600 hover:text-blue-800 cursor-pointer" onClick={() => navigate(-1)}>
+                <ArrowLeftIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">Back to Forum</span>
+                </div>
                 {/* --- Thread Header --- */}
                 <ThreadPost 
                 thread={thread} 
