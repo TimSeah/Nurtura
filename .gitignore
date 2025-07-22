@@ -77,6 +77,9 @@ public/uploads/
 /dist
 /build
 
+# TypeScript build info
+*.tsbuildinfo
+
 # Local development
 .cache/
 server/.env
