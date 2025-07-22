@@ -4,6 +4,10 @@ import { useState, useEffect, type ChangeEvent} from "react";
 import { useParams } from "react-router-dom";
 import ThreadPost from "./threadPost";
 import Comment from "./comment";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+
+const navigate = useNavigate();
 
 interface ThreadDetail{
     _id: number;
@@ -115,6 +119,11 @@ const ThreadDetail: React.FC = () => {
     
     return (
         <div className="min-h-screen bg-gray-50 antialiased">
+            {/* Back Button */}
+            <div className="mb-4 flex items-center space-x-2 text-blue-600 hover:text-blue-800 cursor-pointer" onClick={() => navigate(-1)}>
+            <ArrowLeftIcon className="w-5 h-5" />
+            <span className="text-sm font-medium">Back to Forum</span>
+            </div>
             <div className="max-w-3xl mx-auto px-4 py-8">
                 {/* --- Thread Header --- */}
                 <ThreadPost 

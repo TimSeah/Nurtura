@@ -186,12 +186,12 @@ const Forum: React.FC = () => {
             </div>
             {/* Upvotes + Replies */}
             <div className="ml-4 flex flex-col items-center justify-center text-sm text-gray-500 whitespace-nowrap">
-              <div className="flex items-center gap-1">
+              <button type="button" className="flex items-center gap-1">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M3 10h4v10h6V10h4L10 0 3 10z" />
                 </svg>
                 {t.upvotes}
-              </div>
+              </button>
               <div className="flex items-center gap-1 mt-1">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
