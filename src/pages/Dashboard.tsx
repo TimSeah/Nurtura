@@ -14,6 +14,7 @@ import "./Dashboard.css";
 import VitalSignsModal from "../components/VitalSignsModal";
 import AppointmentModal from "../components/AppointmentModal";
 import CareNoteModal from "../components/CareNoteModal";
+import { apiService } from "../services/apiService";
 import type { VitalSignsData, AppointmentData, CareNoteData } from "../types";
 
 interface Event {
@@ -170,22 +171,40 @@ const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchEventsToday = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/events/today");
-        if (!response.ok) {
-          throw new Error("Failed to fetch events for today");
-        }
-        const data = await response.json();
-        // TODO: populate data to UI accordingly
-        setTodayEvents(data);
+        // Fetch today's events
+        const eventsData = await apiService.getTodaysEvents();
+        setTodayEvents(eventsData);
+
+        // Load other dashboard data
+        loadStats();
+        loadRecentActivities();
       } catch (error) {
-        console.error("Error fetching today's events: ", error);
+        console.error("Error fetching dashboard data:", error);
       }
     };
 
-    fetchEventsToday();
+    fetchDashboardData();
   }, []);
+
+  const loadStats = async () => {
+    try {
+      // You can enhance this to fetch real stats from backend
+      // For now, keeping the mock data structure
+    } catch (error) {
+      console.error("Error loading stats:", error);
+    }
+  };
+
+  const loadRecentActivities = async () => {
+    try {
+      // You can enhance this to fetch real activities from backend
+      // For now, keeping the mock data structure
+    } catch (error) {
+      console.error("Error loading recent activities:", error);
+    }
+  };
 
   return (
     <div className="dashboard">

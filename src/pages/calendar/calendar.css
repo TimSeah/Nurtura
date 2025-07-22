@@ -16,13 +16,20 @@
   margin-bottom: 1rem;
 }
 
-.nav-button {
+.next-prev-button {
   background: none;
   border: none;
   color: #007bff;
   font-weight: bold;
   cursor: pointer;
   font-size: 20px;
+  padding: 30px 0;
+  width: 300px;
+  font-size: larger;
+}
+
+.next-prev-button:hover{
+  background: none;
 }
 
 .nav-button:hover {
@@ -87,7 +94,7 @@
 }
 
 .event-list button {
-    border-left-style: solid;
+  border-left-style: solid;
   border-left-width: 5px;
   border-top: none;
   border-right: none;
@@ -124,12 +131,13 @@
 .event-item {
   margin-top: 0px;
   padding: 4px 12px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
   width: 100%;
   height: auto;
   font-size: medium;
+  align-items: flex-start;
+  justify-content: left;
+  text-align: left;
+  border-radius: 0;
 }
 
 .event-item:hover {
@@ -146,17 +154,6 @@
 .event-item .time {
   font-size: small;
 }
-
-/* .event-item::before {
-  content: "i";
-  color: black;
-  left: 0;
-  width: 400px;
-  background-color: #000000; 
-  border-radius: 2px;
-}  */
-
-/* Modal */
 
 .modal-backdrop {
   position: fixed;

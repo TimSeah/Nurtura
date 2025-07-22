@@ -36,7 +36,7 @@ const ThreadDetail: React.FC = () => {
     const fetchThread = async (id: string) => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/threads/${id}`);
+            const res = await fetch(`http://localhost:5000/api/threads/${id}`);
             if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
             const data: ThreadDetail = await res.json();
             setThread(data);
@@ -49,7 +49,7 @@ const ThreadDetail: React.FC = () => {
 
     const fetchComments = async (threadId: string) => {
         try {
-            const res = await fetch(`/api/threads/${threadId}/comments`);
+            const res = await fetch(`http://localhost:5000/api/threads/${threadId}/comments`);
             if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
             const data = await res.json();
             setComment(data);
@@ -78,7 +78,7 @@ const ThreadDetail: React.FC = () => {
             return;
         }
         try {
-            const res = await fetch(`/api/threads/${id}/comments`, {
+            const res = await fetch(`http://localhost:5000/api/threads/${id}/comments`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -34,7 +34,11 @@ mongoose.connect(process.env.MONGO_URI, {
 })
 .then(() => {
   console.log('MongoDB connected successfully!');
-  const PORT = process.env.PORT || 5000; // Make sure PORT is defined here or globally
+  
+  // Start email reminder service
+  startReminderService();
+  
+  const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log('You can test the server by navigating to http://localhost:5000 in your browser.');
@@ -78,6 +82,13 @@ const eventsRouter = require('./routes/events');
 const journalsRouter = require('./routes/journal'); 
 const threadsRouter = require('./routes/thread');
 const commentRouter = require('./routes/comment');
+const userSettingsRouter = require('./routes/userSettings');
+const vitalSignsRouter = require('./routes/vitalSigns');
+const careRecipientsRouter = require('./routes/careRecipients');
+const alertsRouter = require('./routes/alerts');
+
+// Import and start email reminder service
+const { startReminderService } = require('./services/emailReminderService');
 const carerecepientsRouter = require('./routes/carerecepients');
 
 // Assign imported routers to specific URL paths.
@@ -86,6 +97,10 @@ app.use('/api/events', eventsRouter);
 app.use('/api/journal', journalsRouter); 
 app.use('/api/threads', threadsRouter); 
 app.use('/api/threads/:threadId/comments', commentRouter);
+app.use('/api/user-settings', userSettingsRouter);
+app.use('/api/vital-signs', vitalSignsRouter);
+app.use('/api/care-recipients', careRecipientsRouter);
+app.use('/api/alerts', alertsRouter);
 app.use('/api/carerecepients', carerecepientsRouter);
 
 // --- Error Handling Middleware ---

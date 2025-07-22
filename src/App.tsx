@@ -5,7 +5,7 @@ import Layout from "./components/Layout";
 
 import Dashboard from "./pages/Dashboard.tsx";
 import Calendar from "./pages/calendar/calendar.tsx";
-import HealthTracking from "./pages/HealthTracking.tsx";
+import HealthTracking from "./pages/healthMonitoring/HealthTracking.tsx";
 import CareCircle from "./pages/CareCircle.tsx";
 import Resources from "./pages/Resources.tsx";
 import Alerts from "./pages/Alerts.tsx";
@@ -13,9 +13,9 @@ import Settings from "./pages/Settings.tsx";
 import Forum from "./pages/forum/forum";
 import ForumTab from "./pages/forum/ForumTab";
 import ThreadDetail from "./pages/forum/threadDetail";
-import Journal from "./pages/journal/journal.tsx";
+import Journal from "./pages/healthMonitoring/components/journal/journal.tsx";
 import ResourcesAlt from "./pages/ResorucesAlt.tsx";
-import HealthMonitoring from "./pages/healthMonitoring/HealthMonitoring.tsx";
+import HealthMonitoring from "./pages/healthMonitoring/components/add new recipient/HealthMonitoring.tsx";
 
 function App() {
   return (

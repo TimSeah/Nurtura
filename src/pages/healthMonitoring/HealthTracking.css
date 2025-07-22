@@ -35,6 +35,7 @@
   cursor: pointer;
   transition: all 0.15s ease-in-out;
   text-align: left;
+  margin-bottom: 20px;
 }
 
 .recipient-card:hover {
@@ -64,6 +65,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
+}
+
+.card-title {
+  margin: 20px;
 }
 
 .condition-tag {
@@ -159,6 +164,10 @@
   font-weight: 600;
   color: #1e293b;
   margin: 0;
+}
+
+.add-journal {
+  margin: 10px 0;
 }
 
 .recent-readings {
