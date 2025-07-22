@@ -2,7 +2,7 @@ import React, { useEffect, useState, type FormEvent, type ChangeEvent } from "re
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 import "./Forum.css";
 import { Link } from "react-router-dom";
-import { calculateDaysAgo } from "./utils";
+import { calculateDaysAgo } from "../../utils/calDaysAgoUtil";
 
 const currentUser = "A good grandkid";
 

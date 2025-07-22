@@ -5,18 +5,23 @@ import { mockFetchOnce } from './mockFetch';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
-afterEach(() => {
-  cleanup();
-});
-
 const sampleThreads = [
   { _id: 1, title: 'Hello', content: 'World', author: 'A good grandkid', date: new Date().toISOString(), upvotes: 3, replies: 0 },
   { _id: 2, title: 'Other', content: 'Thing', author: 'Someone else',    date: new Date().toISOString(), upvotes: 1, replies: 0 },
 ];
 
 describe('<Forum />', () => {
-  afterEach(() => vi.restoreAllMocks());
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks()
+  });
 
+  /**
+   * UI Tests for the <Forum /> component
+   * These tests verify user interface behavior, including loading states, error handling,
+   * thread filtering, form validation, and thread creation. They simulate user interactions
+   * and check the rendered output to ensure the UI responds as expected.
+   */
   test('shows loading then threads', async () => {
     mockFetchOnce(sampleThreads); // initial GET
     renderWithRouter(<Forum />);
@@ -72,5 +77,20 @@ describe('<Forum />', () => {
 
     await waitFor(() => expect(screen.queryByText(/Create New Thread/i)).not.toBeInTheDocument());
     expect(await screen.findByText('New T')).toBeInTheDocument();
+  });
+
+  // Integration test: clicking a thread navigates to thread detail page
+  test('navigates to thread detail page on thread click', async () => {
+    mockFetchOnce(sampleThreads);
+    const { container, history } = renderWithRouter(<Forum />);
+    await screen.findByText('Hello');
+
+    const threadLink = screen.getByRole('link', { name: /Hello/i });
+    fireEvent.click(threadLink);
+
+    // Check that the URL changed to the thread detail page
+    await waitFor(() =>
+      expect(history.location.pathname).toBe('/threads/1')
+  );
   });
 });

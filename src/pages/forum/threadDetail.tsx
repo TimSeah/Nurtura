@@ -1,9 +1,9 @@
-import "./forum.css";
-import "./forum"
+import "./Forum.css";
+import "./Forum"
 import { useState, useEffect, type ChangeEvent} from "react";
 import { useParams } from "react-router-dom";
-import ThreadPost from "./threadPost";
-import Comment from "./comment";
+import ThreadPost from "./ThreadPost";
+import Comment from "./Comment";
 
 const currentUser = "Good Commenter";
 
