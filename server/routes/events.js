@@ -35,16 +35,13 @@ router.post('/', async (req, res) => {
   });
 
   try {
-    // Save the new event document to the database
     const savedEvent = await newEvent.save();
-
-    // Send a 201 (Created) status code and the saved event as a JSON response
     res.status(201).json(savedEvent);
+
   } catch (err) {
-    // If an error occurs (e.g., validation error, database error),
-    // log it and send a 400 (Bad Request) or 500 (Internal Server Error) response.
     console.error('Error creating event:', err);
-    res.status(400).json({ message: err.message }); // 400 for validation errors
+    res.status(400).json({ message: err.message }); 
+
   }
 });
 
@@ -115,6 +112,4 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-
-// Export the router so it can be used by the main Express app (server.js)
 module.exports = router;
