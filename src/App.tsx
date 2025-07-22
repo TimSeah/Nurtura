@@ -13,11 +13,8 @@ import Settings from "./pages/Settings.tsx";
 import Forum from "./pages/forum/forum";
 import ForumTab from "./pages/forum/ForumTab";
 import ThreadDetail from "./pages/forum/threadDetail";
-<<<<<<< HEAD
 import Journal from "./pages/journal/journal.tsx";
-=======
 import ResourcesAlt from "./pages/ResorucesAlt.tsx";
->>>>>>> 2dca593d178663f3e31f5a8014d48d846bb2e9a9
 
 function App() {
   return (
