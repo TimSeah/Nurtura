@@ -1,17 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { Heart, Activity, Thermometer, Scale, Plus, TrendingUp, Droplets } from 'lucide-react';
-import type { CareRecipient, VitalSignsData } from '../types';
-import { dataService } from '../services/dataService';
+import { apiService } from '../services/apiService';
 import Modal from '../components/Modal';
 import './HealthTracking.css';
 
+interface CareRecipient {
+  _id: string;
+  name: string;
+  dateOfBirth: string;
+  relationship: string;
+}
+
+interface VitalSignsData {
+  _id?: string;
+  recipientId: string;
+  vitalType: 'blood_pressure' | 'heart_rate' | 'temperature' | 'weight' | 'blood_sugar' | 'oxygen_saturation';
+  value: string;
+  unit: string;
+  dateTime: string;
+  notes?: string;
+}
+
 const HealthTracking: React.FC = () => {
-  const [selectedRecipient, setSelectedRecipient] = useState<string>('1');
+  const [selectedRecipient, setSelectedRecipient] = useState<string>('');
   const [selectedVitalType, setSelectedVitalType] = useState<string>('blood_pressure');
   const [showAddForm, setShowAddForm] = useState(false);
   const [careRecipients, setCareRecipients] = useState<CareRecipient[]>([]);
   const [vitalReadings, setVitalReadings] = useState<VitalSignsData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [newVitalForm, setNewVitalForm] = useState({
     value: '',
     dateTime: '',
@@ -19,34 +37,69 @@ const HealthTracking: React.FC = () => {
   });
 
   useEffect(() => {
-    // Load data from service
-    setCareRecipients(dataService.getCareRecipients());
-    setVitalReadings(dataService.getVitalSigns(selectedRecipient));
+    // Load care recipients on initial mount
+    loadCareRecipients();
+  }, []);
+
+  useEffect(() => {
+    // Load vital readings when selected recipient changes
+    if (selectedRecipient) {
+      loadVitalReadings(selectedRecipient);
+    }
   }, [selectedRecipient]);
+
+  const loadCareRecipients = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const recipients = await apiService.getCareRecipients();
+      setCareRecipients(recipients);
+      if (recipients.length > 0 && !selectedRecipient) {
+        setSelectedRecipient(recipients[0]._id);
+      }
+    } catch (error) {
+      console.error('Error loading care recipients:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load care recipients');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadVitalReadings = async (recipientId: string) => {
+    try {
+      const readings = await apiService.getVitalSigns(recipientId);
+      setVitalReadings(readings);
+    } catch (error) {
+      console.error('Error loading vital readings:', error);
+    }
+  };
 
   const handleRecipientChange = (recipientId: string) => {
     setSelectedRecipient(recipientId);
-    setVitalReadings(dataService.getVitalSigns(recipientId));
   };
 
-  const handleAddVital = (e: React.FormEvent) => {
+  const handleAddVital = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const vitalData: VitalSignsData = {
-      recipientId: selectedRecipient,
-      vitalType: selectedVitalType as VitalSignsData['vitalType'],
-      value: newVitalForm.value,
-      unit: getVitalUnit(selectedVitalType),
-      dateTime: newVitalForm.dateTime,
-      notes: newVitalForm.notes || undefined
-    };
+    try {
+      const vitalData: VitalSignsData = {
+        recipientId: selectedRecipient,
+        vitalType: selectedVitalType as VitalSignsData['vitalType'],
+        value: newVitalForm.value,
+        unit: getVitalUnit(selectedVitalType),
+        dateTime: newVitalForm.dateTime,
+        notes: newVitalForm.notes || undefined
+      };
 
-    const savedVital = dataService.addVitalSigns(vitalData);
-    setVitalReadings(prev => [savedVital, ...prev]);
-    
-    // Reset form
-    setNewVitalForm({ value: '', dateTime: '', notes: '' });
-    setShowAddForm(false);
+      const savedVital = await apiService.addVitalSigns(vitalData);
+      setVitalReadings(prev => [savedVital, ...prev]);
+      
+      // Reset form
+      setNewVitalForm({ value: '', dateTime: '', notes: '' });
+      setShowAddForm(false);
+    } catch (error) {
+      console.error('Error saving vital signs:', error);
+    }
   };
 
   // Generate chart data from actual readings
@@ -118,7 +171,7 @@ const HealthTracking: React.FC = () => {
     };
   };
 
-  const selectedRecipientData = careRecipients.find(r => r.id === selectedRecipient);
+  const selectedRecipientData = careRecipients.find(r => r._id === selectedRecipient);
 
   return (
     <div className="health-tracking">
@@ -133,25 +186,39 @@ const HealthTracking: React.FC = () => {
           <h2 className="card-title">Select Care Recipient</h2>
         </div>
         <div className="recipient-selector">
-          {careRecipients.map(recipient => (
-            <button
-              key={recipient.id}
-              className={`recipient-card ${selectedRecipient === recipient.id ? 'selected' : ''}`}
-              onClick={() => handleRecipientChange(recipient.id)}
-            >
-              <div className="recipient-info">
-                <h3>{recipient.name}</h3>
-                <p>Age: {recipient.age}</p>
-                <div className="conditions">
-                  {recipient.conditions.map(condition => (
-                    <span key={condition} className="condition-tag">
-                      {condition}
-                    </span>
-                  ))}
+          {loading ? (
+            <div className="loading-message">
+              <p>Loading care recipients...</p>
+            </div>
+          ) : error ? (
+            <div className="error-message">
+              <p>Error loading care recipients: {error}</p>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => loadCareRecipients()}
+              >
+                Retry
+              </button>
+            </div>
+          ) : careRecipients.length === 0 ? (
+            <div className="loading-message">
+              <p>No care recipients found. Please add some care recipients first.</p>
+            </div>
+          ) : (
+            careRecipients.map(recipient => (
+              <button
+                key={recipient._id}
+                className={`recipient-card ${selectedRecipient === recipient._id ? 'selected' : ''}`}
+                onClick={() => handleRecipientChange(recipient._id)}
+              >
+                <div className="recipient-info">
+                  <h3>{recipient.name}</h3>
+                  <p>DOB: {new Date(recipient.dateOfBirth).toLocaleDateString()}</p>
+                  <p>Relationship: {recipient.relationship}</p>
                 </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            ))
+          )}
         </div>
       </div>
 
@@ -174,7 +241,7 @@ const HealthTracking: React.FC = () => {
                 const Icon = getVitalIcon(reading.vitalType);
                 const { date, time } = formatDateTime(reading.dateTime);
                 return (
-                  <div key={reading.id} className="reading-card">
+                  <div key={reading._id} className="reading-card">
                     <div className="reading-icon">
                       <Icon />
                     </div>

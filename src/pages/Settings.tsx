@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Bell, Shield, Palette, Save } from 'lucide-react';
 import './Settings.css';
 
 const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState('profile');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
     profile: {
       name: 'Sarah Johnson',
@@ -34,6 +36,31 @@ const Settings: React.FC = () => {
     }
   });
 
+  // Load settings from backend when component mounts
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:5000/api/user-settings/123');
+        if (response.ok) {
+          const data = await response.json();
+          setSettings({
+            profile: data.profile || settings.profile,
+            notifications: data.notifications || settings.notifications,
+            privacy: data.privacy || settings.privacy,
+            appearance: data.appearance || settings.appearance
+          });
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'notifications', label: 'Notifications', icon: Bell },
@@ -51,10 +78,28 @@ const Settings: React.FC = () => {
     }));
   };
 
-  const saveSettings = () => {
-    // In a real app, this would save to backend
-    console.log('Saving settings:', settings);
-    alert('Settings saved successfully!');
+  const saveSettings = async () => {
+    try {
+      setSaving(true);
+      const response = await fetch('http://localhost:5000/api/user-settings/123', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settings),
+      });
+
+      if (response.ok) {
+        alert('Settings saved successfully!');
+      } else {
+        throw new Error('Failed to save settings');
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      alert('Failed to save settings. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -64,7 +109,12 @@ const Settings: React.FC = () => {
         <p>Manage your account preferences and application settings.</p>
       </div>
 
-      <div className="settings-container">
+      {loading ? (
+        <div className="loading-container" style={{ textAlign: 'center', padding: '2rem' }}>
+          <p>Loading settings...</p>
+        </div>
+      ) : (
+        <div className="settings-container">
         {/* Settings Navigation */}
         <div className="settings-nav">
           {tabs.map(tab => {
@@ -345,9 +395,13 @@ const Settings: React.FC = () => {
 
           {/* Save Button */}
           <div className="settings-actions">
-            <button className="btn btn-primary" onClick={saveSettings}>
+            <button 
+              className="btn btn-primary" 
+              onClick={saveSettings}
+              disabled={saving}
+            >
               <Save className="btn-icon" />
-              Save Settings
+              {saving ? 'Saving...' : 'Save Settings'}
             </button>
             <button className="btn btn-secondary">
               Reset to Defaults
@@ -355,6 +409,7 @@ const Settings: React.FC = () => {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 };
