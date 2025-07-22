@@ -105,6 +105,8 @@ const Calendar: React.FC = () => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    console.log("handleInputChange", e.target.name, e.target.value);
+
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -112,6 +114,8 @@ const Calendar: React.FC = () => {
   const handleEditInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    console.log("handleEditInputChange", e.target.name, e.target.value);
+
     const { name, value } = e.target;
     setEditFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -310,6 +314,8 @@ const Calendar: React.FC = () => {
               {dateKey(selectedDay)}
             </h3>
             <input
+              id="title-input"
+              data-testid="title-input"
               type="text"
               name="title"
               placeholder={
@@ -321,6 +327,8 @@ const Calendar: React.FC = () => {
               }
             />
             <input
+              id="time-input"
+              data-testid="time-input"
               type="time"
               name="hour"
               value={editingEvent ? editFormData.hour : formData.hour}
@@ -329,6 +337,8 @@ const Calendar: React.FC = () => {
               }
             />
             <textarea
+              id="remark-input"
+              data-testid="remark-input"
               name="remark"
               placeholder={
                 editingEvent
