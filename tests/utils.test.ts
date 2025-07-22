@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { calculateDaysAgo } from '../src/utils/calDaysAgoUtil';
 
 
-describe('calculateDaysAgo', () => {
+describe('Unit test: calculateDaysAgo', () => {
   test('returns "Today" for current date', () => {
     const now = new Date().toISOString();
     expect(calculateDaysAgo(now)).toBe('Today');

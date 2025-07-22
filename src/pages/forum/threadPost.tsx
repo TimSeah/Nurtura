@@ -1,5 +1,5 @@
 import React from "react";
-import { calculateDaysAgo } from "./utils";
+import { calculateDaysAgo } from "../../utils/calDaysAgoUtil";
 import { ArrowUpIcon, ChatBubbleBottomCenterIcon } from '@heroicons/react/24/outline';
 
 interface ThreadDetail{

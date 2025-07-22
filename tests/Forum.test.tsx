@@ -10,18 +10,13 @@ const sampleThreads = [
   { _id: 2, title: 'Other', content: 'Thing', author: 'Someone else',    date: new Date().toISOString(), upvotes: 1, replies: 0 },
 ];
 
-describe('<Forum />', () => {
-  afterEach(() => {
-    cleanup();
-    vi.restoreAllMocks()
-  });
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks()
+});
 
-  /**
-   * UI Tests for the <Forum /> component
-   * These tests verify user interface behavior, including loading states, error handling,
-   * thread filtering, form validation, and thread creation. They simulate user interactions
-   * and check the rendered output to ensure the UI responds as expected.
-   */
+describe('Forum: UI test cases', () => {
+
   test('shows loading then threads', async () => {
     mockFetchOnce(sampleThreads); // initial GET
     renderWithRouter(<Forum />);
@@ -78,7 +73,9 @@ describe('<Forum />', () => {
     await waitFor(() => expect(screen.queryByText(/Create New Thread/i)).not.toBeInTheDocument());
     expect(await screen.findByText('New T')).toBeInTheDocument();
   });
+});
 
+describe('Forum: Integration test cases', () => {
   // Integration test: clicking a thread navigates to thread detail page
   test('navigates to thread detail page on thread click', async () => {
     mockFetchOnce(sampleThreads);
