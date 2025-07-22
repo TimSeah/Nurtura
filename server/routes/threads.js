@@ -88,7 +88,7 @@ router.patch('/:id/vote', async (req, res) => {
     thread.upvotes = 0;
     }
     if (direction === 'up')      thread.upvotes += 1;
-    else if (direction === 'down') thread.upvotes = Math.max(thread.upvotes - 1, 0);
+    else if (direction === 'down') thread.upvotes -= 1;
 
     await thread.save();
     res.json({ upvotes: thread.upvotes });   // return the new total
