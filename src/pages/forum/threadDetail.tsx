@@ -119,7 +119,7 @@ const ThreadDetail: React.FC = () => {
                 body: JSON.stringify({
                     threadId: id,
                     content: form.content,
-                    author: currentUser, // To be replaced with actual user
+                    author: "good commenter", // To be replaced with actual user
                     date: new Date().toISOString()
                 }),
             });
@@ -148,11 +148,6 @@ const ThreadDetail: React.FC = () => {
     
     return (
         <div className="min-h-screen bg-gray-50 antialiased">
-            {/* Back Button */}
-            <div className="mb-4 flex items-center space-x-2 text-blue-600 hover:text-blue-800 cursor-pointer" onClick={() => navigate(-1)}>
-            <ArrowLeftIcon className="w-5 h-5" />
-            <span className="text-sm font-medium">Back to Forum</span>
-            </div>
             <div className="max-w-3xl mx-auto px-4 py-8">
                 {/* Back Button */}
                 <div className="mb-4 flex items-center space-x-2 text-blue-600 hover:text-blue-800 cursor-pointer" onClick={() => navigate(-1)}>
