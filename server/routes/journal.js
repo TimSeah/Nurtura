@@ -4,6 +4,16 @@ const express = require('express');
 const router = express.Router(); 
 const Journal = require('../models/Journal');
 
+//import auth from @clerk/express
+const {requireAuth} = require('@clerk/express'); 
+
+// Applies authentication check to entire router
+// from this line onwards, all routes in this file require user
+// to be authenticated
+router.use(requireAuth());
+
+
+
 router.get('/', async (req, res) => {
   try {
     // Find all journals in the database.

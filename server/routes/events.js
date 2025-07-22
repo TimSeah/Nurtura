@@ -8,6 +8,16 @@ const UserSettings = require('../models/UserSettings');
 // Import the email reminder service
 const { sendReminderEmail } = require('../services/emailReminderService');
 
+//import auth from @clerk/express
+const {requireAuth} = require('@clerk/express'); 
+
+// Applies authentication check to entire router
+// from this line onwards, all routes in this file require user
+// to be authenticated
+router.use(requireAuth());
+
+
+
 router.get('/', async (req, res) => {
   try {
     const events = await Event.find({}).sort({ date: 1, startTime: 1 });

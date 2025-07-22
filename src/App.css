@@ -16,6 +16,13 @@
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
+.center-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);

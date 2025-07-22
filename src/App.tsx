@@ -1,6 +1,13 @@
 import "./App.css";
-
 import { Routes, Route } from "react-router-dom";
+import {
+  SignedIn,
+  SignedOut,
+  RedirectToSignIn,
+  SignIn,
+  SignUp,
+} from "@clerk/clerk-react";
+
 import Layout from "./components/Layout";
 
 import Dashboard from "./pages/Dashboard.tsx";
@@ -18,22 +25,56 @@ import ResourcesAlt from "./pages/ResorucesAlt.tsx";
 
 function App() {
   return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/calendar" element={<Calendar />} />
-        <Route path="/journal" element={<Journal />} />
-        <Route path="/forum" element={<Forum />} />
-        <Route path="/forumTab" element={<ForumTab />} />
-        <Route path="/threads/:id" element={<ThreadDetail />} />
-        <Route path="/health" element={<HealthTracking />} />
-        <Route path="/care-circle" element={<CareCircle />} />
-        <Route path="/resources" element={<Resources />} />
-        <Route path="/resourcesAlt" element={<ResourcesAlt />} />
-        <Route path="/alerts" element={<Alerts />} />
-        <Route path="/settings" element={<Settings />} />
-      </Routes>
-    </Layout>
+    <Routes>
+      {/* Public Clerk Authentication Pages */}
+      <Route
+        path="/sign-in"
+        element={
+          <div className="center-page">
+            <SignIn />
+          </div>
+        }
+      />
+      <Route
+        path="/sign-up"
+        element={
+          <div className="center-page">
+            <SignUp />
+          </div>
+        }
+      />
+
+      {/* Protected Routes */}
+      <Route
+        path="/*"
+        element={
+          <>
+            <SignedIn>
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/calendar" element={<Calendar />} />
+                  <Route path="/journal" element={<Journal />} />
+                  <Route path="/forum" element={<Forum />} />
+                  <Route path="/forumTab" element={<ForumTab />} />
+                  <Route path="/threads/:id" element={<ThreadDetail />} />
+                  <Route path="/health" element={<HealthTracking />} />
+                  <Route path="/care-circle" element={<CareCircle />} />
+                  <Route path="/resources" element={<Resources />} />
+                  <Route path="/resourcesAlt" element={<ResourcesAlt />} />
+                  <Route path="/alerts" element={<Alerts />} />
+                  <Route path="/settings" element={<Settings />} />
+                </Routes>
+              </Layout>
+            </SignedIn>
+
+            <SignedOut>
+              <RedirectToSignIn />
+            </SignedOut>
+          </>
+        }
+      />
+    </Routes>
   );
 }
 

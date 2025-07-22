@@ -2,6 +2,16 @@ const express = require('express');
 const router = express.Router();
 const CareRecipient = require('../models/CareRecipient');
 
+
+//import auth from @clerk/express
+const {requireAuth} = require('@clerk/express'); 
+
+// Applies authentication check to entire router
+// from this line onwards, all routes in this file require user
+// to be authenticated
+router.use(requireAuth());
+
+
 // Get all care recipients
 router.get('/', async (req, res) => {
   try {

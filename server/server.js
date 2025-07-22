@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const {clerkMiddleware} = require('@clerk/express'); // import clerk middleware for auth
 require('dotenv').config();
 
 const app = express();
@@ -68,6 +69,9 @@ app.use(express.urlencoded({ extended: false }));
 
 // Parse cookies attached to the client request object.
 app.use(cookieParser());
+
+// use here as clerkMiddleware() needs cookies and headers, cookieparser must be before this
+app.use(clerkMiddleware());
 
 // Serve static files (like your React build output in production, or other static assets)
 // from the 'public' directory.

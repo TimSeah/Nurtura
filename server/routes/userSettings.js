@@ -2,6 +2,17 @@ const express = require('express');
 const router = express.Router();
 const UserSettings = require('../models/UserSettings');
 
+
+
+//import auth from @clerk/express
+const {requireAuth} = require('@clerk/express'); 
+
+// Applies authentication check to entire router
+// from this line onwards, all routes in this file require user
+// to be authenticated
+router.use(requireAuth());
+
+
 // Get user settings
 router.get('/:userId', async (req, res) => {
   try {

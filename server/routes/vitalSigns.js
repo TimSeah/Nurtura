@@ -2,6 +2,18 @@ const express = require('express');
 const router = express.Router();
 const VitalSigns = require('../models/VitalSigns');
 
+
+
+//import auth from @clerk/express
+const {requireAuth} = require('@clerk/express'); 
+
+// Applies authentication check to entire router
+// from this line onwards, all routes in this file require user
+// to be authenticated
+router.use(requireAuth());
+
+
+
 // Get all vital signs for a recipient
 router.get('/:recipientId', async (req, res) => {
   try {

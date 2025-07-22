@@ -5,6 +5,18 @@ const Thread = require('../models/Thread'); // Import the Thread model
 // --- GET All Threads ---
 // Route: GET /api/threads
 // This route will fetch all threads from the database.
+
+
+//import auth from @clerk/express
+const {requireAuth} = require('@clerk/express'); 
+
+// Applies authentication check to entire router
+// from this line onwards, all routes in this file require user
+// to be authenticated
+router.use(requireAuth());
+
+
+
 router.get('/', async (req, res) => {
   try {
     // Find all threads in the database.

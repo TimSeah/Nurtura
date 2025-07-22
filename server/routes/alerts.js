@@ -2,6 +2,16 @@ const express = require('express');
 const router = express.Router();
 const Alert = require('../models/Alert');
 
+
+//import auth from @clerk/express
+const {requireAuth} = require('@clerk/express'); 
+
+// Applies authentication check to entire router
+// from this line onwards, all routes in this file require user
+// to be authenticated
+router.use(requireAuth());
+
+
 // Get all alerts for a recipient
 router.get('/:recipientId', async (req, res) => {
   try {
