@@ -154,6 +154,8 @@ describe("Calendar Component", () => {
         remark: "Test remark",
         month: "July",
         userId: "123",
+        enableReminder: true,
+        reminderSent: false,
       }),
     });
   });
