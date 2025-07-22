@@ -1,5 +1,5 @@
 import React from "react";
-import { calculateDaysAgo } from "./utils";
+import { calculateDaysAgo } from "../../utils/calDaysAgoUtil";
 
 interface CommentDetail{
     _id: number;
