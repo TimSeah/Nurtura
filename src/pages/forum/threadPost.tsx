@@ -1,6 +1,6 @@
 import React from "react";
 import { calculateDaysAgo } from "./utils";
-import { ArrowUpIcon, ChatBubbleBottomCenterIcon } from '@heroicons/react/24/outline';
+import { ArrowUpIcon, ChatBubbleBottomCenterIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
 
 interface ThreadDetail{
     _id: number;
@@ -14,10 +14,12 @@ interface ThreadDetail{
 
 interface ThreadDetailProps {
   thread: ThreadDetail;
+  upvotes: number;
+  onVote: (direction: 'up' | 'down') => void;
   onCommentClick: () => void;
 }
 
-const ThreadPost: React.FC<ThreadDetailProps> = ({ thread, onCommentClick }) => {
+const ThreadPost: React.FC<ThreadDetailProps> = ({ thread, onCommentClick, onVote, upvotes }) => {
     return (
     <article className="max-w-3xl mx-auto bg-white rounded-2xl shadow p-6">
         {/* Header */}
@@ -37,19 +39,27 @@ const ThreadPost: React.FC<ThreadDetailProps> = ({ thread, onCommentClick }) => 
         </section>
         
         {/* Footer (actions) */}
-        <footer className="flex items-center space-x-6 text-gray-600">
+        <footer className="flex items-center space-x-1 text-gray-600">
             <button 
-            className="flex items-center space-x-1 hover:text-blue-600 transition"
+            onClick={() => onVote('up')}
+             className="flex items-center space-x-1 hover:text-green-600 transition"
             aria-label="Upvote"
             >
-                <ArrowUpIcon className="w-5 h-5" />
-                <span>
-                    {thread.upvotes}
-                </span>
+            <ArrowUpIcon className="w-5 h-5" />
+            <span>{upvotes}</span>
             </button>
+
+            <button 
+            onClick={() => onVote('down')}
+            className="flex items-center space-x-1 hover:text-red-600 transition"
+            aria-label="Downvote"
+            >
+            <ArrowDownIcon className="w-5 h-5" />
+            </button>
+
             <button
             onClick={onCommentClick}
-            className="flex items-center space-x-1 hover:text-blue-600 transition"
+            className="ml-6 flex items-center space-x-1 hover:text-blue-600 transition"
             aria-label="Add Comment"
             >
                 <ChatBubbleBottomCenterIcon className="w-5 h-5" />

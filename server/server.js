@@ -28,13 +28,18 @@ async function cleanup() {
 }
 
 // Connect to MongoDB
+console.log("MONGO_URI =", process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
 .then(() => {
   console.log('MongoDB connected successfully!');
-  const PORT = process.env.PORT || 5000; // Make sure PORT is defined here or globally
+  
+  // Start email reminder service
+  startReminderService();
+  
+  const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log('You can test the server by navigating to http://localhost:5000 in your browser.');
@@ -75,14 +80,30 @@ app.use(express.static(path.join(__dirname, 'public')));
 // to define your API endpoints for different resources.
 const indexRouter = require('./routes/index');
 const eventsRouter = require('./routes/events');
-const threadsRouter = require('./routes/thread');
+const journalsRouter = require('./routes/journal'); 
+const threadsRouter = require('./routes/threads');
 const commentRouter = require('./routes/comment');
+const userSettingsRouter = require('./routes/userSettings');
+const vitalSignsRouter = require('./routes/vitalSigns');
+const careRecipientsRouter = require('./routes/careRecipients');
+const alertsRouter = require('./routes/alerts');
+
+// Import and start email reminder service
+const { startReminderService } = require('./services/emailReminderService');
+const carerecepientsRouter = require('./routes/carerecepients');
 
 // Assign imported routers to specific URL paths.
 app.use('/', indexRouter);
 app.use('/api/events', eventsRouter); 
+app.use('/api/journal', journalsRouter); 
 app.use('/api/threads', threadsRouter); 
+console.log('threadsRouter mounted at /api/threads');
 app.use('/api/threads/:threadId/comments', commentRouter);
+app.use('/api/user-settings', userSettingsRouter);
+app.use('/api/vital-signs', vitalSignsRouter);
+app.use('/api/care-recipients', careRecipientsRouter);
+app.use('/api/alerts', alertsRouter);
+app.use('/api/carerecepients', carerecepientsRouter);
 
 // --- Error Handling Middleware ---
 
