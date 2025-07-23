@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Comment from '../src/pages/forum/Comment';
-import * as calDaysAgoUtil from '../src/utils/calDaysAgoUtil';
+import Comment from '../../src/pages/forum/Comment';
+import * as calDaysAgoUtil from '../../src/utils/calDaysAgoUtil';
 import { afterEach, describe, test, expect, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 

@@ -8,7 +8,7 @@ import {
 // src/setupTests.ts
 import "@testing-library/jest-dom"; // Only this import is needed
 import userEvent from "@testing-library/user-event";
-import Calendar from "./calendar";
+import Calendar from "../../src/pages/calendar/calendar";
 
 // Mock API calls
 global.fetch = jest.fn() as jest.Mock;

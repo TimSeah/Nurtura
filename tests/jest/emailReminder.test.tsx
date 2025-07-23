@@ -6,7 +6,7 @@ import {
   act,
 } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Calendar from "../calendar/calendar";
+import Calendar from "../../src/pages/calendar/calendar";
 
 // Mock API calls
 global.fetch = jest.fn() as jest.Mock;
