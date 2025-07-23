@@ -40,7 +40,7 @@ router.get('/today', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { title, date, startTime, month, remark, userId } = req.body;
+  const { title, date, startTime, month, remark, userId, enableReminder, reminderEmail } = req.body;
 
   const newEvent = new Event({
     title,
@@ -48,7 +48,10 @@ router.post('/', async (req, res) => {
     startTime,
     month,
     remark,
-    userId
+    userId,
+    enableReminder: enableReminder || false,
+    reminderSent: false, // Always start as false for new events
+    reminderEmail: reminderEmail || ''
   });
 
   try {
