@@ -69,8 +69,6 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-<<<<<<< Updated upstream:server/routes/thread.js
-=======
 // --- PATCH  /api/threads/:id/vote  ---
 // body: { direction: "up" | "down" }
 //experimenting with this
@@ -111,7 +109,5 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-
->>>>>>> Stashed changes:server/routes/threads.js
 // Export the router so it can be used by the main Express app (server.js)
 module.exports = router;
