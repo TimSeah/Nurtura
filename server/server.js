@@ -90,7 +90,6 @@ const alertsRouter = require('./routes/alerts');
 
 // Import and start email reminder service
 const { startReminderService } = require('./services/emailReminderService');
-const carerecepientsRouter = require('./routes/carerecepients');
 
 // Assign imported routers to specific URL paths.
 app.use('/', indexRouter);
@@ -103,7 +102,6 @@ app.use('/api/user-settings', userSettingsRouter);
 app.use('/api/vital-signs', vitalSignsRouter);
 app.use('/api/care-recipients', careRecipientsRouter);
 app.use('/api/alerts', alertsRouter);
-app.use('/api/carerecepients', carerecepientsRouter);
 
 // --- Error Handling Middleware ---
 

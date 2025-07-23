@@ -1,13 +1,29 @@
 // Shared types for the Nurtura application
 
 export interface CareRecipient {
-  id: string;
+  _id?: string;
   name: string;
-  age: number;
-  conditions: string[];
-  emergencyContact?: string;
-  primaryCaregiver?: string;
-  profileImage?: string;
+  dateOfBirth: Date | string;
+  relationship: string;
+  medicalConditions: string[];
+  medications: Array<{
+    name: string;
+    dosage: string;
+    frequency: string;
+    startDate: Date | string;
+    endDate?: Date | string;
+    notes: string;
+  }>;
+  emergencyContacts: Array<{
+    name: string;
+    relationship: string;
+    phone: string;
+    email: string;
+  }>;
+  caregiverNotes: string;
+  isActive: boolean;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 export interface VitalSignsData {

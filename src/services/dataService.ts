@@ -18,28 +18,66 @@ class DataService {
   // Care Recipients
   private careRecipients: CareRecipient[] = [
     {
-      id: '1',
+      _id: '1',
       name: 'Eleanor Johnson',
-      age: 78,
-      conditions: ['Hypertension', 'Diabetes'],
-      emergencyContact: 'Michael Johnson - (555) 987-6543',
-      primaryCaregiver: 'Sarah Johnson'
+      dateOfBirth: '1945-03-15',
+      relationship: 'Mother',
+      medicalConditions: ['Hypertension', 'Diabetes'],
+      medications: [
+        {
+          name: 'Metformin',
+          dosage: '500mg',
+          frequency: 'Twice daily',
+          startDate: '2023-01-01',
+          notes: 'Take with meals'
+        }
+      ],
+      emergencyContacts: [
+        {
+          name: 'Michael Johnson',
+          relationship: 'Son',
+          phone: '(555) 987-6543',
+          email: 'michael@example.com'
+        }
+      ],
+      caregiverNotes: 'Needs assistance with medication management',
+      isActive: true
     },
     {
-      id: '2',
+      _id: '2',
       name: 'John Smith',
-      age: 82,
-      conditions: ['Heart Disease', 'Arthritis'],
-      emergencyContact: 'Mary Smith - (555) 123-4567',
-      primaryCaregiver: 'Sarah Johnson'
+      dateOfBirth: '1941-08-22',
+      relationship: 'Father',
+      medicalConditions: ['Heart Disease', 'Arthritis'],
+      medications: [],
+      emergencyContacts: [
+        {
+          name: 'Mary Smith',
+          relationship: 'Daughter',
+          phone: '(555) 123-4567',
+          email: 'mary@example.com'
+        }
+      ],
+      caregiverNotes: 'Regular check-ups needed',
+      isActive: true
     },
     {
-      id: '3',
+      _id: '3',
       name: 'Mary Brown',
-      age: 75,
-      conditions: ['COPD', 'Osteoporosis'],
-      emergencyContact: 'Robert Brown - (555) 789-0123',
-      primaryCaregiver: 'Sarah Johnson'
+      dateOfBirth: '1948-12-10',
+      relationship: 'Grandmother',
+      medicalConditions: ['COPD', 'Osteoporosis'],
+      medications: [],
+      emergencyContacts: [
+        {
+          name: 'Robert Brown',
+          relationship: 'Son',
+          phone: '(555) 789-0123',
+          email: 'robert@example.com'
+        }
+      ],
+      caregiverNotes: 'Mobility assistance required',
+      isActive: true
     }
   ];
 
@@ -360,7 +398,7 @@ class DataService {
   }
 
   getCareRecipient(id: string): CareRecipient | undefined {
-    return this.careRecipients.find(recipient => recipient.id === id);
+    return this.careRecipients.find(recipient => recipient._id === id);
   }
 
   // Vital Signs Methods
@@ -475,7 +513,7 @@ class DataService {
     const lowercaseQuery = query.toLowerCase();
     return this.careRecipients.filter(recipient =>
       recipient.name.toLowerCase().includes(lowercaseQuery) ||
-      recipient.conditions.some(condition => 
+      recipient.medicalConditions.some((condition: string) => 
         condition.toLowerCase().includes(lowercaseQuery)
       )
     );

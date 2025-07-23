@@ -2,8 +2,8 @@ import "./Forum.css";
 import "./Forum"
 import { useState, useEffect, type ChangeEvent } from "react";
 import { useParams } from "react-router-dom";
-import ThreadPost from "./threadPost";
-import Comment from "./comment";
+import ThreadPost from "./ThreadPost";
+import Comment from "./Comment";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
