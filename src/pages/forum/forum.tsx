@@ -219,7 +219,11 @@ const Forum: React.FC = () => {
                 <button
                   className="mt-2 text-red-500 hover:text-red-700 transition"
                   title="Delete Thread"
-                  onClick={() => handleDelete(t._id)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation(); // Prevent link navigation
+                      handleDelete(t._id);
+                    }}
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9ZM7 6H17V20H7V6ZM9 8V18H11V8H9ZM13 8V18H15V8H13Z" />
