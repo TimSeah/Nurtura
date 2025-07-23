@@ -71,7 +71,7 @@ const HealthMonitoring = () => {
   }, []);
 
   return (
-    <div>
+    <div className="health-monitoring">
       <h3>Add Care Recepient</h3>
       <input
         type="text"
