@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router(); // Create a new Express router
-const Thread = require('../models/thread'); // Import the Thread model
-console.log('threads.js route file loaded');
+const Thread = require('../models/Thread'); // Import the Thread model
 
 // --- GET All Threads ---
 // Route: GET /api/threads
@@ -33,6 +32,7 @@ router.post('/', async (req, res) => {
     author,
     date: new Date(date), // Convert the date string from frontend to a Date object
     upvotes,
+    author
   });
 
   try {
