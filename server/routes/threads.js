@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router(); // Create a new Express router
-const Thread = require('../models/Thread'); // Import the Thread model
+const Thread = require('../models/thread'); // Import the Thread model
+console.log('threads.js route file loaded');
 
 // --- GET All Threads ---
 // Route: GET /api/threads
@@ -32,7 +33,6 @@ router.post('/', async (req, res) => {
     author,
     date: new Date(date), // Convert the date string from frontend to a Date object
     upvotes,
-    author
   });
 
   try {
@@ -65,6 +65,35 @@ router.get('/:id', async (req, res) => {
   } catch (err) {
     // If an error occurs, log it and send a 500 (Internal Server Error) response
     console.error('Error fetching thread:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// --- PATCH  /api/threads/:id/vote  ---
+// body: { direction: "up" | "down" }
+//experimenting with this
+router.patch('/:id/vote', async (req, res) => {
+  const { id } = req.params;
+  const { direction } = req.body;           // expected "up" or "down"
+  console.log('PATCH /api/threads/:id/vote called with', req.params.id, req.body);
+
+  if (!['up', 'down'].includes(direction)) {
+    return res.status(400).json({ message: 'direction must be "up" or "down"' });
+  }
+
+  try {
+    const thread = await Thread.findById(id);
+    if (!thread) return res.status(404).json({ message: 'Thread not found' });
+    if (typeof thread.upvotes !== 'number') {
+    thread.upvotes = 0;
+    }
+    if (direction === 'up')      thread.upvotes += 1;
+    else if (direction === 'down') thread.upvotes -= 1;
+
+    await thread.save();
+    res.json({ upvotes: thread.upvotes });   // return the new total
+  } catch (err) {
+    console.error('Vote error:', err);
     res.status(500).json({ message: err.message });
   }
 });

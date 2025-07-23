@@ -1,8 +1,8 @@
 import React, { useEffect, useState, type FormEvent, type ChangeEvent } from "react";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
-import "./forum.css";
+import "./Forum.css";
 import { Link } from "react-router-dom";
-import { calculateDaysAgo } from "./utils";
+import { calculateDaysAgo } from "../../utils/calDaysAgoUtil";
 
 const currentUser = "A good grandkid";
 
@@ -19,7 +19,8 @@ interface Thread {
 const Forum: React.FC = () => {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [showForm, setShowForm]   = useState(false);
   const [form, setForm] = useState({ title: "", content: ""});
   const [showUserThreads, setShowUserThreads] = useState(false);
@@ -36,7 +37,7 @@ const Forum: React.FC = () => {
       const data: Thread[] = await res.json();
       setThreads(data);
     } catch (e: any) {
-      setError(e.message);
+      setLoadError(e.message);
     } finally {
       setLoading(false);
     }
@@ -53,7 +54,7 @@ const Forum: React.FC = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.content) {
-      setError("Title and content are required.");
+      setFormError("Title and content are required.");
       return;
     }
 
@@ -93,8 +94,8 @@ const Forum: React.FC = () => {
     return <div className="loading">Loading threads...</div>;
   }
 
-  if (error) {
-    return <div className="error">Error loading threads: {error}</div>;
+  if (loadError) {
+    return <div className="error">Error loading threads: {loadError}</div>;
   }
 
   return (
@@ -124,7 +125,7 @@ const Forum: React.FC = () => {
               <DialogTitle as="h1" className="text-lg font-medium leading-6 text-gray-900 mb-4">
                 Create New Thread
               </DialogTitle>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <div>
                   <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
                   <input
@@ -149,7 +150,7 @@ const Forum: React.FC = () => {
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
                   />
                 </div>
-                {error && <p className="text-red-600">{error}</p>}
+                {formError && <p className="text-red-600">{formError}</p>}
                 <div className="flex justify-end space-x-2">
                   <button type="button" onClick={() => setShowForm(false)} className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition">
                     Cancel
@@ -177,21 +178,21 @@ const Forum: React.FC = () => {
               </svg>
             </div>
             {/* Thread Info */}
-            <div className="flex-1">
+            <div className="flex-1 text-left">
               <h2 className="text-md font-semibold text-gray-900">{t.title}</h2>
-              <p className="text-sm text-gray-600">{t.content}</p>
+              {/*<p className="text-sm text-gray-600">{t.content}</p>*/}
               <p className="text-sm mt-1 text-blue-500">
-                Re: {t.author} <span className="text-gray-400">• {calculateDaysAgo(t.date)}</span>
+                By: {t.author} <span className="text-gray-400">• {calculateDaysAgo(t.date)}</span>
               </p>
             </div>
             {/* Upvotes + Replies */}
             <div className="ml-4 flex flex-col items-center justify-center text-sm text-gray-500 whitespace-nowrap">
-              <div className="flex items-center gap-1">
+              <button type="button" className="flex items-center gap-1">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M3 10h4v10h6V10h4L10 0 3 10z" />
                 </svg>
                 {t.upvotes}
-              </div>
+              </button>
               <div className="flex items-center gap-1 mt-1">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />

@@ -1,9 +1,11 @@
-import "./forum.css";
-import "./forum"
-import { useState, useEffect, type ChangeEvent} from "react";
+import "./Forum.css";
+import "./Forum"
+import { useState, useEffect, type ChangeEvent } from "react";
 import { useParams } from "react-router-dom";
-import ThreadPost from "./threadPost";
-import Comment from "./comment";
+import ThreadPost from "./ThreadPost";
+import Comment from "./Comment";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 interface ThreadDetail{
     _id: number;
@@ -24,13 +26,16 @@ interface CommentDetail {
 }
 
 const ThreadDetail: React.FC = () => {
+    const navigate = useNavigate();
     const [thread, setThread] = useState<ThreadDetail | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const { id } = useParams<{ id: string }>();
     const [showForm, setShowForm] = useState(false);
-    const [comment, setComment] = useState<CommentDetail[]>([]);
+    const [comments, setComments] = useState<CommentDetail[]>([]);
     const [form, setForm] = useState({ content: "" });
+    const [formError, setFormError] = useState<string | null>(null);
+    const [upvotes, setUpvotes] = useState(thread?.upvotes ?? 0);
 
 
     const fetchThread = async (id: string) => {
@@ -52,7 +57,7 @@ const ThreadDetail: React.FC = () => {
             const res = await fetch(`http://localhost:5000/api/threads/${threadId}/comments`);
             if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
             const data = await res.json();
-            setComment(data);
+            setComments(data);
         } catch (e: any) {
             setError(e.message);
         } finally {
@@ -62,10 +67,38 @@ const ThreadDetail: React.FC = () => {
     
     useEffect(() => {
         if (id) {
-            fetchThread(id);
-            fetchComments(id);
+            (async () => {
+                setLoading(true);
+                await Promise.all([fetchThread(id), fetchComments(id)]);
+                setLoading(false);
+            })();
         }
     }, [id]);
+
+    const handleVote = async (direction: 'up' | 'down') => {
+         if (!thread) return; // Prevents fetch if thread is still null
+         console.log("Voting thread ID:", thread?._id);
+        try {
+             const res = await fetch(`http://localhost:5000/api/threads/${thread._id}/vote`, {
+             method: 'PATCH',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ direction }),
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+        const updated = await res.json();
+        setUpvotes(updated.upvotes);
+  } catch (err) {
+    console.error("Vote failed:", err);
+    alert("Vote failed");
+  }
+};
+
+    useEffect(() => {
+        if (thread) {
+            setUpvotes(thread.upvotes);
+        }
+    }, [thread]);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -74,7 +107,7 @@ const ThreadDetail: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!form.content) {
-            setError("Content is required.");
+            setFormError("Content is required.");
             return;
         }
         try {
@@ -86,13 +119,13 @@ const ThreadDetail: React.FC = () => {
                 body: JSON.stringify({
                     threadId: id,
                     content: form.content,
-                    author: "A tired caregiver", // To be replaced with actual user
+                    author: "good commenter", // To be replaced with actual user
                     date: new Date().toISOString()
                 }),
             });
             if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
             const newComment: CommentDetail = await res.json();
-            setComment(prev => [...prev, newComment]);
+            setComments(prev => [...prev, newComment]);
             setForm({ content: "" });
             setShowForm(false);
             await fetchComments(id!);
@@ -116,9 +149,16 @@ const ThreadDetail: React.FC = () => {
     return (
         <div className="min-h-screen bg-gray-50 antialiased">
             <div className="max-w-3xl mx-auto px-4 py-8">
+                {/* Back Button */}
+                <div className="mb-4 flex items-center space-x-2 text-blue-600 hover:text-blue-800 cursor-pointer" onClick={() => navigate(-1)}>
+                <ArrowLeftIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">Back to Forum</span>
+                </div>
                 {/* --- Thread Header --- */}
                 <ThreadPost 
                 thread={thread} 
+                upvotes={upvotes}
+                onVote={handleVote}
                 onCommentClick={() => setShowForm(prev => !prev)}
                 />
                 
@@ -127,7 +167,7 @@ const ThreadDetail: React.FC = () => {
                     {/* --- Post Comment --- */}
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 text-left">Comments</h2>
                     {showForm && (
-                        <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+                        <form onSubmit={handleSubmit} noValidate className="flex flex-col space-y-4">
                             <textarea
                             id="content"
                             name="content"
@@ -138,18 +178,27 @@ const ThreadDetail: React.FC = () => {
                             placeholder="Write a comment…"
                             required
                             />
+                            {formError && (
+                                <p role="alert" className="text-red-600 text-sm">{formError}</p>
+                            )}
+                            <div className="flex justify-end space-x-2">
+                            <button type="button" onClick={() => setShowForm(false)} className="self-end px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300 transition"
+                            >
+                                Cancel
+                            </button>
                             <button
                             type="submit"
                             className="self-end px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-800 rounded-lg focus:ring-2 focus:ring-primary-500 focus:outline-none"
                             >
                                 Post comment
                             </button>
+                            </div>
                         </form>
                     )}
                     {/* --- Comments List --- */}
                     <div className="mt-6 space-y-4">
-                        {comment.length > 0 ? (
-                            comment.map((c) => (
+                        {comments.length > 0 ? (
+                            comments.map((c) => (
                                 <Comment key={c._id} comment={c} />
                             ))
                         ) : (

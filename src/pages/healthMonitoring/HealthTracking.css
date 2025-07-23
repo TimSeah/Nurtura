@@ -295,3 +295,55 @@
     text-align: left;
   }
 }
+
+/* Card Header Styles */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.card-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.card-actions .btn-primary {
+  background: #0f766e;
+  color: white;
+}
+
+.card-actions .btn-primary:hover {
+  background: #0d7377;
+}
+
+.card-actions .btn-secondary {
+  background: #64748b;
+  color: white;
+}
+
+.card-actions .btn-secondary:hover {
+  background: #475569;
+}
+
+.btn-icon {
+  width: 1rem;
+  height: 1rem;
+}

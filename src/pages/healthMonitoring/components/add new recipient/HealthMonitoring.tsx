@@ -1,29 +1,27 @@
 import { useState, useEffect } from "react";
 import "./healthmonitoring.css";
-
-interface Carerecepient {
-  _id?: string;
-  name: string;
-  remark: string;
-  caregiverId: string;
-}
+import { CareRecipient } from "../../../../types";
 
 const HealthMonitoring = () => {
   const [name, setName] = useState("");
   const [remark, setRemark] = useState("");
-  const [recepients, setRecepients] = useState<Carerecepient[]>([]);
-  const dummyId = "123";
+  const [recepients, setRecepients] = useState<CareRecipient[]>([]);
 
   const saveRecepient = async () => {
-    const newRecepient: Carerecepient = {
+    const newRecepient = {
       name,
-      remark,
-      caregiverId: dummyId,
+      relationship: remark, // Map the remark field to relationship
+      dateOfBirth: new Date(), // You'll need to add a date picker for this
+      medicalConditions: [],
+      medications: [],
+      emergencyContacts: [],
+      caregiverNotes: "",
+      isActive: true
     };
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/carerecepients/`,
+        `http://localhost:5000/api/care-recipients`,
         {
           method: "POST",
           headers: {
@@ -53,7 +51,7 @@ const HealthMonitoring = () => {
   const getRecepients = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/carerecepients/${dummyId}`
+        `http://localhost:5000/api/care-recipients`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch care recipients");
@@ -89,7 +87,7 @@ const HealthMonitoring = () => {
       <ul>
         {recepients.map((r, i) => (
           <li key={r._id || i}>
-            <strong>{r.name}</strong>: {r.remark}
+            <strong>{r.name}</strong>: {r.relationship}
           </li>
         ))}
       </ul>

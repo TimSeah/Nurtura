@@ -1,3 +1,5 @@
+import '@testing-library/jest-dom';
+import 'whatwg-fetch';
 // src/setupTests.ts
 import '@testing-library/jest-dom';
 import { TextEncoder, TextDecoder } from 'util';

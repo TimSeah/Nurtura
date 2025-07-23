@@ -28,6 +28,7 @@ async function cleanup() {
 }
 
 // Connect to MongoDB
+console.log("MONGO_URI =", process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -80,7 +81,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const indexRouter = require('./routes/index');
 const eventsRouter = require('./routes/events');
 const journalsRouter = require('./routes/journal'); 
-const threadsRouter = require('./routes/thread');
+const threadsRouter = require('./routes/threads');
 const commentRouter = require('./routes/comment');
 const userSettingsRouter = require('./routes/userSettings');
 const vitalSignsRouter = require('./routes/vitalSigns');
@@ -89,19 +90,18 @@ const alertsRouter = require('./routes/alerts');
 
 // Import and start email reminder service
 const { startReminderService } = require('./services/emailReminderService');
-const carerecepientsRouter = require('./routes/carerecepients');
 
 // Assign imported routers to specific URL paths.
 app.use('/', indexRouter);
 app.use('/api/events', eventsRouter); 
 app.use('/api/journal', journalsRouter); 
 app.use('/api/threads', threadsRouter); 
+console.log('threadsRouter mounted at /api/threads');
 app.use('/api/threads/:threadId/comments', commentRouter);
 app.use('/api/user-settings', userSettingsRouter);
 app.use('/api/vital-signs', vitalSignsRouter);
 app.use('/api/care-recipients', careRecipientsRouter);
 app.use('/api/alerts', alertsRouter);
-app.use('/api/carerecepients', carerecepientsRouter);
 
 // --- Error Handling Middleware ---
 
