@@ -6,6 +6,7 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+const threadRoutes = require('./routes/threads');
 
 const app = express();
 
@@ -73,6 +74,9 @@ app.use(cookieParser());
 // Serve static files (like your React build output in production, or other static assets)
 // from the 'public' directory.
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Mount thread routes at /api/threads
+app.use('/api/threads', threadRoutes)
 
 // --- Route Definitions ---
 // Import your route handlers.

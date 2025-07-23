@@ -98,5 +98,17 @@ router.patch('/:id/vote', async (req, res) => {
   }
 });
 
+router.delete('/:id', async (req, res) => {
+  try {
+    const deleted = await Thread.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Thread not found' });
+    res.json({ message: 'Thread deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting thread:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+>>>>>>> Stashed changes:server/routes/threads.js
 // Export the router so it can be used by the main Express app (server.js)
 module.exports = router;
