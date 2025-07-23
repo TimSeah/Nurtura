@@ -18,6 +18,7 @@ import {
   Plus,
   TrendingUp,
   Droplets,
+  Info,
 } from "lucide-react";
 import { apiService } from "../../services/apiService";
 import Modal from "../../components/Modal";
@@ -60,7 +61,7 @@ const HealthTracking: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [newVitalForm, setNewVitalForm] = useState({
     value: "",
-    dateTime: "",
+    dateTime: new Date().toISOString().slice(0, 16),
     notes: "",
   });
   const [isAddingRecipient, setIsAddingRecipient] = useState(false);
@@ -135,12 +136,29 @@ const HealthTracking: React.FC = () => {
       const savedVital = await apiService.addVitalSigns(vitalData);
       setVitalReadings((prev) => [savedVital, ...prev]);
 
-      // Reset form
-      setNewVitalForm({ value: "", dateTime: "", notes: "" });
+      // Reset form and close modal
+      setNewVitalForm({ 
+        value: "", 
+        dateTime: new Date().toISOString().slice(0, 16), 
+        notes: "" 
+      });
       setShowAddForm(false);
+      
+      alert("Vital signs recorded successfully!");
     } catch (error) {
       console.error("Error saving vital signs:", error);
+      alert("Failed to save vital signs. Please try again.");
     }
+  };
+
+  const handleCloseAddForm = () => {
+    // Reset form when closing
+    setNewVitalForm({ 
+      value: "", 
+      dateTime: new Date().toISOString().slice(0, 16), 
+      notes: "" 
+    });
+    setShowAddForm(false);
   };
 
   // Generate chart data from actual readings
@@ -231,6 +249,53 @@ const HealthTracking: React.FC = () => {
         return "Oxygen Saturation";
       default:
         return type;
+    }
+  };
+
+  const getVitalTypeDetails = (type: string) => {
+    switch (type) {
+      case "blood_pressure":
+        return {
+          placeholder: "120/80",
+          hint: "Sit comfortably for 5 minutes before taking. Place cuff on upper arm at heart level. Record as systolic/diastolic (e.g., 120/80).",
+          normalRange: "Normal: Less than 120/80 mmHg"
+        };
+      case "heart_rate":
+        return {
+          placeholder: "72",
+          hint: "Rest for 5 minutes before measuring. Place two fingers on wrist pulse point. Count beats for 60 seconds or use a heart rate monitor.",
+          normalRange: "Normal: 60-100 beats per minute"
+        };
+      case "temperature":
+        return {
+          placeholder: "98.6",
+          hint: "Wait 30 minutes after eating/drinking hot/cold items. Place thermometer under tongue for oral reading or follow device instructions.",
+          normalRange: "Normal: 97.8°F - 99.1°F (36.5°C - 37.3°C)"
+        };
+      case "weight":
+        return {
+          placeholder: "150",
+          hint: "Weigh at the same time each day, preferably in the morning after using the bathroom. Use the same scale on a hard, flat surface.",
+          normalRange: "Track changes over time rather than single readings"
+        };
+      case "blood_sugar":
+        return {
+          placeholder: "120",
+          hint: "Wash hands thoroughly. Use fresh lancet and test strip. Follow your glucose meter instructions. Record timing (fasting, before/after meals).",
+          normalRange: "Fasting: 80-100 mg/dL | After meals: Less than 140 mg/dL"
+        };
+      case "oxygen_saturation":
+        return {
+          placeholder: "98",
+          hint: "Ensure finger is clean and warm. Remove nail polish if present. Place pulse oximeter on fingertip and wait for stable reading.",
+          normalRange: "Normal: 95-100%"
+        };
+      default:
+        return {
+          placeholder: "",
+          hint: "",
+          normalRange: ""
+        };
     }
   };
 
@@ -430,7 +495,7 @@ const HealthTracking: React.FC = () => {
       {/* Add Reading Modal */}
       <Modal
         isOpen={showAddForm}
-        onClose={() => setShowAddForm(false)}
+        onClose={handleCloseAddForm}
         title="Add New Vital Reading"
         size="medium"
       >
@@ -452,17 +517,29 @@ const HealthTracking: React.FC = () => {
           </div>
           <div className="form-group">
             <label>Value</label>
-            <input
-              type="text"
-              value={newVitalForm.value}
-              onChange={(e) =>
-                setNewVitalForm((prev) => ({ ...prev, value: e.target.value }))
-              }
-              placeholder={`Enter ${getVitalDisplayName(
-                selectedVitalType as VitalSignsData["vitalType"]
-              )} value`}
-              required
-            />
+            <div className="vital-input-container">
+              <input
+                type="text"
+                value={newVitalForm.value}
+                onChange={(e) =>
+                  setNewVitalForm((prev) => ({ ...prev, value: e.target.value }))
+                }
+                placeholder={getVitalTypeDetails(selectedVitalType).placeholder}
+                required
+              />
+              <span className="vital-unit-label">
+                {getVitalUnit(selectedVitalType)}
+              </span>
+            </div>
+            {getVitalTypeDetails(selectedVitalType).hint && (
+              <div className="vital-hint">
+                <Info className="hint-icon" />
+                <div className="hint-content">
+                  <p className="hint-text">{getVitalTypeDetails(selectedVitalType).hint}</p>
+                  <p className="normal-range">📊 {getVitalTypeDetails(selectedVitalType).normalRange}</p>
+                </div>
+              </div>
+            )}
           </div>
           <div className="form-group">
             <label>Date & Time</label>
@@ -495,7 +572,7 @@ const HealthTracking: React.FC = () => {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={() => setShowAddForm(false)}
+              onClick={handleCloseAddForm}
             >
               Cancel
             </button>

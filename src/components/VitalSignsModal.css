@@ -110,6 +110,49 @@
   height: 1rem;
 }
 
+/* Vital sign hints */
+.vital-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background-color: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 0.5rem;
+}
+
+.hint-icon {
+  width: 1rem;
+  height: 1rem;
+  color: #0284c7;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.hint-content {
+  flex: 1;
+}
+
+.hint-text {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #0c4a6e;
+}
+
+.normal-range {
+  margin: 0;
+  font-size: 0.6875rem;
+  line-height: 1.3;
+  color: #0369a1;
+  font-weight: 500;
+  background-color: #e0f2fe;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid #7dd3fc;
+}
+
 @media (max-width: 768px) {
   .form-grid {
     grid-template-columns: 1fr;
@@ -121,5 +164,13 @@
   
   .btn {
     justify-content: center;
+  }
+  
+  .vital-hint {
+    padding: 0.5rem;
+  }
+  
+  .hint-text {
+    font-size: 0.6875rem;
   }
 }
