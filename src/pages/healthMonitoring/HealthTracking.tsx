@@ -22,7 +22,8 @@ import {
 import { apiService } from "../../services/apiService";
 import Modal from "../../components/Modal";
 import HealthMonitoring from "./components/add new recipient/HealthMonitoring";
-import Journal from "./components/journal/journal";
+import JournalEntryForm from "./components/journal/JournalEntryForm";
+import JournalEntriesCard from "./components/journal/JournalEntriesCard";
 import "./HealthTracking.css";
 
 interface CareRecipient {
@@ -64,6 +65,13 @@ const HealthTracking: React.FC = () => {
   });
   const [isAddingRecipient, setIsAddingRecipient] = useState(false);
   const [isAddingJournal, setIsAddingJournal] = useState(false);
+  const [journalRefreshKey, setJournalRefreshKey] = useState(0);
+
+  const handleJournalSaved = () => {
+    // Force refresh of journal entries when a new journal is saved
+    setJournalRefreshKey(prev => prev + 1);
+    setIsAddingJournal(false);
+  };
 
   useEffect(() => {
     // Load care recipients on initial mount
@@ -251,6 +259,17 @@ const HealthTracking: React.FC = () => {
       <div className="card">
         <div className="card-header">
           <h2 className="card-title">Select Care Recipient</h2>
+          <div className="card-actions">
+            {!isAddingRecipient && (
+              <button 
+                className="btn btn-primary"
+                onClick={() => setIsAddingRecipient(true)}
+              >
+                <Plus className="btn-icon" />
+                Add Care Recipient
+              </button>
+            )}
+          </div>
         </div>
         <div className="recipient-selector">
           {loading ? (
@@ -293,34 +312,6 @@ const HealthTracking: React.FC = () => {
             ))
           )}
         </div>
-        {/* can move this anywhere */}
-        {!isAddingRecipient && (
-          <button onClick={() => setIsAddingRecipient(true)}>
-            Add New Care Recipient
-          </button>
-        )}
-        {isAddingRecipient && (
-          <>
-            <HealthMonitoring />
-            <button onClick={() => setIsAddingRecipient(false)}>Close</button>
-          </>
-        )}
-
-        {/* can move this anywhere */}
-        {!isAddingJournal && (
-          <button
-            className="add-journal"
-            onClick={() => setIsAddingJournal(true)}
-          >
-            Add New Journal
-          </button>
-        )}
-        {isAddingJournal && (
-          <>
-            <Journal />
-            <button onClick={() => setIsAddingJournal(false)}>Close</button>
-          </>
-        )}
       </div>
       {selectedRecipientData && (
         <>
@@ -330,13 +321,15 @@ const HealthTracking: React.FC = () => {
               <h2 className="card-title">
                 Recent Readings - {selectedRecipientData.name}
               </h2>
-              <button
-                className="btn btn-primary"
-                onClick={() => setShowAddForm(true)}
-              >
-                <Plus className="btn-icon" />
-                Add Reading
-              </button>
+              <div className="card-actions">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setShowAddForm(true)}
+                >
+                  <Plus className="btn-icon" />
+                  Add Reading
+                </button>
+              </div>
             </div>
             <div className="readings-grid">
               {vitalReadings.map((reading) => {
@@ -420,6 +413,18 @@ const HealthTracking: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Journal Entries Section */}
+          {selectedRecipientData && (
+            <div style={{ marginTop: '2rem' }}>
+              <JournalEntriesCard 
+                key={`journal-${selectedRecipient}-${journalRefreshKey}`}
+                recipientId={selectedRecipient}
+                recipientName={selectedRecipientData.name}
+                onAddJournal={() => setIsAddingJournal(true)}
+              />
+            </div>
+          )}
         </>
       )}
       {/* Add Reading Modal */}
@@ -497,6 +502,42 @@ const HealthTracking: React.FC = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Add Care Recipient Modal */}
+      {isAddingRecipient && (
+        <Modal
+          isOpen={isAddingRecipient}
+          onClose={() => setIsAddingRecipient(false)}
+          title="Add New Care Recipient"
+        >
+          <HealthMonitoring />
+          <div className="modal-buttons">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setIsAddingRecipient(false)}
+            >
+              Close
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {/* Add Journal Modal */}
+      {isAddingJournal && selectedRecipientData && (
+        <Modal
+          isOpen={isAddingJournal}
+          onClose={() => setIsAddingJournal(false)}
+          title="Add New Journal Entry"
+          size="large"
+        >
+          <JournalEntryForm 
+            recipientId={selectedRecipient}
+            recipientName={selectedRecipientData.name}
+            onSave={handleJournalSaved}
+          />
+        </Modal>
+      )}
     </div>
   );
 };
