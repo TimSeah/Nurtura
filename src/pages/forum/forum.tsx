@@ -13,7 +13,7 @@ interface Thread {
   author: string;
   date: string;
   upvotes: number;
-  replies: number;
+  comments: number;
 };
 
 const Forum: React.FC = () => {
@@ -36,6 +36,7 @@ const Forum: React.FC = () => {
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       const data: Thread[] = await res.json();
       setThreads(data);
+      console.log(threads);
     } catch (e: any) {
       setLoadError(e.message);
     } finally {
@@ -213,7 +214,8 @@ const Forum: React.FC = () => {
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
                 </svg>
-                {0} {/* replies */}
+                {t.comments}
+                {/* {typeof t.comments === 'number'? t.comments : 0} */}
               </div>
               {t.author == currentUser && (
                 <button
@@ -232,6 +234,7 @@ const Forum: React.FC = () => {
                 </button>
               )}
             </div>
+            <pre>{JSON.stringify(t, null, 2)}</pre>
           </Link>
         ))
       )}
