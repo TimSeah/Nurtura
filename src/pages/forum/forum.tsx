@@ -32,7 +32,7 @@ const Forum: React.FC = () => {
   const fetchThreads = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/threads");
+      const res = await fetch("http://localhost:5000/api/threads");
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       const data: Thread[] = await res.json();
       setThreads(data);
@@ -59,7 +59,7 @@ const Forum: React.FC = () => {
     }
 
     try{
-      const res = await fetch("/api/threads", {
+      const res = await fetch("http://localhost:5000/api/threads", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

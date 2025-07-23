@@ -108,6 +108,8 @@ const Calendar: React.FC = () => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    console.log("handleInputChange", e.target.name, e.target.value);
+
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -115,6 +117,8 @@ const Calendar: React.FC = () => {
   const handleEditInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    console.log("handleEditInputChange", e.target.name, e.target.value);
+
     const { name, value } = e.target;
     setEditFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -167,7 +171,7 @@ const Calendar: React.FC = () => {
       month: monthNames[month],
       userId: defaultId, // CHANGE TO ACTUAL USER ID LATER
       enableReminder: true, // Enable reminders by default
-      reminderSent: false
+      reminderSent: false,
     };
 
     try {
@@ -179,17 +183,17 @@ const Calendar: React.FC = () => {
 
       if (response.ok) {
         const savedEvent = await response.json();
-        
+
         const key = dateKey(selectedDay);
         setEvents((prev) => ({
           ...prev,
           [key]: [...(prev[key] || []), savedEvent],
         }));
       } else {
-        console.error('Failed to save event');
+        console.error("Failed to save event");
       }
     } catch (error) {
-      console.error('Error saving event:', error);
+      console.error("Error saving event:", error);
     }
 
     closeForm();
@@ -292,7 +296,7 @@ const Calendar: React.FC = () => {
       <div className="calendar-header">
         <button
           onClick={() => setCurrentDate(new Date(year, month - 1))}
-          className="nav-button"
+          className="next-prev-button"
         >
           &lt; Previous Month
         </button>
@@ -301,7 +305,7 @@ const Calendar: React.FC = () => {
         </h2>
         <button
           onClick={() => setCurrentDate(new Date(year, month + 1))}
-          className="nav-button"
+          className="next-prev-button"
         >
           Next Month &gt;
         </button>
@@ -325,6 +329,8 @@ const Calendar: React.FC = () => {
               {dateKey(selectedDay)}
             </h3>
             <input
+              id="title-input"
+              data-testid="title-input"
               type="text"
               name="title"
               placeholder={
@@ -336,6 +342,8 @@ const Calendar: React.FC = () => {
               }
             />
             <input
+              id="time-input"
+              data-testid="time-input"
               type="time"
               name="hour"
               value={editingEvent ? editFormData.hour : formData.hour}
@@ -344,6 +352,8 @@ const Calendar: React.FC = () => {
               }
             />
             <textarea
+              id="remark-input"
+              data-testid="remark-input"
               name="remark"
               placeholder={
                 editingEvent
@@ -372,18 +382,22 @@ const Calendar: React.FC = () => {
                   <button
                     onClick={async () => {
                       try {
-                        const event = events[editingEvent.key][editingEvent.index];
-                        const response = await fetch(`http://localhost:5000/api/events/${event._id}/send-reminder`, {
-                          method: 'POST'
-                        });
+                        const event =
+                          events[editingEvent.key][editingEvent.index];
+                        const response = await fetch(
+                          `http://localhost:5000/api/events/${event._id}/send-reminder`,
+                          {
+                            method: "POST",
+                          }
+                        );
                         if (response.ok) {
-                          alert('Test reminder sent successfully!');
+                          alert("Test reminder sent successfully!");
                         } else {
-                          alert('Failed to send test reminder');
+                          alert("Failed to send test reminder");
                         }
                       } catch (error) {
-                        console.error('Error sending test reminder:', error);
-                        alert('Error sending test reminder');
+                        console.error("Error sending test reminder:", error);
+                        alert("Error sending test reminder");
                       }
                     }}
                   >

@@ -2,8 +2,8 @@ import "./Forum.css";
 import "./Forum"
 import { useState, useEffect, type ChangeEvent } from "react";
 import { useParams } from "react-router-dom";
-import ThreadPost from "./threadPost";
-import Comment from "./comment";
+import ThreadPost from "./ThreadPost";
+import Comment from "./Comment";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
@@ -37,12 +37,13 @@ const ThreadDetail: React.FC = () => {
     const [comments, setComments] = useState<CommentDetail[]>([]);
     const [form, setForm] = useState({ content: "" });
     const [formError, setFormError] = useState<string | null>(null);
+    const [upvotes, setUpvotes] = useState(thread?.upvotes ?? 0);
 
 
     const fetchThread = async (id: string) => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/threads/${id}`);
+            const res = await fetch(`http://localhost:5000/api/threads/${id}`);
             if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
             const data: ThreadDetail = await res.json();
             setThread(data);
@@ -55,7 +56,7 @@ const ThreadDetail: React.FC = () => {
 
     const fetchComments = async (threadId: string) => {
         try {
-            const res = await fetch(`/api/threads/${threadId}/comments`);
+            const res = await fetch(`http://localhost:5000/api/threads/${threadId}/comments`);
             if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
             const data = await res.json();
             setComments(data);
@@ -76,6 +77,31 @@ const ThreadDetail: React.FC = () => {
         }
     }, [id]);
 
+    const handleVote = async (direction: 'up' | 'down') => {
+         if (!thread) return; // Prevents fetch if thread is still null
+         console.log("Voting thread ID:", thread?._id);
+        try {
+             const res = await fetch(`http://localhost:5000/api/threads/${thread._id}/vote`, {
+             method: 'PATCH',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ direction }),
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+        const updated = await res.json();
+        setUpvotes(updated.upvotes);
+  } catch (err) {
+    console.error("Vote failed:", err);
+    alert("Vote failed");
+  }
+};
+
+    useEffect(() => {
+        if (thread) {
+            setUpvotes(thread.upvotes);
+        }
+    }, [thread]);
+
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -87,7 +113,7 @@ const ThreadDetail: React.FC = () => {
             return;
         }
         try {
-            const res = await fetch(`/api/threads/${id}/comments`, {
+            const res = await fetch(`http://localhost:5000/api/threads/${id}/comments`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -133,6 +159,8 @@ const ThreadDetail: React.FC = () => {
                 {/* --- Thread Header --- */}
                 <ThreadPost 
                 thread={thread} 
+                upvotes={upvotes}
+                onVote={handleVote}
                 onCommentClick={() => setShowForm(prev => !prev)}
                 />
                 
