@@ -3,6 +3,7 @@ import type { Alert } from '../types';
 import { apiService } from '../services/apiService';
 import { filterAlerts, calculateAlertCounts } from '../utils/alertUtils';
 
+
 interface UseAlertsReturn {
   alerts: Alert[];
   filteredAlerts: Alert[];
@@ -31,7 +32,8 @@ export const useAlerts = (): UseAlertsReturn => {
     try {
       setIsLoading(true);
       setError(null);
-      // Using a default recipient ID - in a real app, this would come from auth context
+      // Using a default recipient ID 
+      // - in a real app, this would come from auth context
       const alertsData = await apiService.getAlerts('1'); // Default recipient ID
       setAlerts(alertsData);
     } catch (err) {

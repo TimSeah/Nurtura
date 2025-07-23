@@ -1,13 +1,14 @@
-import React from 'react';
-import { Bell, AlertTriangle, CheckCircle, Clock, X } from 'lucide-react';
-import type { Alert } from '../types';
-import { 
-  getAlertCardClassNames, 
-  getPriorityBadgeClassName, 
+import React from "react";
+import { Bell, AlertTriangle, CheckCircle, Clock, X } from "lucide-react";
+import type { Alert } from "../types";
+import {
+  getAlertCardClassNames,
+  getPriorityBadgeClassName,
   getAlertIconClassName,
-  formatTimestamp
-} from '../utils/alertUtils';
-import './AlertCard.css';
+  formatTimestamp,
+} from "../utils/alertUtils";
+import "./AlertCard.css";
+//import { useApi } from "../hooks/useApi"; // for clerk auth
 
 interface AlertCardProps {
   alert: Alert;
@@ -15,19 +16,28 @@ interface AlertCardProps {
   onRemove: (id: string) => void;
 }
 
-const AlertCard: React.FC<AlertCardProps> = ({ alert, onMarkAsRead, onRemove }) => {
-  const getPriorityIcon = (priority: Alert['priority']) => {
+const AlertCard: React.FC<AlertCardProps> = ({
+  alert,
+  onMarkAsRead,
+  onRemove,
+}) => {
+  const getPriorityIcon = (priority: Alert["priority"]) => {
     switch (priority) {
-      case 'critical': return AlertTriangle;
-      case 'high': return AlertTriangle;
-      case 'medium': return Bell;
-      case 'low': return CheckCircle;
-      default: return Bell;
+      case "critical":
+        return AlertTriangle;
+      case "high":
+        return AlertTriangle;
+      case "medium":
+        return Bell;
+      case "low":
+        return CheckCircle;
+      default:
+        return Bell;
     }
   };
 
   const handleRemove = () => {
-    if (window.confirm('Are you sure you want to remove this alert?')) {
+    if (window.confirm("Are you sure you want to remove this alert?")) {
       onRemove(alert.id);
     }
   };
@@ -44,7 +54,7 @@ const AlertCard: React.FC<AlertCardProps> = ({ alert, onMarkAsRead, onRemove }) 
           <h3>{alert.title}</h3>
           <div className="alert-meta">
             <span className={getPriorityBadgeClassName(alert.priority)}>
-              {(alert.priority || 'default').toUpperCase()}
+              {(alert.priority || "default").toUpperCase()}
             </span>
             {alert.recipient && (
               <span className="care-recipient">{alert.recipient}</span>
@@ -64,7 +74,7 @@ const AlertCard: React.FC<AlertCardProps> = ({ alert, onMarkAsRead, onRemove }) 
       </div>
       <div className="alert-actions">
         {!alert.isRead && (
-          <button 
+          <button
             className="btn btn-sm btn-primary"
             onClick={() => onMarkAsRead(alert.id)}
             aria-label={`Mark ${alert.title} as read`}
@@ -73,7 +83,7 @@ const AlertCard: React.FC<AlertCardProps> = ({ alert, onMarkAsRead, onRemove }) 
             Mark Read
           </button>
         )}
-        <button 
+        <button
           className="btn btn-sm btn-secondary"
           onClick={handleRemove}
           aria-label={`Remove ${alert.title} alert`}

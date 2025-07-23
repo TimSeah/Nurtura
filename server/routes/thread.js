@@ -6,14 +6,14 @@ const Thread = require('../models/Thread'); // Import the Thread model
 // Route: GET /api/threads
 // This route will fetch all threads from the database.
 
-
+//DEPRECATED, NO LONGER USING AUTH
 //import auth from @clerk/express
-const {requireAuth} = require('@clerk/express'); 
+//const {requireAuth} = require('@clerk/express'); 
 
 // Applies authentication check to entire router
 // from this line onwards, all routes in this file require user
 // to be authenticated
-router.use(requireAuth());
+//router.use(requireAuth());
 
 
 

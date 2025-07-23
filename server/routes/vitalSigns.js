@@ -3,14 +3,14 @@ const router = express.Router();
 const VitalSigns = require('../models/VitalSigns');
 
 
-
+//DEPRECATED, NO LONGER USING AUTH
 //import auth from @clerk/express
-const {requireAuth} = require('@clerk/express'); 
+//const {requireAuth} = require('@clerk/express'); 
 
 // Applies authentication check to entire router
 // from this line onwards, all routes in this file require user
 // to be authenticated
-router.use(requireAuth());
+//router.use(requireAuth());
 
 
 

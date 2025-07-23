@@ -1,9 +1,11 @@
 // API configuration and base functions
 const API_BASE_URL = 'http://localhost:5000/api';
 
+
 class ApiService {
   private async request(endpoint: string, options: RequestInit = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
+
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
@@ -222,3 +224,6 @@ class ApiService {
 }
 
 export const apiService = new ApiService();
+
+
+

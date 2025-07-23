@@ -1,0 +1,12 @@
+{
+  "data": {
+    "id": "user_123",
+    "email_addresses": [
+      { "email_address": "testuser@example.com" }
+    ],
+    "first_name": "Test",
+    "last_name": "User",
+    "image_url": "https://example.com/avatar.png"
+  },
+  "type": "user.created"
+}

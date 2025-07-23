@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const {clerkMiddleware} = require('@clerk/express'); // import clerk middleware for auth
+//const {clerkMiddleware} = require('@clerk/express'); // import clerk middleware for auth
 require('dotenv').config();
 
 const app = express();
@@ -70,8 +70,21 @@ app.use(express.urlencoded({ extended: false }));
 // Parse cookies attached to the client request object.
 app.use(cookieParser());
 
+
+app.use('/api/clerk-webhook', express.json(), require('./routes/clerkWebhook')); // BEFORE clerkMiddleware
+//DEPRECATED, NO LONGER USING AUTH
+/*
 // use here as clerkMiddleware() needs cookies and headers, cookieparser must be before this
-app.use(clerkMiddleware());
+// apply auth to everything except /api/clerk-webhook route
+app.use(
+  clerkMiddleware({
+    ignoredRoutes: ['/api/clerk-webhook',
+      '/api/care-recipients'
+    ],
+  })
+);
+*/
+
 
 // Serve static files (like your React build output in production, or other static assets)
 // from the 'public' directory.
@@ -90,6 +103,7 @@ const userSettingsRouter = require('./routes/userSettings');
 const vitalSignsRouter = require('./routes/vitalSigns');
 const careRecipientsRouter = require('./routes/careRecipients');
 const alertsRouter = require('./routes/alerts');
+//const clerkWebhookRouter = require('./routes/clerkWebhook'); // to send POST request from Clerk to register user in db
 
 // Import and start email reminder service
 const { startReminderService } = require('./services/emailReminderService');
@@ -104,6 +118,8 @@ app.use('/api/user-settings', userSettingsRouter);
 app.use('/api/vital-signs', vitalSignsRouter);
 app.use('/api/care-recipients', careRecipientsRouter);
 app.use('/api/alerts', alertsRouter);
+
+//app.use('/api/clerk-webhook', clerkWebhookRouter);  // for Clerk
 
 // --- Error Handling Middleware ---
 

@@ -3,13 +3,14 @@ const router = express.Router({ mergeParams: true }); // Enable mergeParams to a
 const Thread = require('../models/Thread');
 const Comment = require('../models/Comment');
 
+//DEPRECATED, NO LONGER USING AUTH
 // import auth from @clerk/express
-const {requireAuth} = require('@clerk/express')
+//const {requireAuth} = require('@clerk/express')
 
 // Applies authentication check to entire router
 // from this line onwards, all routes in this file require user
 // to be authenticated
-router.use(requireAuth());
+//router.use(requireAuth());
 
 router.get('/', async (req, res) => {
 const threadId = req.params.threadId;
