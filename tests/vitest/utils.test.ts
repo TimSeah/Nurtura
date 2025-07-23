@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { calculateDaysAgo } from '../src/utils/calDaysAgoUtil';
+import { calculateDaysAgo } from '../../src/utils/calDaysAgoUtil';
 
 
 describe('Unit test: calculateDaysAgo', () => {

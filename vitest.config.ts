@@ -5,8 +5,9 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
+    setupFiles: './tests/vitest/setup.ts',
+    include: ['tests/vitest/**/*.test.{ts,tsx}'],
+    exclude: ['tests/jest/**'],
     globals: true,
-    setupFiles: './src/setupTests.ts',
-    css: true, // so importing './forum.css' doesn't explode
   },
 });
