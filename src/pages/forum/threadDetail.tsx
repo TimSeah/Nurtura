@@ -7,8 +7,6 @@ import Comment from "./Comment";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
-const currentUser = "Good Commenter";
-
 interface ThreadDetail{
     _id: number;
     title: string;
@@ -121,7 +119,7 @@ const ThreadDetail: React.FC = () => {
                 body: JSON.stringify({
                     threadId: id,
                     content: form.content,
-                    author: currentUser, // To be replaced with actual user
+                    author: "good commenter", // To be replaced with actual user
                     date: new Date().toISOString()
                 }),
             });
