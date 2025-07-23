@@ -7,7 +7,7 @@ import { calculateDaysAgo } from "../../utils/calDaysAgoUtil";
 const currentUser = "A good grandkid";
 
 interface Thread {
-  _id: number;
+  _id: string;
   title: string;
   content: string;
   author: string;
@@ -87,6 +87,22 @@ const Forum: React.FC = () => {
     }catch (err: any) {
         console.error("Failed to create thread:", err);
         alert(`Failed to create thread: ${err}`);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this thread?")) return;
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/threads/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error(await res.text());
+
+      setThreads(prev => prev.filter(thread => thread._id !== id));
+    } catch (err: any) {
+      console.error("Failed to delete thread:", err);
+      alert(`Failed to delete thread: ${err.message}`);
     }
   };
 
@@ -199,6 +215,18 @@ const Forum: React.FC = () => {
                 </svg>
                 {0} {/* replies */}
               </div>
+              {t.author == currentUser && (
+                <button
+                  className="mt-2 text-red-500 hover:text-red-700 transition"
+                  title="Delete Thread"
+                  onClick={() => handleDelete(t._id)}
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9ZM7 6H17V20H7V6ZM9 8V18H11V8H9ZM13 8V18H15V8H13Z" />
+                  </svg>
+                  {/* Delete */}
+                </button>
+              )}
             </div>
           </Link>
         ))
