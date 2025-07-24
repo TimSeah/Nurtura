@@ -162,8 +162,8 @@ html, body {
 }
 
 .nav-item:hover {
-  color: white;
-  border-color: white;
+  /* color: white;
+  border-color: white; */
   transform: translateX(4px);
 }
 
