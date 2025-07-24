@@ -1,21 +1,36 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./healthmonitoring.css";
-import { CareRecipient } from "../../../../types";
 
-const HealthMonitoring = () => {
+interface HealthMonitoringProps {
+  onSaveSuccess?: () => void;
+  onCancel?: () => void;
+}
+
+const HealthMonitoring: React.FC<HealthMonitoringProps> = ({ onSaveSuccess, onCancel }) => {
   const [name, setName] = useState("");
-  const [remark, setRemark] = useState("");
-  const [recepients, setRecepients] = useState<CareRecipient[]>([]);
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [relationship, setRelationship] = useState("");
+  const [medicalConditions, setMedicalConditions] = useState("");
+  const [caregiverNotes, setCaregiverNotes] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const saveRecepient = async () => {
+    // Validation
+    if (!name.trim() || !dateOfBirth || !relationship.trim()) {
+      alert("Please fill in all required fields (Name, Date of Birth, Relationship)");
+      return;
+    }
+
+    setIsLoading(true);
+
     const newRecepient = {
-      name,
-      relationship: remark, // Map the remark field to relationship
-      dateOfBirth: new Date(), // You'll need to add a date picker for this
-      medicalConditions: [],
-      medications: [],
-      emergencyContacts: [],
-      caregiverNotes: "",
+      name: name.trim(),
+      dateOfBirth: new Date(dateOfBirth),
+      relationship: relationship.trim(),
+      medicalConditions: medicalConditions.split(',').map(c => c.trim()).filter(c => c),
+      medications: [], // Empty array as medications are managed separately
+      emergencyContacts: [], // Empty array for now, can be added later
+      caregiverNotes: caregiverNotes.trim(),
       isActive: true
     };
 
@@ -37,60 +52,86 @@ const HealthMonitoring = () => {
 
       const data = await response.json();
       console.log("Saved recepient:", data);
-      alert("Recepient added!");
+      alert("Care Recipient added successfully!");
+      
+      // Clear form
       setName("");
-      setRemark("");
-
-      await getRecepients();
+      setDateOfBirth("");
+      setRelationship("");
+      setMedicalConditions("");
+      setCaregiverNotes("");
+      
+      // Call the success callback to close the modal
+      if (onSaveSuccess) {
+        onSaveSuccess();
+      }
     } catch (error) {
       console.error("Error:", error);
-      alert("Failed to add recepient");
+      alert("Failed to add care recipient");
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  const getRecepients = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/care-recipients`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch care recipients");
-      }
-      const data = await response.json();
-      setRecepients(data);
-    } catch (error) {
-      console.error("Error fetching recepients:", error);
-      alert("Could not load care recipients");
-    }
-  };
-
-  useEffect(() => {
-    getRecepients();
-  }, []);
 
   return (
-    <div className="health-monitoring">
-      <h3>Add Care Recepient</h3>
-      <input
-        type="text"
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Remark"
-        value={remark}
-        onChange={(e) => setRemark(e.target.value)}
-      />
-      <button onClick={saveRecepient}>Add Care Recepient</button>
-      <ul>
-        {recepients.map((r, i) => (
-          <li key={r._id || i}>
-            <strong>{r.name}</strong>: {r.relationship}
-          </li>
-        ))}
-      </ul>
+    <div className="container">
+      {/* Basic Information */}
+      <div className="form-section">
+        <h4>Basic Information</h4>
+        <input
+          type="text"
+          placeholder="Name *"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <input
+          type="date"
+          placeholder="Date of Birth *"
+          value={dateOfBirth}
+          onChange={(e) => setDateOfBirth(e.target.value)}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Relationship *"
+          value={relationship}
+          onChange={(e) => setRelationship(e.target.value)}
+          required
+        />
+        <textarea
+          placeholder="Medical Conditions (separate with commas)"
+          value={medicalConditions}
+          onChange={(e) => setMedicalConditions(e.target.value)}
+          rows={3}
+        />
+        <textarea
+          placeholder="Caregiver Notes"
+          value={caregiverNotes}
+          onChange={(e) => setCaregiverNotes(e.target.value)}
+          rows={3}
+        />
+      </div>
+
+      <div className="form-actions">
+        <button 
+          onClick={saveRecepient} 
+          className="save-button"
+          disabled={isLoading}
+        >
+          {isLoading ? "Adding..." : "Add Care Recipient"}
+        </button>
+        {onCancel && (
+          <button 
+            type="button" 
+            onClick={onCancel} 
+            className="cancel-button"
+            disabled={isLoading}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </div>
   );
 };

@@ -50,9 +50,19 @@ const Dashboard: React.FC = () => {
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [showCareNoteModal, setShowCareNoteModal] = useState(false);
 
-  const handleVitalSignsSave = (data: VitalSignsData) => {
-    console.log("Vital signs saved:", data);
-    // In a real app, this would save to backend/state management
+  const handleVitalSignsSave = async (data: VitalSignsData) => {
+    try {
+      console.log("Saving vital signs to backend:", data);
+      const savedVitalSigns = await apiService.addVitalSigns(data);
+      console.log("Vital signs saved successfully:", savedVitalSigns);
+      
+      // You could add a toast notification here
+      alert("Vital signs recorded successfully!");
+      
+    } catch (error) {
+      console.error("Error saving vital signs:", error);
+      alert("Failed to save vital signs. Please try again.");
+    }
   };
 
   const handleAppointmentSave = (data: AppointmentData) => {
