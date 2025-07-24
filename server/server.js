@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 //const {clerkMiddleware} = require('@clerk/express'); // import clerk middleware for auth
 require('dotenv').config();
+const threadRoutes = require('./routes/threads');
 
 const app = express();
 
@@ -29,6 +30,7 @@ async function cleanup() {
 }
 
 // Connect to MongoDB
+console.log("MONGO_URI =", process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -90,6 +92,9 @@ app.use(
 // from the 'public' directory.
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Mount thread routes at /api/threads
+app.use('/api/threads', threadRoutes)
+
 // --- Route Definitions ---
 // Import your route handlers.
 // You will create these files (e.g., './routes/index.js', './routes/events.js')
@@ -97,7 +102,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const indexRouter = require('./routes/index');
 const eventsRouter = require('./routes/events');
 const journalsRouter = require('./routes/journal'); 
-const threadsRouter = require('./routes/thread');
+const threadsRouter = require('./routes/threads');
 const commentRouter = require('./routes/comment');
 const userSettingsRouter = require('./routes/userSettings');
 const vitalSignsRouter = require('./routes/vitalSigns');
@@ -113,6 +118,7 @@ app.use('/', indexRouter);
 app.use('/api/events', eventsRouter); 
 app.use('/api/journal', journalsRouter); 
 app.use('/api/threads', threadsRouter); 
+console.log('threadsRouter mounted at /api/threads');
 app.use('/api/threads/:threadId/comments', commentRouter);
 app.use('/api/user-settings', userSettingsRouter);
 app.use('/api/vital-signs', vitalSignsRouter);

@@ -18,6 +18,8 @@
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
 }
 
 .modal.small {
@@ -36,13 +38,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2rem 0 2rem;
+  padding: 1.25rem 1.5rem 0 1.5rem;
   border-bottom: 1px solid #e2e8f0;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
+  flex-shrink: 0;
 }
 
 .modal-title {
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 1.25rem 0;
   color: #1e293b;
   font-size: 1.25rem;
   font-weight: 600;
@@ -56,7 +59,7 @@
   color: #64748b;
   border-radius: 0.25rem;
   transition: all 0.2s;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .modal-close:hover {
@@ -70,7 +73,10 @@
 }
 
 .modal-content {
-  padding: 0 2rem 2rem 2rem;
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .modal-actions {
@@ -80,6 +86,20 @@
   margin-top: 2rem;
   padding-top: 1.5rem;
   border-top: 1px solid #e2e8f0;
+}
+
+/* Journal Form Specific Styling */
+.modal:has(.journal-entry-form) {
+  max-height: 80vh;
+}
+
+.modal:has(.journal-entry-form) .modal-content {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: 0;
+  max-height: calc(80vh - 120px);
+  overflow: visible;
 }
 
 /* Form Styles */

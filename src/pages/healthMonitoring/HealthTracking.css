@@ -1,0 +1,292 @@
+/* HealthTracking Component Styles */
+
+.health-tracking {
+  max-width: 100%;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.page-header p {
+  color: #64748b;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.conditions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.card-title {
+  margin: 20px;
+}
+
+.condition-tag {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.vital-types-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.vital-type-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  text-align: center;
+}
+
+.vital-type-card:hover {
+  border-color: #0f766e;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.vital-type-card.selected {
+  border-color: #0f766e;
+  background-color: #f0fdfa;
+}
+
+.vital-type-icon {
+  width: 3rem;
+  height: 3rem;
+  background: #f0fdfa;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.75rem;
+}
+
+.vital-type-icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #0f766e;
+}
+
+.vital-type-card h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.vital-type-card p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.charts-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.chart-container {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.chart-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.add-journal {
+  margin: 10px 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #64748b;
+}
+
+.empty-state h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.empty-state p {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 1024px) {
+  .charts-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .vital-types-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .vital-hint {
+    padding: 0.5rem;
+  }
+  
+  .hint-text {
+    font-size: 0.6875rem;
+  }
+
+  .normal-range {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.375rem;
+  }
+
+  .vital-unit-label {
+    font-size: 0.75rem;
+  }
+}
+
+/* Card Header Styles */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.card-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.card-actions .btn-primary {
+  background: #0f766e;
+  color: white;
+}
+
+.card-actions .btn-primary:hover {
+  background: #0d7377;
+}
+
+.card-actions .btn-secondary {
+  background: #64748b;
+  color: white;
+}
+
+.card-actions .btn-secondary:hover {
+  background: #475569;
+}
+
+.btn-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Vital sign input container */
+.vital-input-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.vital-input-container input {
+  flex: 1;
+  padding-right: 3rem;
+}
+
+.vital-unit-label {
+  position: absolute;
+  right: 0.75rem;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+/* Vital sign hints */
+.vital-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background-color: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 0.5rem;
+}
+
+.hint-icon {
+  width: 1rem;
+  height: 1rem;
+  color: #0284c7;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.hint-content {
+  flex: 1;
+}
+
+.hint-text {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #0c4a6e;
+}
+
+.normal-range {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #1e40af;
+  background-color: #dbeafe;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  display: inline-block;
+}

@@ -81,5 +81,45 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// --- PATCH  /api/threads/:id/vote  ---
+// body: { direction: "up" | "down" }
+//experimenting with this
+router.patch('/:id/vote', async (req, res) => {
+  const { id } = req.params;
+  const { direction } = req.body;           // expected "up" or "down"
+  console.log('PATCH /api/threads/:id/vote called with', req.params.id, req.body);
+
+  if (!['up', 'down'].includes(direction)) {
+    return res.status(400).json({ message: 'direction must be "up" or "down"' });
+  }
+
+  try {
+    const thread = await Thread.findById(id);
+    if (!thread) return res.status(404).json({ message: 'Thread not found' });
+    if (typeof thread.upvotes !== 'number') {
+    thread.upvotes = 0;
+    }
+    if (direction === 'up')      thread.upvotes += 1;
+    else if (direction === 'down') thread.upvotes -= 1;
+
+    await thread.save();
+    res.json({ upvotes: thread.upvotes });   // return the new total
+  } catch (err) {
+    console.error('Vote error:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const deleted = await Thread.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Thread not found' });
+    res.json({ message: 'Thread deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting thread:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Export the router so it can be used by the main Express app (server.js)
 module.exports = router;

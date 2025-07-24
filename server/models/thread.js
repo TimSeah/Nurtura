@@ -23,15 +23,10 @@ const threadSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    author: {
-        type: String,
-        // ref: 'User',
-        required: true
-    },
-}, {
+  
+}, { 
     timestamps: true
 })
 
-const Thread = mongoose.model('Thread', threadSchema);
-
+const Thread = mongoose.models.Thread || mongoose.model('Thread', threadSchema);
 module.exports = Thread;

@@ -57,12 +57,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           >
             {isMobileMenuOpen ? <X /> : <Menu />}
           </button>
+          <div className="logo">
+            <Heart className="logo-icon" />
+            <span className="logo-text">Nurtura</span>
+          </div>
         </div>
       </header>
 
       <div className="layout-body">
         <nav className={`sidebar ${isMobileMenuOpen ? "mobile-open" : ""}`}>
           <div className="nav-items">
+            <div className="logo">
+              <Heart className="logo-icon" />
+              <span className="logo-text">Nurtura</span>
+            </div>
             {navigationItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;

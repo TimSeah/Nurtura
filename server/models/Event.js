@@ -28,6 +28,18 @@ const eventSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  enableReminder: {
+    type: Boolean,
+    default: false
+  },
+  reminderSent: {
+    type: Boolean,
+    default: false
+  },
+  reminderEmail: {
+    type: String,
+    default: ''
+  }
 }, {
 
   timestamps: true
