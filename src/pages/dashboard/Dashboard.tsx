@@ -216,11 +216,11 @@ const Dashboard: React.FC = () => {
 
       {/* Stats Grid */}
       <div className="stats-grid">
-        {stats.map((stat, index) => {
+        {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <a href={stat.link}>
-              <div key={index} className="stat-card">
+            <a href={stat.link} key={stat.action}>
+              <div className="stat-card">
                 <div className={`stat-icon ${getStatIconClass(stat.color)}`}>
                   <Icon />
                 </div>
