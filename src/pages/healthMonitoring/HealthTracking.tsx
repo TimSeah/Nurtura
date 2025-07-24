@@ -1,18 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-} from "recharts";
-import {
-  Activity,
-  TrendingUp,
   Info,
 } from "lucide-react";
 import { apiService } from "../../services/apiService";
@@ -24,6 +11,7 @@ import JournalEntryForm from "./components/journal/JournalEntryForm";
 import JournalEntriesCard from "./components/journal/JournalEntriesCard";
 import CareRecipientSelector from "./components/careRecipientSelector";
 import ReadingsCard from "./components/readingsCard";
+import TrendsCard from "./components/trendsCard";
 import "./HealthTracking.css";
 
 interface VitalSignsData {
@@ -158,40 +146,6 @@ const HealthTracking: React.FC = () => {
     setShowAddForm(false);
   };
 
-  // Generate chart data from actual readings
-  const getChartData = (vitalType: VitalSignsData["vitalType"]) => {
-    const relevantReadings = vitalReadings
-      .filter((reading) => reading.vitalType === vitalType)
-      .sort(
-        (a, b) =>
-          new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
-      )
-      .slice(-7); // Last 7 readings
-
-    return relevantReadings.map((reading) => {
-      const date = new Date(reading.dateTime);
-      const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
-
-      if (vitalType === "blood_pressure") {
-        const [systolic, diastolic] = reading.value
-          .split("/")
-          .map((v) => parseInt(v.trim()));
-        return {
-          date: dateStr,
-          systolic: systolic || 0,
-          diastolic: diastolic || 0,
-        };
-      } else if (vitalType === "heart_rate") {
-        return { date: dateStr, rate: parseInt(reading.value) || 0 };
-      }
-
-      return { date: dateStr, value: parseFloat(reading.value) || 0 };
-    });
-  };
-
-  const bloodPressureData = getChartData("blood_pressure");
-  const heartRateData = getChartData("heart_rate");
-
   const getVitalUnit = (type: string) => {
     switch (type) {
       case "blood_pressure":
@@ -298,61 +252,8 @@ const HealthTracking: React.FC = () => {
             onAddReading={() => setShowAddForm(true)}
           />
 
-          {/* Charts */}
-          <div className="charts-grid">
-            <div className="card">
-              <div className="card-header">
-                <h2 className="card-title">
-                  <TrendingUp className="title-icon" />
-                  Blood Pressure Trend
-                </h2>
-              </div>
-              <div className="chart-container">
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={bloodPressureData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="systolic"
-                      stroke="#dc2626"
-                      strokeWidth={2}
-                      name="Systolic"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="diastolic"
-                      stroke="#0f766e"
-                      strokeWidth={2}
-                      name="Diastolic"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="card-header">
-                <h2 className="card-title">
-                  <Activity className="title-icon" />
-                  Heart Rate Trend
-                </h2>
-              </div>
-              <div className="chart-container">
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={heartRateData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="rate" fill="#7c3aed" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
+          {/* Health Trends Chart */}
+          <TrendsCard vitalReadings={vitalReadings} />
 
           {/* Journal Entries Section */}
           {selectedRecipientData && (

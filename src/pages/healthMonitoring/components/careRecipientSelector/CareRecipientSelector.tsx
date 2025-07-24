@@ -91,6 +91,12 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
                     <span className="no-conditions">None reported</span>
                   )}
                 </div>
+                {recipient.caregiverNotes && (
+                  <div className="caregiver-notes">
+                    <span className="notes-label">Notes:</span>
+                    <p className="notes-text">{recipient.caregiverNotes}</p>
+                  </div>
+                )}
               </div>
             </button>
           ))

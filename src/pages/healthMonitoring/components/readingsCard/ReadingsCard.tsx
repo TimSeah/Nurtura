@@ -1,5 +1,5 @@
-import React from "react";
-import { Plus, Heart, Activity, Thermometer, Scale, Droplets } from "lucide-react";
+import React, { useState, useMemo } from "react";
+import { Plus, Heart, Activity, Thermometer, Scale, Droplets, ChevronLeft, ChevronRight } from "lucide-react";
 import { CareRecipient } from "../../../../types";
 import "./ReadingsCard.css";
 
@@ -30,6 +30,39 @@ const ReadingsCard: React.FC<ReadingsCardProps> = ({
   vitalReadings,
   onAddReading,
 }) => {
+  const [currentPage, setCurrentPage] = useState(0);
+  const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const itemsPerPage = 4; // 2 rows × 2 columns = 4 items per page
+
+  // Filter readings based on selected filter
+  const filteredReadings = useMemo(() => {
+    if (selectedFilter === "all") {
+      return vitalReadings;
+    }
+    return vitalReadings.filter(reading => reading.vitalType === selectedFilter);
+  }, [vitalReadings, selectedFilter]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredReadings.length / itemsPerPage);
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentReadings = filteredReadings.slice(startIndex, endIndex);
+
+  // Reset page when filter changes
+  const handleFilterChange = (filter: string) => {
+    setSelectedFilter(filter);
+    setCurrentPage(0);
+  };
+
+  // Pagination handlers
+  const handlePrevPage = () => {
+    setCurrentPage(prev => Math.max(0, prev - 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(totalPages - 1, prev + 1));
+  };
+
   const getVitalIcon = (type: VitalSignsData["vitalType"]) => {
     switch (type) {
       case "blood_pressure":
@@ -87,6 +120,22 @@ const ReadingsCard: React.FC<ReadingsCardProps> = ({
           Recent Readings - {selectedRecipient.name}
         </h2>
         <div className="card-actions">
+          <div className="filter-container">
+            {/* <Filter className="filter-icon" /> */}
+            <select 
+              value={selectedFilter} 
+              onChange={(e) => handleFilterChange(e.target.value)}
+              className="filter-select"
+            >
+              <option value="all">All Types</option>
+              <option value="blood_pressure">Blood Pressure</option>
+              <option value="heart_rate">Heart Rate</option>
+              <option value="temperature">Temperature</option>
+              <option value="weight">Weight</option>
+              <option value="blood_sugar">Blood Sugar</option>
+              <option value="oxygen_saturation">Oxygen Saturation</option>
+            </select>
+          </div>
           <button
             className="btn btn-primary"
             onClick={onAddReading}
@@ -96,36 +145,80 @@ const ReadingsCard: React.FC<ReadingsCardProps> = ({
           </button>
         </div>
       </div>
-      <div className="readings-grid">
-        {vitalReadings.length === 0 ? (
-          <div className="no-readings">
-            <p>No vital readings recorded yet.</p>
-            <p>Click "Add Reading" to start tracking vital signs.</p>
+      
+      <div className="readings-content">
+        <div className="readings-grid">
+          {filteredReadings.length === 0 ? (
+            <div className="no-readings">
+              <p>No vital readings found.</p>
+              {selectedFilter === "all" ? (
+                <p>Click "Add Reading" to start tracking vital signs.</p>
+              ) : (
+                <p>No readings found for the selected filter. Try a different filter or add a new reading.</p>
+              )}
+            </div>
+          ) : currentReadings.length === 0 ? (
+            <div className="no-readings">
+              <p>No readings on this page.</p>
+              <p>Use the navigation buttons to view other pages.</p>
+            </div>
+          ) : (
+            currentReadings.map((reading) => {
+              const Icon = getVitalIcon(reading.vitalType);
+              const { date, time } = formatDateTime(reading.dateTime);
+              return (
+                <div key={reading._id} className="reading-card">
+                  <div className="reading-icon">
+                    <Icon />
+                  </div>
+                  <div className="reading-content">
+                    <h4>{getVitalDisplayName(reading.vitalType)}</h4>
+                    <p className="reading-value">
+                      {reading.value} {reading.unit}
+                    </p>
+                    <p className="reading-time">
+                      {date} at {time}
+                    </p>
+                    {reading.notes && (
+                      <p className="reading-notes">{reading.notes}</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+        
+        {/* Pagination Controls */}
+        {filteredReadings.length > itemsPerPage && (
+          <div className="pagination-controls">
+            <button 
+              className="pagination-btn"
+              onClick={handlePrevPage}
+              disabled={currentPage === 0}
+            >
+              <ChevronLeft className="pagination-icon" />
+              Previous
+            </button>
+            
+            <div className="pagination-info">
+              <span className="page-numbers">
+                Page {currentPage + 1} of {totalPages}
+              </span>
+              <span className="results-count">
+                Showing {startIndex + 1}-{Math.min(endIndex, filteredReadings.length)} of {filteredReadings.length} readings
+              </span>
+            </div>
+            
+            <button 
+              className="pagination-btn"
+              onClick={handleNextPage}
+              disabled={currentPage >= totalPages - 1}
+            >
+              Next
+              <ChevronRight className="pagination-icon" />
+            </button>
           </div>
-        ) : (
-          vitalReadings.map((reading) => {
-            const Icon = getVitalIcon(reading.vitalType);
-            const { date, time } = formatDateTime(reading.dateTime);
-            return (
-              <div key={reading._id} className="reading-card">
-                <div className="reading-icon">
-                  <Icon />
-                </div>
-                <div className="reading-content">
-                  <h4>{getVitalDisplayName(reading.vitalType)}</h4>
-                  <p className="reading-value">
-                    {reading.value} {reading.unit}
-                  </p>
-                  <p className="reading-time">
-                    {date} at {time}
-                  </p>
-                  {reading.notes && (
-                    <p className="reading-notes">{reading.notes}</p>
-                  )}
-                </div>
-              </div>
-            );
-          })
         )}
       </div>
     </div>

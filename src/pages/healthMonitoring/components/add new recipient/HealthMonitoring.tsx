@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./healthmonitoring.css";
-import { CareRecipient } from "../../../../types";
 
 const HealthMonitoring = () => {
   const [name, setName] = useState("");
@@ -8,8 +7,6 @@ const HealthMonitoring = () => {
   const [relationship, setRelationship] = useState("");
   const [medicalConditions, setMedicalConditions] = useState("");
   const [caregiverNotes, setCaregiverNotes] = useState("");
-  
-  const [recepients, setRecepients] = useState<CareRecipient[]>([]);
 
   const saveRecepient = async () => {
     // Validation
@@ -55,33 +52,11 @@ const HealthMonitoring = () => {
       setRelationship("");
       setMedicalConditions("");
       setCaregiverNotes("");
-
-      await getRecepients();
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to add care recipient");
     }
   };
-
-  const getRecepients = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/care-recipients`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch care recipients");
-      }
-      const data = await response.json();
-      setRecepients(data);
-    } catch (error) {
-      console.error("Error fetching recepients:", error);
-      alert("Could not load care recipients");
-    }
-  };
-
-  useEffect(() => {
-    getRecepients();
-  }, []);
 
   return (
     <div className="container">
@@ -128,32 +103,6 @@ const HealthMonitoring = () => {
       <button onClick={saveRecepient} className="save-button">
         Add Care Recipient
       </button>
-
-      {/* Display existing recipients */}
-      <div className="recipients-list">
-        <h4>Existing Care Recipients</h4>
-        {recepients.length === 0 ? (
-          <p>No care recipients added yet.</p>
-        ) : (
-          <ul>
-            {recepients.map((r, i) => (
-              <li key={r._id || i}>
-                <strong>{r.name}</strong> - {r.relationship}
-                <div>Date of Birth: {new Date(r.dateOfBirth).toLocaleDateString()}</div>
-                {r.medicalConditions.length > 0 && (
-                  <div>Medical Conditions: {r.medicalConditions.join(', ')}</div>
-                )}
-                {r.caregiverNotes && (
-                  <div>Notes: {r.caregiverNotes}</div>
-                )}
-                <div style={{fontSize: '12px', color: '#6b7280', marginTop: '8px'}}>
-                  <em>Medications and Emergency Contacts can be managed separately</em>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
     </div>
   );
 };
