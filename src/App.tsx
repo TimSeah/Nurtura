@@ -3,7 +3,7 @@ import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/dashboard/Dashboard";
 import Calendar from "./pages/calendar/calendar";
 import HealthTracking from "./pages/healthMonitoring/HealthTracking";
 import CareCircle from "./pages/CareCircle";
