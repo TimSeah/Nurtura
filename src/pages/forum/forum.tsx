@@ -288,7 +288,7 @@ const Forum: React.FC = () => {
                   </div>
                   {t.author == currentUser && (
                     <button
-                      className="mt-2 text-red-500 hover:text-red-700 transition"
+                      className="mt-2 -ml-3 text-red-500 hover:text-red-700 transition"
                       title="Delete Thread"
                       onClick={(e) => {
                         e.preventDefault();
