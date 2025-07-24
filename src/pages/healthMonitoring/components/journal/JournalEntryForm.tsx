@@ -74,8 +74,6 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
 
   return (
     <div className="journal-entry-form">
-      <h3>New Journal Entry for {recipientName}</h3>
-      
       <div className="form-group">
         <label htmlFor="journal-title">Title</label>
         <input
@@ -107,7 +105,7 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
           placeholder={`${recipientName}'s feelings and thoughts for today...`}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          rows={8}
+          rows={6}
           required
         />
       </div>

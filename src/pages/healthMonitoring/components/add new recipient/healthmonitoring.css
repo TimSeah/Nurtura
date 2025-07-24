@@ -1,49 +1,126 @@
-.health-monitoring  .container {
-  max-width: 500px;
-  margin: 40px auto;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  font-family: Arial, sans-serif;
-}
-
-.health-monitoring h3 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.health-monitoring input {
+/* Modal-optimized container - remove page-style elements */
+.container {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 12px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  font-family: inherit;
+  background: transparent;
+}
+
+.container h3 {
+  margin: 0 0 1.5rem 0;
+  color: #374151;
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.form-section {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #f9fafb;
+}
+
+.form-section h4 {
+  margin: 0 0 1rem 0;
+  color: #374151;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.container input,
+.container textarea {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
   border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
+  border: 1px solid #d1d5db;
+  font-size: 0.875rem;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.health-monitoring button {
+.container textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.container input:focus,
+.container textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.save-button {
   width: 100%;
-  padding: 12px;
-  background-color: #007bff;
+  background-color: #10b981;
   color: white;
   border: none;
   border-radius: 6px;
-  font-size: 15px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  margin-top: 1rem;
 }
 
-.health-monitoring button:hover {
-  background-color: #0056b3;
+.save-button:hover {
+  background-color: #059669;
 }
 
-.health-monitoring ul {
-  margin-top: 20px;
-  padding-left: 20px;
+.save-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
 }
 
-.health-monitoring li {
-  margin-bottom: 8px;
+.cancel-button {
+  width: 100%;
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.cancel-button:hover {
+  background-color: #4b5563;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.form-actions .save-button,
+.form-actions .cancel-button {
+  margin-top: 0;
+  flex: 1;
+}
+
+/* Remove responsive overrides that conflict with modal */
+@media (max-width: 768px) {
+  .form-section {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .container input,
+  .container textarea {
+    padding: 0.625rem;
+    font-size: 0.875rem;
+  }
 }
