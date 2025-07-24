@@ -11,28 +11,20 @@ import {
   Bar,
 } from "recharts";
 import {
-  Heart,
   Activity,
-  Thermometer,
-  Scale,
-  Plus,
   TrendingUp,
-  Droplets,
   Info,
 } from "lucide-react";
 import { apiService } from "../../services/apiService";
+import { CareRecipient } from "../../types";
 import Modal from "../../components/Modal";
 import HealthMonitoring from "./components/add new recipient/HealthMonitoring";
+import MedicationsCard from "./components/medications/MedicationsCard";
 import JournalEntryForm from "./components/journal/JournalEntryForm";
 import JournalEntriesCard from "./components/journal/JournalEntriesCard";
+import CareRecipientSelector from "./components/careRecipientSelector";
+import ReadingsCard from "./components/readingsCard";
 import "./HealthTracking.css";
-
-interface CareRecipient {
-  _id: string;
-  name: string;
-  dateOfBirth: string;
-  relationship: string;
-}
 
 interface VitalSignsData {
   _id?: string;
@@ -72,6 +64,11 @@ const HealthTracking: React.FC = () => {
     // Force refresh of journal entries when a new journal is saved
     setJournalRefreshKey(prev => prev + 1);
     setIsAddingJournal(false);
+  };
+
+  const handleMedicationAdded = () => {
+    // Refresh care recipients data when medications are updated
+    loadCareRecipients();
   };
 
   useEffect(() => {
@@ -195,25 +192,6 @@ const HealthTracking: React.FC = () => {
   const bloodPressureData = getChartData("blood_pressure");
   const heartRateData = getChartData("heart_rate");
 
-  const getVitalIcon = (type: VitalSignsData["vitalType"]) => {
-    switch (type) {
-      case "blood_pressure":
-        return Heart;
-      case "heart_rate":
-        return Activity;
-      case "temperature":
-        return Thermometer;
-      case "weight":
-        return Scale;
-      case "blood_sugar":
-        return Droplets;
-      case "oxygen_saturation":
-        return Activity;
-      default:
-        return Heart;
-    }
-  };
-
   const getVitalUnit = (type: string) => {
     switch (type) {
       case "blood_pressure":
@@ -230,25 +208,6 @@ const HealthTracking: React.FC = () => {
         return "%";
       default:
         return "";
-    }
-  };
-
-  const getVitalDisplayName = (type: VitalSignsData["vitalType"]) => {
-    switch (type) {
-      case "blood_pressure":
-        return "Blood Pressure";
-      case "heart_rate":
-        return "Heart Rate";
-      case "temperature":
-        return "Temperature";
-      case "weight":
-        return "Weight";
-      case "blood_sugar":
-        return "Blood Sugar";
-      case "oxygen_saturation":
-        return "Oxygen Saturation";
-      default:
-        return type;
     }
   };
 
@@ -299,14 +258,6 @@ const HealthTracking: React.FC = () => {
     }
   };
 
-  const formatDateTime = (dateTime: string) => {
-    const date = new Date(dateTime);
-    return {
-      date: date.toLocaleDateString(),
-      time: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-  };
-
   const selectedRecipientData = careRecipients.find(
     (r) => r._id === selectedRecipient
   );
@@ -321,107 +272,31 @@ const HealthTracking: React.FC = () => {
         </p>
       </div>
       {/* Care Recipient Selector */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">Select Care Recipient</h2>
-          <div className="card-actions">
-            {!isAddingRecipient && (
-              <button 
-                className="btn btn-primary"
-                onClick={() => setIsAddingRecipient(true)}
-              >
-                <Plus className="btn-icon" />
-                Add Care Recipient
-              </button>
-            )}
-          </div>
-        </div>
-        <div className="recipient-selector">
-          {loading ? (
-            <div className="loading-message">
-              <p>Loading care recipients...</p>
-            </div>
-          ) : error ? (
-            <div className="error-message">
-              <p>Error loading care recipients: {error}</p>
-              <button
-                className="btn btn-secondary"
-                onClick={() => loadCareRecipients()}
-              >
-                Retry
-              </button>
-            </div>
-          ) : careRecipients.length === 0 ? (
-            <div className="loading-message">
-              <p>
-                No care recipients found. Please add some care recipients first.
-              </p>
-            </div>
-          ) : (
-            careRecipients.map((recipient) => (
-              <button
-                key={recipient._id}
-                className={`recipient-card ${
-                  selectedRecipient === recipient._id ? "selected" : ""
-                }`}
-                onClick={() => handleRecipientChange(recipient._id)}
-              >
-                <div className="recipient-info">
-                  <h3>{recipient.name}</h3>
-                  <p>
-                    DOB: {new Date(recipient.dateOfBirth).toLocaleDateString()}
-                  </p>
-                  <p>Relationship: {recipient.relationship}</p>
-                </div>
-              </button>
-            ))
-          )}
-        </div>
-      </div>
+      <CareRecipientSelector
+        careRecipients={careRecipients}
+        selectedRecipient={selectedRecipient}
+        loading={loading}
+        error={error}
+        isAddingRecipient={isAddingRecipient}
+        onRecipientChange={handleRecipientChange}
+        onAddRecipient={() => setIsAddingRecipient(true)}
+        onRetry={() => loadCareRecipients()}
+      />
+
+      {/* Medications Card */}
+      <MedicationsCard 
+        selectedRecipient={selectedRecipientData || null} 
+        onMedicationAdded={handleMedicationAdded}
+      />
+
       {selectedRecipientData && (
         <>
           {/* Recent Readings */}
-          <div className="card">
-            <div className="card-header">
-              <h2 className="card-title">
-                Recent Readings - {selectedRecipientData.name}
-              </h2>
-              <div className="card-actions">
-                <button
-                  className="btn btn-primary"
-                  onClick={() => setShowAddForm(true)}
-                >
-                  <Plus className="btn-icon" />
-                  Add Reading
-                </button>
-              </div>
-            </div>
-            <div className="readings-grid">
-              {vitalReadings.map((reading) => {
-                const Icon = getVitalIcon(reading.vitalType);
-                const { date, time } = formatDateTime(reading.dateTime);
-                return (
-                  <div key={reading._id} className="reading-card">
-                    <div className="reading-icon">
-                      <Icon />
-                    </div>
-                    <div className="reading-content">
-                      <h4>{getVitalDisplayName(reading.vitalType)}</h4>
-                      <p className="reading-value">
-                        {reading.value} {reading.unit}
-                      </p>
-                      <p className="reading-time">
-                        {date} at {time}
-                      </p>
-                      {reading.notes && (
-                        <p className="reading-notes">{reading.notes}</p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <ReadingsCard
+            selectedRecipient={selectedRecipientData}
+            vitalReadings={vitalReadings}
+            onAddReading={() => setShowAddForm(true)}
+          />
 
           {/* Charts */}
           <div className="charts-grid">
