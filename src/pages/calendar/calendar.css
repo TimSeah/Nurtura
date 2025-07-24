@@ -16,13 +16,12 @@
 .next-prev-button {
   background: none;
   border: none;
-  color: #007bff;
-  font-weight: bold;
+  color: #0C9891;
+  /* font-weight: bold; */
   cursor: pointer;
-  font-size: 20px;
+  font-size: 25px;
   padding: 30px 0;
   width: 300px;
-  font-size: larger;
 }
 
 .next-prev-button:hover{
@@ -35,7 +34,7 @@
 
 .month-title {
   font-size: 35px;
-  font-weight: bold;
+  
 }
 
 .calendar-weekdays {
@@ -51,6 +50,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 0.2rem;
+  padding: 0 20px;
 }
 
 .calendar-day {

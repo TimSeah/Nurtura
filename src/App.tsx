@@ -28,10 +28,10 @@ function App() {
         <Route path="/forumTab" element={<ForumTab />} />
         <Route path="/threads/:id" element={<ThreadDetail />} />
         <Route path="/health" element={<HealthTracking />} />
-        <Route path="/care-circle" element={<CareCircle />} />
+        {/* <Route path="/care-circle" element={<CareCircle />} /> */}
         <Route path="/resources" element={<Resources />} />
         <Route path="/resourcesAlt" element={<ResourcesAlt />} />
-        <Route path="/alerts" element={<Alerts />} />
+        {/* <Route path="/alerts" element={<Alerts />} /> */}
         <Route path="/settings" element={<Settings />} />
         <Route path="/healthmonitoring" element={<HealthMonitoring />} />
       </Routes>

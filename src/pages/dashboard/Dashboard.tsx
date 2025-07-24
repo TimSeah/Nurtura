@@ -55,10 +55,9 @@ const Dashboard: React.FC = () => {
       console.log("Saving vital signs to backend:", data);
       const savedVitalSigns = await apiService.addVitalSigns(data);
       console.log("Vital signs saved successfully:", savedVitalSigns);
-      
+
       // You could add a toast notification here
       alert("Vital signs recorded successfully!");
-      
     } catch (error) {
       console.error("Error saving vital signs:", error);
       alert("Failed to save vital signs. Please try again.");
@@ -246,7 +245,7 @@ const Dashboard: React.FC = () => {
       <div className="dashboard-grid">
         {/* Today's Tasks */}
         <div className="card">
-          <div className="card-header">
+          <div className="card-header dashboard-card">
             <h2 className="card-title">
               <Clock className="title-icon" />
               Today's Tasks
@@ -275,7 +274,7 @@ const Dashboard: React.FC = () => {
 
         {/* Recent Activity */}
         <div className="card">
-          <div className="card-header">
+          <div className="card-header dashboard-card">
             <h2 className="card-title">
               <TrendingUp className="title-icon" />
               Recent Activity

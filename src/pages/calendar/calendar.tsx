@@ -292,7 +292,11 @@ const Calendar: React.FC = () => {
   }, [year, month]);
 
   return (
-    <div className="calendar-container">
+    <div className="health-tracking">
+      <div className="page-header">
+        <h1>My Calendar</h1>
+        <p>See or schedule your upcoming tasks.</p>
+      </div>
       <div className="calendar-header">
         <button
           onClick={() => setCurrentDate(new Date(year, month - 1))}

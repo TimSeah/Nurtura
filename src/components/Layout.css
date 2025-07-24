@@ -18,7 +18,7 @@
   --gray-700: #616161;
   --gray-800: #424242;
   --gray-900: #212121;
-  --text-primary: #212121;
+  --text-primary: #1E293B;
   --text-secondary: #616161;
   --text-muted: #757575;
   --background-primary: #ffffff;
@@ -136,7 +136,7 @@ html, body {
   overflow-y: auto;
   box-shadow: var(--shadow-light);
   /* background-color:#0078d4; */
-  background: linear-gradient(to bottom, #0078d4, #00b4d8); /* Blue to Aqua */
+  background: linear-gradient(to bottom, #0c9891, #5fe8d8); /* Blue to Aqua */
 }
 
 
@@ -169,9 +169,8 @@ html, body {
 
 .nav-item.active {
   background-color: white;
-  color: var(--primary-blue);
-  border-color: var(--primary-blue);
-  box-shadow: var(--shadow-medium);
+  color: #0c9891;
+  border-color:#0c9891;
 }
 
 .nav-item.active:hover {
@@ -286,6 +285,7 @@ html, body {
 
 .card-header {
   margin-bottom: 2rem;
+  justify-content: center;
 }
 
 .card-title {
@@ -398,7 +398,7 @@ html, body {
   }
 
   .layout-header {
-    background-color: #0078d4;
+    background-color: #0C9891;
     height: auto;
     color: white;
     padding: 0;

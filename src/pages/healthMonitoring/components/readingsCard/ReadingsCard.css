@@ -124,7 +124,7 @@
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  background: white;
+  background: #fafafa;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   font-size: 14px;
@@ -169,12 +169,12 @@
 
 /* Card base styles (inherited from main component) */
 .card {
-  background: white;
+  background: #fafafa;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   margin-bottom: 24px;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  border: 2px solid #e5e7eb;
 }
 
 .card-header {

@@ -26,11 +26,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { path: "/", label: "Dashboard", icon: Home },
     { path: "/calendar", label: "Calendar", icon: Calendar },
     { path: "/health", label: "Health Tracking", icon: Activity },
-    { path: "/care-circle", label: "Care Circle", icon: Heart },
+    // { path: "/care-circle", label: "Care Circle", icon: Heart },
     { path: "/forum", label: "Forum", icon: Users },
     { path: "/resources", label: "Locations", icon: X },
     { path: "/resourcesAlt", label: "Resources", icon: MapPin },
-    { path: "/alerts", label: "Alerts", icon: Bell },
+    // { path: "/alerts", label: "Alerts", icon: Bell },
     { path: "/settings", label: "Settings", icon: Settings },
   ];
 

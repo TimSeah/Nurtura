@@ -48,7 +48,7 @@
 }
 
 .vital-type-card {
-  background: white;
+  background: #fafafa;
   border: 2px solid #e2e8f0;
   border-radius: 0.75rem;
   padding: 1rem;
@@ -105,11 +105,11 @@
 }
 
 .chart-container {
-  background: white;
+  background: #fafafa;
   border-radius: 0.75rem;
   padding: 1.5rem;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .chart-header {
@@ -184,6 +184,11 @@
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
   gap: 1rem;
+  background-color: #fafafa;
+}
+
+.card {
+  background-color: #fafafa;
 }
 
 .card-actions {
@@ -207,7 +212,7 @@
 
 .card-actions .btn-primary {
   background: #0f766e;
-  color: white;
+  color: #fafafa;
 }
 
 .card-actions .btn-primary:hover {
@@ -216,7 +221,7 @@
 
 .card-actions .btn-secondary {
   background: #64748b;
-  color: white;
+  color: #fafafa;
 }
 
 .card-actions .btn-secondary:hover {
@@ -257,7 +262,7 @@
   margin-top: 0.5rem;
   padding: 0.75rem;
   background-color: #f0f9ff;
-  border: 1px solid #bae6fd;
+  border: 2px solid #bae6fd;
   border-radius: 0.5rem;
 }
 

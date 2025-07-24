@@ -99,7 +99,7 @@
 }
 
 .gradient-name-header {
-  background: linear-gradient(90deg, #4bffa2, #3b4ad3); /* Customize colors */
+  background: linear-gradient(90deg, #FFBCB5, #0c9891); /* Customize colors */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
@@ -113,24 +113,22 @@
   margin: 0;
 }
 
-.stat-label {
-  color: #64748b;
-  font-size: 0.875rem;
-  margin: 0.25rem 0 0 0;
-}
-
-.stat-trend {
-  color: #16a34a;
-  font-size: 0.75rem;
-  margin: 0.25rem 0 0 0;
-  font-weight: 500;
-}
-
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem;
   margin-bottom: 2rem;
+}
+
+.card-header.dashboard-card {
+  display: flex;
+  justify-content: center;
+  padding: 7px 5px;
+}
+
+.card-header.dashboard-card h2 {
+  font-weight: bold;
+  font-size: 25px;
 }
 
 .title-icon {
@@ -148,7 +146,7 @@
 .task-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 1rem;
   background: #f8fafc;
   border-radius: 0.5rem;
