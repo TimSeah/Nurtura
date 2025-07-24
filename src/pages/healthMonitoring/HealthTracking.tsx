@@ -362,17 +362,15 @@ const HealthTracking: React.FC = () => {
           isOpen={isAddingRecipient}
           onClose={() => setIsAddingRecipient(false)}
           title="Add New Care Recipient"
+          size="medium"
         >
-          <HealthMonitoring />
-          <div className="modal-buttons">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => setIsAddingRecipient(false)}
-            >
-              Close
-            </button>
-          </div>
+          <HealthMonitoring 
+            onSaveSuccess={() => {
+              setIsAddingRecipient(false);
+              loadCareRecipients(); // Reload the care recipients list
+            }}
+            onCancel={() => setIsAddingRecipient(false)}
+          />
         </Modal>
       )}
 
@@ -381,8 +379,8 @@ const HealthTracking: React.FC = () => {
         <Modal
           isOpen={isAddingJournal}
           onClose={() => setIsAddingJournal(false)}
-          title="Add New Journal Entry"
-          size="large"
+          title={`New Journal Entry for ${selectedRecipientData.name}`}
+          size="medium"
         >
           <JournalEntryForm 
             recipientId={selectedRecipient}

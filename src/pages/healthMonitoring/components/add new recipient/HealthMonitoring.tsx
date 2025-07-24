@@ -1,12 +1,18 @@
 import { useState } from "react";
 import "./healthmonitoring.css";
 
-const HealthMonitoring = () => {
+interface HealthMonitoringProps {
+  onSaveSuccess?: () => void;
+  onCancel?: () => void;
+}
+
+const HealthMonitoring: React.FC<HealthMonitoringProps> = ({ onSaveSuccess, onCancel }) => {
   const [name, setName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [relationship, setRelationship] = useState("");
   const [medicalConditions, setMedicalConditions] = useState("");
   const [caregiverNotes, setCaregiverNotes] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const saveRecepient = async () => {
     // Validation
@@ -14,6 +20,8 @@ const HealthMonitoring = () => {
       alert("Please fill in all required fields (Name, Date of Birth, Relationship)");
       return;
     }
+
+    setIsLoading(true);
 
     const newRecepient = {
       name: name.trim(),
@@ -52,16 +60,21 @@ const HealthMonitoring = () => {
       setRelationship("");
       setMedicalConditions("");
       setCaregiverNotes("");
+      
+      // Call the success callback to close the modal
+      if (onSaveSuccess) {
+        onSaveSuccess();
+      }
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to add care recipient");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="container">
-      <h3>Add Care Recipient</h3>
-      
       {/* Basic Information */}
       <div className="form-section">
         <h4>Basic Information</h4>
@@ -100,9 +113,25 @@ const HealthMonitoring = () => {
         />
       </div>
 
-      <button onClick={saveRecepient} className="save-button">
-        Add Care Recipient
-      </button>
+      <div className="form-actions">
+        <button 
+          onClick={saveRecepient} 
+          className="save-button"
+          disabled={isLoading}
+        >
+          {isLoading ? "Adding..." : "Add Care Recipient"}
+        </button>
+        {onCancel && (
+          <button 
+            type="button" 
+            onClick={onCancel} 
+            className="cancel-button"
+            disabled={isLoading}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </div>
   );
 };
