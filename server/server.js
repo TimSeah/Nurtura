@@ -59,8 +59,8 @@ mongoose.connect(process.env.MONGO_URI, {
 // IMPORTANT: In production, you should restrict this to your frontend's specific domain:
 // app.use(cors({ origin: 'http://localhost:3000' })); // Example for development
 app.use(cors({
-  origin: 'http://localhost:5173',  // or wherever your frontend runs
-  credentials: true
+  origin: true,        // reflect request.origin back in ACAO
+  credentials: true,   // allow cookies/auth headers
 }));
 
 // Log HTTP requests to the console in 'dev' format (colorful, concise output)
