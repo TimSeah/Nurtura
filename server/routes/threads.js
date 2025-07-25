@@ -1,23 +1,32 @@
 const express = require('express');
 const router = express.Router(); // Create a new Express router
 const Thread = require('../models/thread'); // Import the Thread model
+const Comment = require('../models/comment');
 console.log('threads.js route file loaded');
 
 // --- GET All Threads ---
 // Route: GET /api/threads
 // This route will fetch all threads from the database.
 router.get('/', async (req, res) => {
-  try {
-    // Find all threads in the database.
-    const threads = await Thread.find({}).sort({ date: -1 }); // Sort by date
+  const threads = await Thread.find().sort({ date: -1 });
+  // one aggregation to get all comment‑counts at once
+  const counts = await Comment.aggregate([
+    { $match: { threadId: { $in: threads.map(t => t._id) } } },
+    { $group: { _id: '$threadId', count: { $sum: 1 } } }
+  ]);
+  const countMap = new Map(counts.map(c => [c._id.toString(), c.count]));
 
-    // Send the found threads as a JSON response
-    res.json(threads);
-  } catch (err) {
-    // If an error occurs, log it and send a 500 (Internal Server Error) response
-    console.error('Error fetching threads:', err);
-    res.status(500).json({ message: err.message });
-  }
+  const payload = threads.map(t => ({
+    _id:     t._id,
+    title:   t.title,
+    content: t.content,
+    author:  t.author,
+    date:    t.date,
+    upvotes: t.upvotes,
+    vote:    req.user?.id ? (t.votes.get(req.user.id) === 1 ? 'up' : t.votes.get(req.user.id) === -1 ? 'down' : null) : null,
+    replies: countMap.get(t._id.toString()) || 0
+  }));
+  res.json(payload);
 });
 
 // This route will create a new thread document in the database.

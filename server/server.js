@@ -7,6 +7,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 const threadRoutes = require('./routes/threads');
+const { expressjwt: jwtMiddleware } = require('express-jwt');
+const authRoutes = require('./routes/auth');
+
 
 const app = express();
 
@@ -55,7 +58,10 @@ mongoose.connect(process.env.MONGO_URI, {
 // Enable CORS for all origins.
 // IMPORTANT: In production, you should restrict this to your frontend's specific domain:
 // app.use(cors({ origin: 'http://localhost:3000' })); // Example for development
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',  // or wherever your frontend runs
+  credentials: true
+}));
 
 // Log HTTP requests to the console in 'dev' format (colorful, concise output)
 app.use(logger('dev'));
@@ -74,6 +80,18 @@ app.use(cookieParser());
 // Serve static files (like your React build output in production, or other static assets)
 // from the 'public' directory.
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/api/auth', authRoutes);
+
+// any route under /api that needs login:
+app.use(
+  '/api/threads',
+  jwtMiddleware({
+    secret: process.env.JWT_SECRET,
+    algorithms: ['HS256'],
+    getToken: req => req.cookies.token
+  })
+);
 
 // Mount thread routes at /api/threads
 app.use('/api/threads', threadRoutes)
