@@ -1,11 +1,12 @@
 import "./Forum.css";
 import "./Forum"
-import { useState, useEffect, type ChangeEvent } from "react";
+import { useState, useEffect,useContext, type ChangeEvent } from "react";
 import { useParams } from "react-router-dom";
 import ThreadPost from "./ThreadPost";
 import Comment from "./Comment";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { AuthContext } from "../../contexts/AuthContext";
 
 interface ThreadDetail{
     _id: number;
@@ -36,12 +37,15 @@ const ThreadDetail: React.FC = () => {
     const [form, setForm] = useState({ content: "" });
     const [formError, setFormError] = useState<string | null>(null);
     const [upvotes, setUpvotes] = useState(thread?.upvotes ?? 0);
+    const { user } = useContext(AuthContext);
 
 
     const fetchThread = async (id: string) => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:5000/api/threads/${id}`);
+            const res = await fetch(`http://localhost:5000/api/threads/${id}`, {
+  credentials: 'include'
+})
             if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
             const data: ThreadDetail = await res.json();
             setThread(data);
@@ -54,7 +58,10 @@ const ThreadDetail: React.FC = () => {
 
     const fetchComments = async (threadId: string) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/threads/${threadId}/comments`);
+            const res = await fetch(`http://localhost:5000/api/threads/${threadId}/comments`, {
+  credentials: 'include'
+})
+            
             if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
             const data = await res.json();
             setComments(data);
@@ -81,6 +88,7 @@ const ThreadDetail: React.FC = () => {
         try {
              const res = await fetch(`http://localhost:5000/api/threads/${thread._id}/vote`, {
              method: 'PATCH',
+             credentials: 'include',
              headers: { 'Content-Type': 'application/json' },
              body: JSON.stringify({ direction }),
     });
@@ -110,16 +118,21 @@ const ThreadDetail: React.FC = () => {
             setFormError("Content is required.");
             return;
         }
+        if (!user) {
+            alert("You must be logged in to comment.");
+            return;
+        }
         try {
             const res = await fetch(`http://localhost:5000/api/threads/${id}/comments`, {
                 method: "POST",
+                credentials: 'include',
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     threadId: id,
                     content: form.content,
-                    author: "good commenter", // To be replaced with actual user
+                    author: user.username, // To be replaced with actual user
                     date: new Date().toISOString()
                 }),
             });

@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { Outlet } from 'react-router-dom';
 import {
   Home,
   Calendar,
@@ -14,9 +15,9 @@ import {
 } from "lucide-react";
 import "./Layout.css";
 
-interface LayoutProps {
+/*interface LayoutProps {
   children: React.ReactNode;
-}
+} */
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
@@ -82,7 +83,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </nav>
 
-        <main className="main-content">{children}</main>
+        <main className="main-content">
+          <Outlet />
+        </main>
       </div>
     </div>
   );

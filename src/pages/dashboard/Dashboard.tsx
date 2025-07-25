@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../contexts/AuthContext";
 import {
   Activity,
   Calendar,
@@ -49,6 +50,7 @@ const Dashboard: React.FC = () => {
   const [showVitalSignsModal, setShowVitalSignsModal] = useState(false);
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [showCareNoteModal, setShowCareNoteModal] = useState(false);
+  const { user } = useContext(AuthContext); 
 
   const handleVitalSignsSave = async (data: VitalSignsData) => {
     try {
@@ -218,7 +220,7 @@ const Dashboard: React.FC = () => {
       <div className="dashboard-header">
         <img src={koala}></img>
         <h1>
-          Welcome back, <span className="gradient-name-header">Sarah</span>
+          Welcome back, <span className="gradient-name-header">{user ? user.username : "Guest"} </span>
         </h1>
         <p>How can we help you today?</p>
       </div>
