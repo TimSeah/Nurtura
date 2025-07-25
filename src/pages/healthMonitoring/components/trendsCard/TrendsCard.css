@@ -1,0 +1,224 @@
+.trends-card {
+  margin-bottom: 2rem;
+}
+
+.trends-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.trends-card .card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.trends-card .title-icon {
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
+}
+
+.vital-selector {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vital-type-select {
+  appearance: none;
+  background: #fafafa;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 32px 8px 12px;
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  min-width: 160px;
+}
+
+.vital-type-select:hover {
+  border-color: #9ca3af;
+}
+
+.vital-type-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.select-icon {
+  position: absolute;
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+  pointer-events: none;
+}
+
+.chart-container {
+  padding: 1rem;
+  background: #ffffff !important;
+  border-radius: 8px;
+  margin-top: 1rem;
+  min-height: 350px;
+  width: 100%;
+  position: relative;
+  overflow: visible; /* Keep visible for tooltip */
+  z-index: 10;
+}
+
+/* Force proper dimensions for ResponsiveContainer and its children */
+.chart-container > div,
+.chart-container .recharts-responsive-container,
+.chart-container .recharts-responsive-container > div,
+.chart-container .recharts-wrapper,
+.chart-container .recharts-wrapper > div {
+  width: 100% !important;
+  height: 300px !important;
+  min-width: 100% !important;
+  min-height: 300px !important;
+}
+
+/* Ensure all SVG elements are visible and properly styled */
+.chart-container svg,
+.chart-container .recharts-surface {
+  background: transparent !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Ensure chart elements are visible */
+.chart-container .recharts-layer,
+.chart-container .recharts-line,
+.chart-container .recharts-line-dots,
+.chart-container .recharts-cartesian-grid,
+.chart-container .recharts-cartesian-axis,
+.chart-container path,
+.chart-container circle,
+.chart-container line,
+.chart-container text {
+  opacity: 1 !important;
+  visibility: visible !important;
+  fill-opacity: 1 !important;
+  stroke-opacity: 1 !important;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6b7280;
+}
+
+.empty-state p {
+  margin: 0.5rem 0;
+}
+
+.empty-state p:first-child {
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .trends-card .card-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .trends-card .card-title {
+    justify-content: center;
+    text-align: center;
+  }
+  
+  .vital-selector {
+    justify-content: center;
+  }
+  
+  .vital-type-select {
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
+/* Chart responsiveness */
+.chart-container .recharts-wrapper {
+  width: 100% !important;
+}
+
+/* Custom tooltip styling */
+.custom-tooltip {
+  background: #fafafa !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  padding: 8px 12px !important;
+  font-size: 0.875rem !important;
+  max-width: 250px !important;
+  word-wrap: break-word !important;
+  white-space: normal !important;
+  z-index: 1000 !important;
+  pointer-events: none !important;
+}
+
+.custom-tooltip .tooltip-label {
+  margin: 0 0 4px 0 !important;
+  font-weight: 600 !important;
+  color: #374151 !important;
+}
+
+.custom-tooltip .tooltip-time {
+  margin: 0 0 4px 0 !important;
+  font-size: 0.8rem !important;
+  color: #6b7280 !important;
+}
+
+.custom-tooltip .tooltip-entry {
+  margin: 2px 0 !important;
+  font-weight: 500 !important;
+}
+
+.custom-tooltip .tooltip-readings {
+  margin: 4px 0 0 0 !important;
+  font-size: 0.8rem !important;
+  color: #6b7280 !important;
+  font-style: italic !important;
+}
+
+/* Original tooltip styling (fallback) */
+.chart-container .recharts-tooltip-wrapper {
+  z-index: 1000 !important;
+  pointer-events: none !important;
+}
+
+.chart-container .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: #fafafa !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  padding: 8px 12px !important;
+  font-size: 0.875rem !important;
+  max-width: 250px !important;
+  word-wrap: break-word !important;
+  white-space: normal !important;
+}
+
+/* Ensure custom tooltip wrapper follows cursor */
+.chart-container .recharts-tooltip-wrapper .custom-tooltip {
+  position: relative !important;
+  transform: translate(-50%, -100%) !important;
+  margin-top: -10px !important;
+}
+
+/* Legend styling */
+.recharts-legend-wrapper {
+  padding-top: 1rem;
+}

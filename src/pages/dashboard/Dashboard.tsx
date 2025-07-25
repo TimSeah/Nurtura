@@ -4,18 +4,24 @@ import {
   Activity,
   Calendar,
   Users,
-  AlertTriangle,
+  BookPlus,
   Heart,
   Clock,
   TrendingUp,
   Bell,
 } from "lucide-react";
 import "./Dashboard.css";
-import VitalSignsModal from "../components/VitalSignsModal";
-import AppointmentModal from "../components/AppointmentModal";
-import CareNoteModal from "../components/CareNoteModal";
-import { apiService } from "../services/apiService";
-import type { VitalSignsData, AppointmentData, CareNoteData } from "../types";
+import VitalSignsModal from "../../components/VitalSignsModal";
+import AppointmentModal from "../../components/AppointmentModal";
+import CareNoteModal from "../../components/CareNoteModal";
+import { apiService } from "../../services/apiService";
+import type {
+  VitalSignsData,
+  AppointmentData,
+  CareNoteData,
+} from "../../types";
+
+import koala from "./components/pics/koala.png";
 
 interface Event {
   title: string;
@@ -24,11 +30,10 @@ interface Event {
 }
 
 interface DashboardStat {
-  label: string;
-  value: string;
   icon: React.ElementType;
   color: string;
-  trend?: string;
+  action: string;
+  link: string;
 }
 
 interface RecentActivity {
@@ -45,9 +50,18 @@ const Dashboard: React.FC = () => {
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [showCareNoteModal, setShowCareNoteModal] = useState(false);
 
-  const handleVitalSignsSave = (data: VitalSignsData) => {
-    console.log("Vital signs saved:", data);
-    // In a real app, this would save to backend/state management
+  const handleVitalSignsSave = async (data: VitalSignsData) => {
+    try {
+      console.log("Saving vital signs to backend:", data);
+      const savedVitalSigns = await apiService.addVitalSigns(data);
+      console.log("Vital signs saved successfully:", savedVitalSigns);
+
+      // You could add a toast notification here
+      alert("Vital signs recorded successfully!");
+    } catch (error) {
+      console.error("Error saving vital signs:", error);
+      alert("Failed to save vital signs. Please try again.");
+    }
   };
 
   const handleAppointmentSave = (data: AppointmentData) => {
@@ -60,37 +74,30 @@ const Dashboard: React.FC = () => {
     // In a real app, this would save to backend/state management
   };
 
-  const handleViewAllAlerts = () => {
-    navigate("/alerts");
-  };
   const stats: DashboardStat[] = [
     {
-      label: "Active Care Recipients",
-      value: "3",
-      icon: Users,
+      icon: Activity,
       color: "#0f766e",
-      trend: "+1 this month",
+      action: "Monitor Recipients",
+      link: "/health",
     },
     {
-      label: "Upcoming Appointments",
-      value: "7",
       icon: Calendar,
       color: "#7c3aed",
-      trend: "2 this week",
+      action: "View Calendar",
+      link: "/calendar",
     },
     {
-      label: "Health Alerts",
-      value: "2",
-      icon: AlertTriangle,
+      icon: Users,
       color: "#dc2626",
-      trend: "Requires attention",
+      action: "Ask in Forum",
+      link: "/forum",
     },
     {
-      label: "Medications Due",
-      value: "4",
-      icon: Heart,
+      icon: BookPlus,
       color: "#ea580c",
-      trend: "Today",
+      action: "See Caregiver Resources",
+      link: "/resources",
     },
   ];
 
@@ -209,25 +216,28 @@ const Dashboard: React.FC = () => {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h1>Welcome back, Sarah</h1>
-        <p>Here's what's happening with your care recipients today.</p>
+        <img src={koala}></img>
+        <h1>
+          Welcome back, <span className="gradient-name-header">Sarah</span>
+        </h1>
+        <p>How can we help you today?</p>
       </div>
 
       {/* Stats Grid */}
       <div className="stats-grid">
-        {stats.map((stat, index) => {
+        {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="stat-card">
-              <div className={`stat-icon ${getStatIconClass(stat.color)}`}>
-                <Icon />
+            <a href={stat.link} key={stat.action}>
+              <div className="stat-card">
+                <div className={`stat-icon ${getStatIconClass(stat.color)}`}>
+                  <Icon />
+                </div>
+                <div className="stat-content">
+                  <h3 className="stat-label">{stat.action}</h3>
+                </div>
               </div>
-              <div className="stat-content">
-                <h3>{stat.value}</h3>
-                <p className="stat-label">{stat.label}</p>
-                {stat.trend && <p className="stat-trend">{stat.trend}</p>}
-              </div>
-            </div>
+            </a>
           );
         })}
       </div>
@@ -235,7 +245,7 @@ const Dashboard: React.FC = () => {
       <div className="dashboard-grid">
         {/* Today's Tasks */}
         <div className="card">
-          <div className="card-header">
+          <div className="card-header dashboard-card">
             <h2 className="card-title">
               <Clock className="title-icon" />
               Today's Tasks
@@ -244,7 +254,7 @@ const Dashboard: React.FC = () => {
           <div className="task-list">
             {todayEvents.length === 0 ? (
               <h3 className="no-events-today">
-                No events for today. Have a wonderful day ahead!
+                Nothing for today. Have a wonderful day ahead!
               </h3>
             ) : (
               <>
@@ -264,7 +274,7 @@ const Dashboard: React.FC = () => {
 
         {/* Recent Activity */}
         <div className="card">
-          <div className="card-header">
+          <div className="card-header dashboard-card">
             <h2 className="card-title">
               <TrendingUp className="title-icon" />
               Recent Activity
@@ -291,40 +301,6 @@ const Dashboard: React.FC = () => {
               );
             })}
           </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">Quick Actions</h2>
-        </div>
-        <div className="quick-actions">
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowVitalSignsModal(true)}
-          >
-            <Heart className="btn-icon" />
-            Record Vital Signs
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowAppointmentModal(true)}
-          >
-            <Calendar className="btn-icon" />
-            Schedule Appointment
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowCareNoteModal(true)}
-          >
-            <Users className="btn-icon" />
-            Add Care Note
-          </button>
-          <button className="btn btn-secondary" onClick={handleViewAllAlerts}>
-            <Bell className="btn-icon" />
-            View All Alerts
-          </button>
         </div>
       </div>
 

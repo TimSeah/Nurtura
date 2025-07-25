@@ -1,10 +1,7 @@
 .calendar-container {
-  margin: 0;
+  margin-top: 0;
   padding: 1.5rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: white;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  background-color: var(--background-secondary);
   font-family: sans-serif;
   height:100%;
 }
@@ -19,13 +16,12 @@
 .next-prev-button {
   background: none;
   border: none;
-  color: #007bff;
-  font-weight: bold;
+  color: #0C9891;
+  /* font-weight: bold; */
   cursor: pointer;
-  font-size: 20px;
+  font-size: 25px;
   padding: 30px 0;
   width: 300px;
-  font-size: larger;
 }
 
 .next-prev-button:hover{
@@ -38,7 +34,7 @@
 
 .month-title {
   font-size: 35px;
-  font-weight: bold;
+  
 }
 
 .calendar-weekdays {
@@ -54,14 +50,15 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 0.2rem;
+  padding: 0 20px;
 }
 
 .calendar-day {
   padding: 0.75rem 0;
   text-align: center;
-  border-radius: 4px;
-  background-color: #f5f5f5;
-  border: #f5f5f5 3px solid;
+  border-radius: 10px;
+  background-color: #eaeaea;
+  border: #eaeaea 3px solid;
 }
 
 .calendar-day.today {
@@ -73,7 +70,7 @@
 
 .calendar-day.empty {
   background: none;
-  border: white 3px solid;
+  border: #eaeaea 3px solid;
 }
 
 /* Base styles from previous code */

@@ -1,12 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Search, MapPin, Phone, Globe, Clock, Star, Filter } from 'lucide-react';
-import type { Resource } from '../types';
-import { dataService } from '../services/dataService';
-import './Resources.css';
+import React, { useState, useEffect } from "react";
+import {
+  Search,
+  MapPin,
+  Phone,
+  Globe,
+  Clock,
+  Star,
+  Filter,
+} from "lucide-react";
+import type { Resource } from "../types";
+import { dataService } from "../services/dataService";
+import "./Resources.css";
+
+import caregiving1 from "../pages/dashboard/components/pics/koala.png";
+import caregiving2 from "../pages/dashboard/components/pics/koala.png";
+import caregiving3 from "../pages/dashboard/components/pics/koala.png";
 
 const Resources: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<'all' | Resource['category']>('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<
+    "all" | Resource["category"]
+  >("all");
   const [resources, setResources] = useState<Resource[]>([]);
 
   useEffect(() => {
@@ -14,20 +28,24 @@ const Resources: React.FC = () => {
   }, []);
 
   const categories = [
-    { value: 'all' as const, label: 'All Resources' },
-    { value: 'medical' as const, label: 'Medical Care' },
-    { value: 'transportation' as const, label: 'Transportation' },
-    { value: 'social' as const, label: 'Social Services' },
-    { value: 'emergency' as const, label: 'Emergency Services' },
-    { value: 'recreation' as const, label: 'Recreation' },
-    { value: 'support' as const, label: 'Support Groups' }
+    { value: "all" as const, label: "All Resources" },
+    { value: "medical" as const, label: "Medical Care" },
+    { value: "transportation" as const, label: "Transportation" },
+    { value: "social" as const, label: "Social Services" },
+    { value: "emergency" as const, label: "Emergency Services" },
+    { value: "recreation" as const, label: "Recreation" },
+    { value: "support" as const, label: "Support Groups" },
   ];
 
-  const filteredResources = resources.filter(resource => {
-    const matchesSearch = resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         resource.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         resource.services.some(service => service.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCategory = selectedCategory === 'all' || resource.category === selectedCategory;
+  const filteredResources = resources.filter((resource) => {
+    const matchesSearch =
+      resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      resource.services.some((service) =>
+        service.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    const matchesCategory =
+      selectedCategory === "all" || resource.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -35,16 +53,74 @@ const Resources: React.FC = () => {
     return Array.from({ length: 5 }, (_, index) => (
       <Star
         key={index}
-        className={`star ${index < Math.floor(rating) ? 'filled' : ''}`}
+        className={`star ${index < Math.floor(rating) ? "filled" : ""}`}
       />
     ));
   };
+
+  const articleList = [
+    {
+      id: 1,
+      title: "Caring for Yourself",
+      image: caregiving1,
+      url: "https://www.caregiver.org/caregiver-resources/caring-for-yourself/",
+      description:
+        "As a caregiver, we often overlook our own wellbeing we deserve.",
+    },
+    {
+      id: 2,
+      title: "Managing Elderly Behaviours",
+      image: caregiving2,
+      url: "https://ntuchealth.sg/elderly-care/resources/health-and-wellness/5-difficult-elderly-behaviours-and-how-to-manage-them",
+      description: "Learn how to react to common elderly habits.",
+    },
+    {
+      id: 3,
+      title: "Building a Support Network",
+      image: caregiving3,
+      url: "https://www.aarp.org/caregiving/life-balance/info-2017/building-support-network.html",
+      description:
+        "Connect with others and find resources to help you on your journey.",
+    },
+    // Add more articles as needed
+  ];
 
   return (
     <div className="resources">
       <div className="page-header">
         <h1>Community Resources</h1>
-        <p>Find healthcare providers, support services, and community resources in your area.</p>
+        <p>
+          Find caregiving articles, healthcare providers, support services, and
+          community resources in Singapore.
+        </p>
+      </div>
+
+      {/* Articles Section */}
+      <div className="articles-section">
+        <h2>Articles</h2>
+        <div className="articles-grid">
+          {articleList.map((article) => (
+            <div className="article-card" key={article.id}>
+              <img
+                src={article.image}
+                alt={article.title}
+                className="article-image"
+              />
+              <div className="article-content">
+                <h3>{article.title}</h3>
+                <p>{article.description}</p>
+                <a
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                >
+                  Read Article
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Search and Filter */}
@@ -61,11 +137,15 @@ const Resources: React.FC = () => {
           </div>
           <div className="filter-select">
             <Filter className="filter-icon" />
-            <select 
-              value={selectedCategory} 
-              onChange={(e) => setSelectedCategory(e.target.value as 'all' | Resource['category'])}
+            <select
+              value={selectedCategory}
+              onChange={(e) =>
+                setSelectedCategory(
+                  e.target.value as "all" | Resource["category"]
+                )
+              }
             >
-              {categories.map(category => (
+              {categories.map((category) => (
                 <option key={category.value} value={category.value}>
                   {category.label}
                 </option>
@@ -77,20 +157,18 @@ const Resources: React.FC = () => {
 
       {/* Resources List */}
       <div className="resources-grid">
-        {filteredResources.map(resource => (
+        {filteredResources.map((resource) => (
           <div key={resource.id} className="resource-card">
             <div className="resource-header">
               <h3>{resource.name}</h3>
               <div className="resource-rating">
-                <div className="stars">
-                  {renderStars(resource.rating)}
-                </div>
+                <div className="stars">{renderStars(resource.rating)}</div>
                 <span className="rating-text">{resource.rating}</span>
               </div>
             </div>
-            
+
             <p className="resource-description">{resource.description}</p>
-            
+
             <div className="resource-details">
               <div className="detail-item">
                 <MapPin className="detail-icon" />
@@ -103,7 +181,11 @@ const Resources: React.FC = () => {
               {resource.website && (
                 <div className="detail-item">
                   <Globe className="detail-icon" />
-                  <a href={resource.website} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={resource.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Visit Website
                   </a>
                 </div>
@@ -117,7 +199,7 @@ const Resources: React.FC = () => {
             <div className="resource-services">
               <h4>Services:</h4>
               <div className="services-tags">
-                {resource.services.map(service => (
+                {resource.services.map((service) => (
                   <span key={service} className="service-tag">
                     {service}
                   </span>

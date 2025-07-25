@@ -27,6 +27,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "tests"],
+  "include": ["src", "tests", "src/pages/dashboard/components/HeaderAnimatedBackground/.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

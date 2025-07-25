@@ -1,37 +1,18 @@
 import React, { useState, useEffect } from "react";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-} from "recharts";
-import {
-  Heart,
-  Activity,
-  Thermometer,
-  Scale,
-  Plus,
-  TrendingUp,
-  Droplets,
+  Info,
 } from "lucide-react";
 import { apiService } from "../../services/apiService";
+import { CareRecipient } from "../../types";
 import Modal from "../../components/Modal";
 import HealthMonitoring from "./components/add new recipient/HealthMonitoring";
+import MedicationsCard from "./components/medications/MedicationsCard";
 import JournalEntryForm from "./components/journal/JournalEntryForm";
 import JournalEntriesCard from "./components/journal/JournalEntriesCard";
+import CareRecipientSelector from "./components/careRecipientSelector";
+import ReadingsCard from "./components/readingsCard";
+import TrendsCard from "./components/trendsCard";
 import "./HealthTracking.css";
-
-interface CareRecipient {
-  _id: string;
-  name: string;
-  dateOfBirth: string;
-  relationship: string;
-}
 
 interface VitalSignsData {
   _id?: string;
@@ -60,7 +41,7 @@ const HealthTracking: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [newVitalForm, setNewVitalForm] = useState({
     value: "",
-    dateTime: "",
+    dateTime: new Date().toISOString().slice(0, 16),
     notes: "",
   });
   const [isAddingRecipient, setIsAddingRecipient] = useState(false);
@@ -71,6 +52,11 @@ const HealthTracking: React.FC = () => {
     // Force refresh of journal entries when a new journal is saved
     setJournalRefreshKey(prev => prev + 1);
     setIsAddingJournal(false);
+  };
+
+  const handleMedicationAdded = () => {
+    // Refresh care recipients data when medications are updated
+    loadCareRecipients();
   };
 
   useEffect(() => {
@@ -135,65 +121,29 @@ const HealthTracking: React.FC = () => {
       const savedVital = await apiService.addVitalSigns(vitalData);
       setVitalReadings((prev) => [savedVital, ...prev]);
 
-      // Reset form
-      setNewVitalForm({ value: "", dateTime: "", notes: "" });
+      // Reset form and close modal
+      setNewVitalForm({ 
+        value: "", 
+        dateTime: new Date().toISOString().slice(0, 16), 
+        notes: "" 
+      });
       setShowAddForm(false);
+      
+      alert("Vital signs recorded successfully!");
     } catch (error) {
       console.error("Error saving vital signs:", error);
+      alert("Failed to save vital signs. Please try again.");
     }
   };
 
-  // Generate chart data from actual readings
-  const getChartData = (vitalType: VitalSignsData["vitalType"]) => {
-    const relevantReadings = vitalReadings
-      .filter((reading) => reading.vitalType === vitalType)
-      .sort(
-        (a, b) =>
-          new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
-      )
-      .slice(-7); // Last 7 readings
-
-    return relevantReadings.map((reading) => {
-      const date = new Date(reading.dateTime);
-      const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
-
-      if (vitalType === "blood_pressure") {
-        const [systolic, diastolic] = reading.value
-          .split("/")
-          .map((v) => parseInt(v.trim()));
-        return {
-          date: dateStr,
-          systolic: systolic || 0,
-          diastolic: diastolic || 0,
-        };
-      } else if (vitalType === "heart_rate") {
-        return { date: dateStr, rate: parseInt(reading.value) || 0 };
-      }
-
-      return { date: dateStr, value: parseFloat(reading.value) || 0 };
+  const handleCloseAddForm = () => {
+    // Reset form when closing
+    setNewVitalForm({ 
+      value: "", 
+      dateTime: new Date().toISOString().slice(0, 16), 
+      notes: "" 
     });
-  };
-
-  const bloodPressureData = getChartData("blood_pressure");
-  const heartRateData = getChartData("heart_rate");
-
-  const getVitalIcon = (type: VitalSignsData["vitalType"]) => {
-    switch (type) {
-      case "blood_pressure":
-        return Heart;
-      case "heart_rate":
-        return Activity;
-      case "temperature":
-        return Thermometer;
-      case "weight":
-        return Scale;
-      case "blood_sugar":
-        return Droplets;
-      case "oxygen_saturation":
-        return Activity;
-      default:
-        return Heart;
-    }
+    setShowAddForm(false);
   };
 
   const getVitalUnit = (type: string) => {
@@ -215,31 +165,51 @@ const HealthTracking: React.FC = () => {
     }
   };
 
-  const getVitalDisplayName = (type: VitalSignsData["vitalType"]) => {
+  const getVitalTypeDetails = (type: string) => {
     switch (type) {
       case "blood_pressure":
-        return "Blood Pressure";
+        return {
+          placeholder: "120/80",
+          hint: "Sit comfortably for 5 minutes before taking. Place cuff on upper arm at heart level. Record as systolic/diastolic (e.g., 120/80).",
+          normalRange: "Normal: Less than 120/80 mmHg"
+        };
       case "heart_rate":
-        return "Heart Rate";
+        return {
+          placeholder: "72",
+          hint: "Rest for 5 minutes before measuring. Place two fingers on wrist pulse point. Count beats for 60 seconds or use a heart rate monitor.",
+          normalRange: "Normal: 60-100 beats per minute"
+        };
       case "temperature":
-        return "Temperature";
+        return {
+          placeholder: "98.6",
+          hint: "Wait 30 minutes after eating/drinking hot/cold items. Place thermometer under tongue for oral reading or follow device instructions.",
+          normalRange: "Normal: 97.8°F - 99.1°F (36.5°C - 37.3°C)"
+        };
       case "weight":
-        return "Weight";
+        return {
+          placeholder: "150",
+          hint: "Weigh at the same time each day, preferably in the morning after using the bathroom. Use the same scale on a hard, flat surface.",
+          normalRange: "Track changes over time rather than single readings"
+        };
       case "blood_sugar":
-        return "Blood Sugar";
+        return {
+          placeholder: "120",
+          hint: "Wash hands thoroughly. Use fresh lancet and test strip. Follow your glucose meter instructions. Record timing (fasting, before/after meals).",
+          normalRange: "Fasting: 80-100 mg/dL | After meals: Less than 140 mg/dL"
+        };
       case "oxygen_saturation":
-        return "Oxygen Saturation";
+        return {
+          placeholder: "98",
+          hint: "Ensure finger is clean and warm. Remove nail polish if present. Place pulse oximeter on fingertip and wait for stable reading.",
+          normalRange: "Normal: 95-100%"
+        };
       default:
-        return type;
+        return {
+          placeholder: "",
+          hint: "",
+          normalRange: ""
+        };
     }
-  };
-
-  const formatDateTime = (dateTime: string) => {
-    const date = new Date(dateTime);
-    return {
-      date: date.toLocaleDateString(),
-      time: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
   };
 
   const selectedRecipientData = careRecipients.find(
@@ -256,163 +226,34 @@ const HealthTracking: React.FC = () => {
         </p>
       </div>
       {/* Care Recipient Selector */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">Select Care Recipient</h2>
-          <div className="card-actions">
-            {!isAddingRecipient && (
-              <button 
-                className="btn btn-primary"
-                onClick={() => setIsAddingRecipient(true)}
-              >
-                <Plus className="btn-icon" />
-                Add Care Recipient
-              </button>
-            )}
-          </div>
-        </div>
-        <div className="recipient-selector">
-          {loading ? (
-            <div className="loading-message">
-              <p>Loading care recipients...</p>
-            </div>
-          ) : error ? (
-            <div className="error-message">
-              <p>Error loading care recipients: {error}</p>
-              <button
-                className="btn btn-secondary"
-                onClick={() => loadCareRecipients()}
-              >
-                Retry
-              </button>
-            </div>
-          ) : careRecipients.length === 0 ? (
-            <div className="loading-message">
-              <p>
-                No care recipients found. Please add some care recipients first.
-              </p>
-            </div>
-          ) : (
-            careRecipients.map((recipient) => (
-              <button
-                key={recipient._id}
-                className={`recipient-card ${
-                  selectedRecipient === recipient._id ? "selected" : ""
-                }`}
-                onClick={() => handleRecipientChange(recipient._id)}
-              >
-                <div className="recipient-info">
-                  <h3>{recipient.name}</h3>
-                  <p>
-                    DOB: {new Date(recipient.dateOfBirth).toLocaleDateString()}
-                  </p>
-                  <p>Relationship: {recipient.relationship}</p>
-                </div>
-              </button>
-            ))
-          )}
-        </div>
-      </div>
+      <CareRecipientSelector
+        careRecipients={careRecipients}
+        selectedRecipient={selectedRecipient}
+        loading={loading}
+        error={error}
+        isAddingRecipient={isAddingRecipient}
+        onRecipientChange={handleRecipientChange}
+        onAddRecipient={() => setIsAddingRecipient(true)}
+        onRetry={() => loadCareRecipients()}
+      />
+
+      {/* Medications Card */}
+      <MedicationsCard 
+        selectedRecipient={selectedRecipientData || null} 
+        onMedicationAdded={handleMedicationAdded}
+      />
+
       {selectedRecipientData && (
         <>
           {/* Recent Readings */}
-          <div className="card">
-            <div className="card-header">
-              <h2 className="card-title">
-                Recent Readings - {selectedRecipientData.name}
-              </h2>
-              <div className="card-actions">
-                <button
-                  className="btn btn-primary"
-                  onClick={() => setShowAddForm(true)}
-                >
-                  <Plus className="btn-icon" />
-                  Add Reading
-                </button>
-              </div>
-            </div>
-            <div className="readings-grid">
-              {vitalReadings.map((reading) => {
-                const Icon = getVitalIcon(reading.vitalType);
-                const { date, time } = formatDateTime(reading.dateTime);
-                return (
-                  <div key={reading._id} className="reading-card">
-                    <div className="reading-icon">
-                      <Icon />
-                    </div>
-                    <div className="reading-content">
-                      <h4>{getVitalDisplayName(reading.vitalType)}</h4>
-                      <p className="reading-value">
-                        {reading.value} {reading.unit}
-                      </p>
-                      <p className="reading-time">
-                        {date} at {time}
-                      </p>
-                      {reading.notes && (
-                        <p className="reading-notes">{reading.notes}</p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <ReadingsCard
+            selectedRecipient={selectedRecipientData}
+            vitalReadings={vitalReadings}
+            onAddReading={() => setShowAddForm(true)}
+          />
 
-          {/* Charts */}
-          <div className="charts-grid">
-            <div className="card">
-              <div className="card-header">
-                <h2 className="card-title">
-                  <TrendingUp className="title-icon" />
-                  Blood Pressure Trend
-                </h2>
-              </div>
-              <div className="chart-container">
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={bloodPressureData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="systolic"
-                      stroke="#dc2626"
-                      strokeWidth={2}
-                      name="Systolic"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="diastolic"
-                      stroke="#0f766e"
-                      strokeWidth={2}
-                      name="Diastolic"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="card-header">
-                <h2 className="card-title">
-                  <Activity className="title-icon" />
-                  Heart Rate Trend
-                </h2>
-              </div>
-              <div className="chart-container">
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={heartRateData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="rate" fill="#7c3aed" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
+          {/* Health Trends Chart */}
+          <TrendsCard vitalReadings={vitalReadings} />
 
           {/* Journal Entries Section */}
           {selectedRecipientData && (
@@ -430,7 +271,7 @@ const HealthTracking: React.FC = () => {
       {/* Add Reading Modal */}
       <Modal
         isOpen={showAddForm}
-        onClose={() => setShowAddForm(false)}
+        onClose={handleCloseAddForm}
         title="Add New Vital Reading"
         size="medium"
       >
@@ -452,17 +293,29 @@ const HealthTracking: React.FC = () => {
           </div>
           <div className="form-group">
             <label>Value</label>
-            <input
-              type="text"
-              value={newVitalForm.value}
-              onChange={(e) =>
-                setNewVitalForm((prev) => ({ ...prev, value: e.target.value }))
-              }
-              placeholder={`Enter ${getVitalDisplayName(
-                selectedVitalType as VitalSignsData["vitalType"]
-              )} value`}
-              required
-            />
+            <div className="vital-input-container">
+              <input
+                type="text"
+                value={newVitalForm.value}
+                onChange={(e) =>
+                  setNewVitalForm((prev) => ({ ...prev, value: e.target.value }))
+                }
+                placeholder={getVitalTypeDetails(selectedVitalType).placeholder}
+                required
+              />
+              <span className="vital-unit-label">
+                {getVitalUnit(selectedVitalType)}
+              </span>
+            </div>
+            {getVitalTypeDetails(selectedVitalType).hint && (
+              <div className="vital-hint">
+                <Info className="hint-icon" />
+                <div className="hint-content">
+                  <p className="hint-text">{getVitalTypeDetails(selectedVitalType).hint}</p>
+                  <p className="normal-range">📊 {getVitalTypeDetails(selectedVitalType).normalRange}</p>
+                </div>
+              </div>
+            )}
           </div>
           <div className="form-group">
             <label>Date & Time</label>
@@ -495,7 +348,7 @@ const HealthTracking: React.FC = () => {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={() => setShowAddForm(false)}
+              onClick={handleCloseAddForm}
             >
               Cancel
             </button>
@@ -509,17 +362,15 @@ const HealthTracking: React.FC = () => {
           isOpen={isAddingRecipient}
           onClose={() => setIsAddingRecipient(false)}
           title="Add New Care Recipient"
+          size="medium"
         >
-          <HealthMonitoring />
-          <div className="modal-buttons">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={() => setIsAddingRecipient(false)}
-            >
-              Close
-            </button>
-          </div>
+          <HealthMonitoring 
+            onSaveSuccess={() => {
+              setIsAddingRecipient(false);
+              loadCareRecipients(); // Reload the care recipients list
+            }}
+            onCancel={() => setIsAddingRecipient(false)}
+          />
         </Modal>
       )}
 
@@ -528,8 +379,8 @@ const HealthTracking: React.FC = () => {
         <Modal
           isOpen={isAddingJournal}
           onClose={() => setIsAddingJournal(false)}
-          title="Add New Journal Entry"
-          size="large"
+          title={`New Journal Entry for ${selectedRecipientData.name}`}
+          size="medium"
         >
           <JournalEntryForm 
             recipientId={selectedRecipient}

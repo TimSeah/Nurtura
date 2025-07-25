@@ -1,5 +1,5 @@
 :root {
-  --header-height: 81px;
+  /* --header-height: 81px; */
   /* Mayo Clinic inspired color palette */
   --primary-blue: #0078d4;
   --primary-blue-hover: #106ebe;
@@ -18,7 +18,7 @@
   --gray-700: #616161;
   --gray-800: #424242;
   --gray-900: #212121;
-  --text-primary: #212121;
+  --text-primary: #1E293B;
   --text-secondary: #616161;
   --text-muted: #757575;
   --background-primary: #ffffff;
@@ -35,7 +35,7 @@
 }
 
 .layout {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   display: flex;
   flex-direction: column;
   background-color: var(--background-secondary);
@@ -66,6 +66,7 @@ html, body {
   height: var(--header-height);
   display: flex;
   align-items: center;
+  display: none;
 }
 
 .header-content {
@@ -81,16 +82,21 @@ html, body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  color: white;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.logo-text {
+  font-size: 35px;
   font-weight: 600;
-  font-size: 1.75rem;
-  color: var(--primary-blue);
-  letter-spacing: -0.025em;
+  color: white;
 }
 
 .logo-icon {
-  width: 2.25rem;
-  height: 2.25rem;
-  color: var(--primary-blue);
+  width: 2rem;
+  height: auto;
+  color: white;
 }
 
 .mobile-menu-toggle {
@@ -105,17 +111,18 @@ html, body {
 }
 
 .mobile-menu-toggle:hover {
-  border-color: var(--primary-blue);
-  color: var(--primary-blue);
-  background-color: var(--primary-blue-light);
+  /* border-color: var(--primary-blue); */
+  border-color: white;
+  /* color: var(--primary-blue); */
+  background-color:#0078d4;
 }
 
 .layout-body {
   display: flex;
   flex: 1;
-  margin: 0 auto;
+  margin: 0;
   width: 100%;
-  padding-top: calc(var(--header-height) - 20px); /* Use CSS custom property */
+  /* padding-top: calc(var(--header-height) - 20px); Use CSS custom property */
 
 }
 
@@ -123,12 +130,15 @@ html, body {
   width: 280px;
   background: var(--background-primary);
   border-right: 1px solid var(--border-light);
-  padding: 2rem 0;
+  padding: 0;
   position: sticky;
   top: 0;
   overflow-y: auto;
   box-shadow: var(--shadow-light);
+  /* background-color:#0078d4; */
+  background: linear-gradient(to bottom, #0c9891, #5fe8d8); /* Blue to Aqua */
 }
+
 
 .nav-items {
   display: flex;
@@ -142,7 +152,7 @@ html, body {
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  color: var(--text-secondary);
+  color: white;
   text-decoration: none;
   border-radius: var(--radius-large);
   transition: all 0.2s ease;
@@ -152,22 +162,21 @@ html, body {
 }
 
 .nav-item:hover {
-  background-color: var(--primary-blue-light);
-  color: var(--primary-blue);
-  border-color: var(--primary-blue-light);
+  /* color: white;
+  border-color: white; */
   transform: translateX(4px);
 }
 
 .nav-item.active {
-  background-color: var(--primary-blue);
-  color: var(--background-primary);
-  border-color: var(--primary-blue);
-  box-shadow: var(--shadow-medium);
+  background-color: white;
+  color: #0c9891;
+  border-color:#0c9891;
 }
 
 .nav-item.active:hover {
-  background-color: var(--primary-blue-hover);
-  border-color: var(--primary-blue-hover);
+  /* background: none;
+  color: white;
+  border-color: white; */
   transform: translateX(4px);
 }
 
@@ -184,26 +193,48 @@ html, body {
 
 .main-content {
   flex: 1;
-  padding: 0;
+  padding: 30px 0;
   overflow-x: auto;
   overflow-y: auto;
-  height: 100%;
-  box-sizing: border-box;
+  /* height: 100%; */
+  /* box-sizing: border-box; */
   background-color: var(--background-secondary);
+}
+
+.sidebar.mobile-open {
+  height: 100%;
 }
 
 /* Mobile Styles - Mayo Clinic Theme */
 @media (max-width: 768px) {
+  .layout-header {
+    display: inline;
+  }
+
+  .header-content {
+    align-items: center;
+    justify-content: space-between;
+    display: flex;
+  }
+
+  .logo {
+    height: 60px;
+  }
+
   .mobile-menu-toggle {
     display: block;
   }
 
   .layout-body {
     position: relative;
-    padding-top: var(--header-height);
+    padding-top: 0;
     max-width: 100%;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .nav-item {
+    color:#0078d4;
   }
 
   .sidebar {
@@ -254,6 +285,7 @@ html, body {
 
 .card-header {
   margin-bottom: 2rem;
+  justify-content: center;
 }
 
 .card-title {
@@ -328,11 +360,49 @@ html, body {
   outline-offset: 2px;
 }
 
+.header-content {
+  padding: 5px;
+  margin: 0;
+}
+
 /* Improved responsive behavior */
 @media (max-width: 1200px) {
   .layout-body {
     max-width: 100%;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 0;
+    padding-right: 0;
   }
+
+  .layout-header {
+    justify-content: center;
+  }
+
+  .header-content {
+    padding: 0;
+    margin: 0;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .mobile-menu-toggle {
+    color:white;
+    opacity: 1;
+    border: none;
+    justify-self: right;
+  }
+
+  .logo {
+    padding: 0;
+    margin: 0;
+  }
+
+  .layout-header {
+    background-color: #0C9891;
+    height: auto;
+    color: white;
+    padding: 0;
+    margin: 0;
+  }
+  
 }
