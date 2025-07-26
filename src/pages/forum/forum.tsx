@@ -285,7 +285,7 @@ const Forum: React.FC = () => {
                     >
                       <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
                     </svg>
-                    {0} {/* replies */}
+                    {t.replies} {/* replies */}
                   </div>
                   {t.author == currentUser && (
                     <button
