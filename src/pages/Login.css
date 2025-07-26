@@ -1,0 +1,108 @@
+/* src/pages/Login.css */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  /* match your sidebar gradient */
+  background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Container to center everything */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #2dd4bf, #059669);
+  padding: 2rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+.login-card {
+  background: #fff;
+  /* bump width if you like: */
+  max-width: 600px;
+  margin: 0 auto;
+  /* more padding top/bottom to increase height: */
+  padding: 3rem 2rem;            /* ↑ here */
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  text-align: center;
+  /* you can also force a minimum height: */
+  min-height: 400px;            /* ↑ optional */
+}
+
+.login-card .logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-card .logo-icon {
+  width: 36px;
+  height: 36px;
+  color: #10b981; /* Nurtura teal */
+  margin-right: 0.5rem;
+}
+
+.login-card h1 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.login-welcome {
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+
+.login-card form input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color .2s;
+}
+
+.login-card form input:focus {
+  outline: none;
+  border-color: #10b981;
+}
+
+.login-card form button {
+  width: 100%;
+  padding: 0.75rem;
+  background: #10b981;
+  color: white;
+  font-size: 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.login-card form button:hover {
+  background: #059669;
+}
+
+.login-card .register-link {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
