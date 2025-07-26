@@ -39,8 +39,8 @@ const Forum: React.FC = () => {
   const [showUserThreads, setShowUserThreads] = useState(false);
 
   const visibleThreads = showUserThreads
-    ? threads.filter((t) => t.author === user?.email)
-    : threads;
+  ? threads.filter((t) => t.author === user?.email || t.author === user?.username)
+  : threads;
 
   const fetchThreads = async () => {
     setLoading(true);
@@ -84,7 +84,7 @@ const Forum: React.FC = () => {
         body: JSON.stringify({
           title: form.title,
           content: form.content,
-          author: user?.username,
+          //author: user?.username,
           date: new Date().toISOString(),
           upvotes: 0,
         }),
