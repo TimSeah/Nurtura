@@ -32,7 +32,7 @@ router.post('/login', async (req, res) => {
   const token = jwt.sign({ sub: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' });
   // send as HTTP‑only cookie:
   res.cookie('token', token, { httpOnly: true, sameSite: 'strict' });
-  res.json({ username: user.username });
+  res.json({ _id: user._id, username: user.username });
 });
 
 // POST /api/auth/logout

@@ -69,7 +69,16 @@ const Forum: React.FC = () => {
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
+  
+  console.log("Creating thread with author:", user?.username, user?.email);
+  console.log("Request payload:", {
+  title: form.title,
+  content: form.content,
+  author: user?.username || user?.email || "Anonymous",
+  date: new Date().toISOString(),
+  upvotes: 0,
+});
+console.log("user =", user);
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!form.title || !form.content) {

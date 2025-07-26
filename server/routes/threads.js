@@ -32,8 +32,8 @@ router.get('/', async (req, res) => {
 // This route will create a new thread document in the database.
 router.post('/', async (req, res) => {
   // Extract thread data from the request body
-  const { title, content, date, upvotes } = req.body;
-  const author = req.auth?.email || req.auth?.username; 
+  const { title, content, date, upvotes, author } = req.body;
+  //const author = req.auth?.email || req.auth?.username; 
 
   // Create a new Thread instance using the Mongoose model
   // Mongoose will automatically validate the data against the schema.
