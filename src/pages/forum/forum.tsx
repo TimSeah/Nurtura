@@ -78,12 +78,13 @@ const Forum: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          credentials: 'include',
+          
         },
+        credentials: 'include',
         body: JSON.stringify({
           title: form.title,
           content: form.content,
-          author: user?.email,
+          author: user?.username,
           date: new Date().toISOString(),
           upvotes: 0,
         }),
