@@ -24,11 +24,34 @@ const Forum: React.FC = () => {
   const [showForm, setShowForm]   = useState(false);
   const [form, setForm] = useState({ title: "", content: ""});
   const [showUserThreads, setShowUserThreads] = useState(false);
+  const [sortOption, setSortOption] = useState("recent");
+
+
+  const sortedThreads = [...threads].sort((a, b) => {
+    switch (sortOption) {
+      case "likes":
+        return b.upvotes - a.upvotes;
+      case "comments":
+        return (b.replies || 0) - (a.replies || 0); // fallback in case replies is undefined
+      case "oldest":
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      case "recent":
+      default:
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+    }
+  });
 
   const visibleThreads = showUserThreads
+<<<<<<< Updated upstream
   ? threads.filter(t => t.author === currentUser)
   : threads;
   
+=======
+    ? sortedThreads.filter((t) => t.author === currentUser)
+    : sortedThreads;
+
+
+>>>>>>> Stashed changes
   const fetchThreads = async () => {
     setLoading(true);
     try {
@@ -115,6 +138,7 @@ const Forum: React.FC = () => {
   }
 
   return (
+<<<<<<< Updated upstream
     <div className="max-w-5xl mx-auto px-4 py-8 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Forum</h1>
@@ -125,6 +149,44 @@ const Forum: React.FC = () => {
         <button onClick={() => setShowForm(true)} className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition">
           + New Thread
         </button>
+=======
+    <>
+      <div className="page-header">
+        <h1>Forum</h1>
+        <p>Ask questions to or help out another caregiver.</p>
+      </div>
+      <div className="max-w-5xl mx-auto px-4 bg-gray-50 min-h-screen">
+        <div className="flex justify-between items-center mb-6">
+          {/* <h1 className="text-3xl font-bold text-gray-800">Forum</h1> */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowForm(true)}
+              className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition"
+            >
+              + New Thread
+            </button>
+            <button
+              onClick={() => setShowUserThreads((prev) => !prev)}
+              className={`${
+                showUserThreads
+                  ? "bg-gray-200 hover:bg-gray-300"
+                  : "bg-gray-200 hover:bg-gray-300"
+              } text-sm px-4 py-2 rounded-md shadow-sm transition`}
+            >
+              {showUserThreads ? "Show All Threads" : "My Threads"}
+            </button>
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              className="ml-1 text-xs bg-gray-200 h-13 px-2 pt-0.4 border border-gray-400 shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded"
+            >
+              <option value="recent">Most Recent</option>
+              <option value="oldest">Oldest</option>
+              <option value="comments">Most Comments</option>
+              <option value="likes">Most Upvotes</option>
+            </select>
+          </div>
+>>>>>>> Stashed changes
         </div>
       </div>
 
