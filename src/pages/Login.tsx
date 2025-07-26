@@ -1,21 +1,22 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext';
-import logo from './dashboard/components/pics/koala2.png'  // adjust path as needed
-import './Login.css';
+import React, { useState, useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext";
+import logo from "./dashboard/components/pics/koala2.png"; // adjust path as needed
+import "./Login.css";
 
 export default function Login() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (await login(username, password)) {
-      navigate('/');
+      navigate("/");
     } else {
-      alert('Invalid credentials');
+      alert("Invalid credentials");
     }
   };
 
@@ -23,11 +24,11 @@ export default function Login() {
     <div className="login-container">
       {/* ← NEW HEADER */}
       <div className="login-header">
-  <div className="login-title-with-icon">
-    <img src={logo} alt="Nurtura Logo" className="login-logo-icon" />
-    <h2 className="login-welcome">Welcome to Nurtura!</h2>
-  </div>
-</div>
+        <div className="login-title-with-icon">
+          <img src={logo} alt="Nurtura Logo" className="login-logo-icon" />
+          <h2 className="login-welcome">Welcome to Nurtura!</h2>
+        </div>
+      </div>
 
       <div className="login-card">
         <h1 className="login-title">Log In</h1>
@@ -36,7 +37,7 @@ export default function Login() {
             type="text"
             placeholder="Username"
             value={username}
-            onChange={e => setUsername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
             required
             className="login-input"
           />
@@ -44,7 +45,7 @@ export default function Login() {
             type="password"
             placeholder="Password"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             required
             className="login-input"
           />
@@ -53,7 +54,7 @@ export default function Login() {
           </button>
         </form>
         <p className="login-footer">
-          Don’t have an account?{' '}
+          Don’t have an account?{" "}
           <Link to="/register" className="login-register-link">
             Register here
           </Link>

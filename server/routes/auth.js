@@ -13,6 +13,11 @@ router.post('/register', async (req, res) => {
     res.status(201).json({ message: 'ok' });
   } catch (err) {
     console.error(err);
+
+    if (err.code === 11000) {
+      return res.status(400).json({message: "Username already exists"});
+    }
+
     res.status(400).json({ message: err.message });
   }
 });
