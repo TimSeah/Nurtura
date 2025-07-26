@@ -43,12 +43,18 @@ const Forum: React.FC = () => {
 
   const visibleThreads = showUserThreads
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   ? threads.filter(t => t.author === currentUser)
   : threads;
   
 =======
     ? sortedThreads.filter((t) => t.author === currentUser)
     : sortedThreads;
+=======
+    ? sortedThreads.filter((t) => t.author === currentUser)
+    : sortedThreads;
+
+>>>>>>> Stashed changes
 
 
 >>>>>>> Stashed changes
