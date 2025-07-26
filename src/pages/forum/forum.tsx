@@ -135,7 +135,8 @@ const Forum: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (user?.email !== threads.find((t) => t._id === id)?.author) return;
+    const thread = threads.find((t) => t._id === id);
+    if (thread?.author !== user?.email && thread?.author !== user?.username) return;
     if (!window.confirm("Are you sure you want to delete this thread?")) return;
 
     try {
