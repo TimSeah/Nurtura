@@ -119,7 +119,9 @@ console.log("user =", user);
   };
 
   const handleDelete = async (id: string) => {
-    if (user?.email !== threads.find((t) => t._id === id)?.author) return;
+     console.log("Delete button clicked for thread:", id); 
+    const thread = threads.find((t) => t._id === id);
+    if (thread?.author !== user?.email && thread?.author !== user?.username) return;
     if (!window.confirm("Are you sure you want to delete this thread?")) return;
 
     try {
@@ -252,82 +254,59 @@ console.log("user =", user);
             <p>No threads yet</p>
           ) : (
             visibleThreads.map((t) => (
-              <Link
-                key={t._id}
-                to={`/threads/${t._id}`}
-                className="flex items-start bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition border"
-              >
-                {/* Icon */}
-                {/* <div className={`w-10 h-10 flex items-center justify-center rounded-full mr-4 ${thread.color}`}> */}
-                <div
-                  className={`w-10 h-10 flex items-center justify-center rounded-full mr-4 bg-blue-100 text-blue-600`}
-                >
-                  <svg
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
-                  </svg>
-                </div>
-                {/* Thread Info */}
-                <div className="flex-1 text-left">
-                  <h2 className="text-md font-semibold text-gray-900">
-                    {t.title}
-                  </h2>
-                  {/*<p className="text-sm text-gray-600">{t.content}</p>*/}
-                  <p className="text-sm mt-1 text-blue-500">
-                    By: {t.author}{" "}
-                    <span className="text-gray-400">
-                      • {calculateDaysAgo(t.date)}
-                    </span>
-                  </p>
-                </div>
-                {/* Upvotes + Replies */}
-                <div className="ml-4 flex flex-col items-center justify-center text-sm text-gray-500 whitespace-nowrap">
-                  <button type="button" className="flex items-center gap-1">
-                    <svg
-                      className="w-4 h-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M3 10h4v10h6V10h4L10 0 3 10z" />
-                    </svg>
-                    {t.upvotes}
-                  </button>
-                  <div className="flex items-center gap-1 mt-1">
-                    <svg
-                      className="w-4 h-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
-                    </svg>
-                    {t.replies} {/* replies */}
-                  </div>
-                  {(t.author === user?.email ||
-                    t.author === user?.username) && ( // updated logic to check if current user is author, fixes bug where delete button does not appear
-                    <button
-                      className="mt-2 -ml-3 text-red-500 hover:text-red-700 transition"
-                      title="Delete Thread"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation(); // Prevent link navigation
-                        handleDelete(t._id);
-                      }}
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9ZM7 6H17V20H7V6ZM9 8V18H11V8H9ZM13 8V18H15V8H13Z" />
-                      </svg>
-                      {/* Delete */}
-                    </button>
-                  )}
-                </div>
-              </Link>
+              <div
+  key={t._id}
+  className="flex items-start bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition border relative"
+>
+        <Link
+          to={`/threads/${t._id}`}
+          className="flex-1 flex items-start"
+        >
+          {/* Icon */}
+          <div className="w-10 h-10 flex items-center justify-center rounded-full mr-4 bg-blue-100 text-blue-600">
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
+            </svg>
+          </div>
+
+          {/* Thread Info */}
+          <div className="flex-1 text-left">
+            <h2 className="text-md font-semibold text-gray-900">{t.title}</h2>
+            <p className="text-sm mt-1 text-blue-500">
+              By: {t.author}{" "}
+              <span className="text-gray-400">• {calculateDaysAgo(t.date)}</span>
+            </p>
+          </div>
+        </Link>
+
+        {/* Upvotes + Replies + Delete Button */}
+        <div className="ml-4 flex flex-col items-center justify-center text-sm text-gray-500 whitespace-nowrap">
+          <div className="flex items-center gap-1">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M3 10h4v10h6V10h4L10 0 3 10z" />
+            </svg>
+            {t.upvotes}
+          </div>
+          <div className="flex items-center gap-1 mt-1">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
+            </svg>
+            {t.replies}
+          </div>
+
+          {(t.author === user?.email || t.author === user?.username) && (
+            <button
+              className="mt-2 text-red-500 hover:text-red-700 transition"
+              title="Delete Thread"
+              onClick={() => handleDelete(t._id)}
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9ZM7 6H17V20H7V6ZM9 8V18H11V8H9ZM13 8V18H15V8H13Z" />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
             ))
           )}
         </div>
