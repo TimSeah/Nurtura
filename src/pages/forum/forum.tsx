@@ -296,7 +296,8 @@ const Forum: React.FC = () => {
                     </svg>
                     {t.replies} {/* replies */}
                   </div>
-                  {t.author === user?.email && (
+                  {(t.author === user?.email ||
+                    t.author === user?.username) && ( // updated logic to check if current user is author, fixes bug where delete button does not appear
                     <button
                       className="mt-2 -ml-3 text-red-500 hover:text-red-700 transition"
                       title="Delete Thread"
