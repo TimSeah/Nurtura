@@ -13,8 +13,8 @@ import {
 import "./Forum.css";
 import { Link } from "react-router-dom";
 import { calculateDaysAgo } from "../../utils/calDaysAgoUtil";
-import { useContext } from 'react';
-import { AuthContext } from '../../contexts/AuthContext';
+import { useContext } from "react";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const currentUser = "A good grandkid";
 
@@ -29,7 +29,7 @@ interface Thread {
 }
 
 const Forum: React.FC = () => {
-  const { user } = useContext(AuthContext); 
+  const { user } = useContext(AuthContext);
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -39,13 +39,17 @@ const Forum: React.FC = () => {
   const [showUserThreads, setShowUserThreads] = useState(false);
 
   const visibleThreads = showUserThreads
-  ? threads.filter((t) => t.author === user?.email || t.author === user?.username)
-  : threads;
+    ? threads.filter(
+        (t) => t.author === user?.email || t.author === user?.username
+      ) // for "My Threads" button to work
+    : threads;
 
   const fetchThreads = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/threads", { credentials: 'include' });
+      const res = await fetch("http://localhost:5000/api/threads", {
+        credentials: "include",
+      });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       const data: Thread[] = await res.json();
       setThreads(data);
@@ -78,13 +82,12 @@ const Forum: React.FC = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
           title: form.title,
           content: form.content,
-          //author: user?.username,
+          author: user?.username || user?.email || "Anonymous",
           date: new Date().toISOString(),
           upvotes: 0,
         }),
@@ -107,13 +110,13 @@ const Forum: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (user?.email !== threads.find(t => t._id === id)?.author) return;
+    if (user?.email !== threads.find((t) => t._id === id)?.author) return;
     if (!window.confirm("Are you sure you want to delete this thread?")) return;
 
     try {
       const res = await fetch(`http://localhost:5000/api/threads/${id}`, {
         method: "DELETE",
-        credentials: 'include',
+        credentials: "include",
       });
       if (!res.ok) throw new Error(await res.text());
 
