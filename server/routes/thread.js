@@ -1,23 +1,55 @@
 const express = require('express');
 const router = express.Router(); // Create a new Express router
 const Thread = require('../models/Thread'); // Import the Thread model
+const Comment = require('../models/Comment'); // Import the Comment model
 
 // --- GET All Threads ---
 // Route: GET /api/threads
 // This route will fetch all threads from the database.
+// router.get('/', async (req, res) => {
+//   try {
+//     // Find all threads in the database.
+//     const threads = await Thread.find({}).sort({ date: -1 }).lean(); // .lean() improves performance
+
+//     const threadsWithCounts = await Promise.all(
+//       threads.map(async (thread) => {
+//         const count = await Comment.countDocuments({ threadId: thread._id });
+//         return { ...thread, comments: count };
+//       })
+//     );
+
+//     // Send the found threads as a JSON response
+//     res.json(threadsWithCounts);
+//   } catch (err) {
+//     // If an error occurs, log it and send a 500 (Internal Server Error) response
+//     console.error('Error fetching threads:', err);
+//     res.status(500).json({ message: err.message });
+//   }
+// });
+
+
 router.get('/', async (req, res) => {
   try {
-    // Find all threads in the database.
-    const threads = await Thread.find({}).sort({ date: -1 }); // Sort by date
+    const threads = await Thread.find().sort({ createdAt: -1 });
 
-    // Send the found threads as a JSON response
-    res.json(threads);
+    // Attach comment counts to each thread
+    const threadsWithComments = await Promise.all(
+      threads.map(async (thread) => {
+        const commentCount = await Comment.countDocuments({ threadId: thread._id });
+        return {
+          ...thread.toObject(),
+          comments: commentCount,
+        };
+      })
+    );
+
+    res.json(threadsWithComments);
   } catch (err) {
-    // If an error occurs, log it and send a 500 (Internal Server Error) response
-    console.error('Error fetching threads:', err);
-    res.status(500).json({ message: err.message });
+    console.error('Failed to get threads:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 // This route will create a new thread document in the database.
 router.post('/', async (req, res) => {
@@ -40,7 +72,7 @@ router.post('/', async (req, res) => {
     const savedThread = await newThread.save();
 
     // Send a 201 (Created) status code and the saved thread as a JSON response
-    res.status(201).json(savedThread);
+    res.status(201).json({ ...savedThread.toObject(), comments: 0 });
   } catch (err) {
     // If an error occurs (e.g., validation error, database error),
     // log it and send a 400 (Bad Request) or 500 (Internal Server Error) response.

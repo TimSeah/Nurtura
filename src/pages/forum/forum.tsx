@@ -34,10 +34,25 @@ const Forum: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", content: "" });
   const [showUserThreads, setShowUserThreads] = useState(false);
+  const [sortOption, setSortOption] = useState("recent");
+
+  const sortedThreads = [...threads].sort((a, b) => {
+    switch (sortOption) {
+      case "likes":
+        return b.upvotes - a.upvotes;
+      case "comments":
+        return (b.replies || 0) - (a.replies || 0); // fallback in case replies is undefined
+      case "oldest":
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      case "recent":
+      default:
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+    }
+  });
 
   const visibleThreads = showUserThreads
-    ? threads.filter((t) => t.author === currentUser)
-    : threads;
+    ? sortedThreads.filter((t) => t.author === currentUser)
+    : sortedThreads;
 
   const fetchThreads = async () => {
     setLoading(true);
@@ -46,6 +61,7 @@ const Forum: React.FC = () => {
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       const data: Thread[] = await res.json();
       setThreads(data);
+      console.log(threads);
     } catch (e: any) {
       setLoadError(e.message);
     } finally {
@@ -136,6 +152,12 @@ const Forum: React.FC = () => {
           {/* <h1 className="text-3xl font-bold text-gray-800">Forum</h1> */}
           <div className="flex gap-4">
             <button
+              onClick={() => setShowForm(true)}
+              className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition"
+            >
+              + New Thread
+            </button>
+            <button
               onClick={() => setShowUserThreads((prev) => !prev)}
               className={`${
                 showUserThreads
@@ -145,12 +167,16 @@ const Forum: React.FC = () => {
             >
               {showUserThreads ? "Show All Threads" : "My Threads"}
             </button>
-            <button
-              onClick={() => setShowForm(true)}
-              className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition"
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              className="ml-1 text-[8px] bg-gray-200 h-13 px-2 pt-1 border border-gray-400 shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded"
             >
-              + New Thread
-            </button>
+              <option value="recent">Most Recent</option>
+              <option value="oldest">Oldest</option>
+              <option value="comments">Most Comments</option>
+              <option value="likes">Most Upvotes</option>
+            </select>
           </div>
         </div>
 
@@ -284,7 +310,7 @@ const Forum: React.FC = () => {
                     >
                       <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
                     </svg>
-                    {0} {/* replies */}
+                    {t.replies} {/* replies */}
                   </div>
                   {t.author == currentUser && (
                     <button
