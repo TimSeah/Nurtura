@@ -10,6 +10,7 @@ interface ThreadDetail{
   date: string;
   upvotes: number;
   replies: number;
+  userVote: 'up' | 'down' | null;
 }
 
 interface ThreadDetailProps {
@@ -17,9 +18,10 @@ interface ThreadDetailProps {
   upvotes: number;
   onVote: (direction: 'up' | 'down') => void;
   onCommentClick: () => void;
+  userVote: 'up' | 'down' | null;
 }
 
-const ThreadPost: React.FC<ThreadDetailProps> = ({ thread, onCommentClick, onVote, upvotes }) => {
+const ThreadPost: React.FC<ThreadDetailProps> = ({ thread, onCommentClick, onVote,userVote }) => { // took out upvotes inside
     return (
     <article className="max-w-3xl mx-auto bg-white rounded-2xl shadow p-6">
         {/* Header */}
@@ -45,20 +47,27 @@ const ThreadPost: React.FC<ThreadDetailProps> = ({ thread, onCommentClick, onVot
             onClick={() => onVote('up')}
             className="flex items-center space-x-1 transition group"
             aria-label="Upvote"
-            >
-            {/* only this icon turns green on hover */}
-            <ArrowUpIcon className="w-5 h-5 group-hover:text-green-600 transition-colors" />
-            <span className="text-gray-600">{upvotes}</span>
-            </button>
+        >
+            <ArrowUpIcon
+            className={`w-5 h-5 transition-colors ${
+                userVote === 'up' ? 'text-green-600' : 'group-hover:text-green-600'
+            }`}
+            />
+            <span className="text-gray-600">{thread.upvotes}</span>
+        </button>
 
         
             <button 
             onClick={() => onVote('down')}
-            className="flex items-center space-x-1 hover:text-red-600 transition"
+            className="flex items-center space-x-1 transition group"
             aria-label="Downvote"
-            >
-            <ArrowDownIcon className="w-5 h-5" />
-            </button>
+        >
+            <ArrowDownIcon
+            className={`w-5 h-5 transition-colors ${
+                userVote === 'down' ? 'text-red-600' : 'group-hover:text-red-600'
+            }`}
+            />
+        </button>
 
             <button
             onClick={onCommentClick}

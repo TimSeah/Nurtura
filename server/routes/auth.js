@@ -29,9 +29,14 @@ router.post('/login', async (req, res) => {
   if (!user || !(await user.verifyPassword(password))) {
     return res.status(401).json({ message: 'Invalid creds' });
   }
-  const token = jwt.sign({ sub: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' });
+  const token = jwt.sign({ _id: user._id}, process.env.JWT_SECRET, { expiresIn: '2h' });
   // send as HTTP‑only cookie:
-  res.cookie('token', token, { httpOnly: true, sameSite: 'strict' });
+  res.cookie('token', token, {
+  httpOnly: true,
+  sameSite: 'strict',
+  secure: process.env.NODE_ENV === 'production', // 🔒 only over HTTPS in prod
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+});
   res.json({ _id: user._id, username: user.username });
 });
 
