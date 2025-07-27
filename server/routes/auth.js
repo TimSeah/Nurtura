@@ -29,15 +29,44 @@ router.post('/login', async (req, res) => {
   if (!user || !(await user.verifyPassword(password))) {
     return res.status(401).json({ message: 'Invalid creds' });
   }
-  const token = jwt.sign({ _id: user._id}, process.env.JWT_SECRET, { expiresIn: '2h' });
-  // send as HTTP‑only cookie:
+  
+  // Include username in JWT payload
+  const token = jwt.sign(
+    { _id: user._id, username: user.username }, 
+    process.env.JWT_SECRET, 
+    { expiresIn: '2h' }
+  );
+  
   res.cookie('token', token, {
-  httpOnly: true,
-  sameSite: 'strict',
-  secure: process.env.NODE_ENV === 'production', // 🔒 only over HTTPS in prod
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-});
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+  
   res.json({ _id: user._id, username: user.username });
+});
+
+// GET /api/auth/me - This route will have req.auth populated by JWT middleware
+router.get('/me', async (req, res) => {
+  console.log('Auth check - req.auth:', req.auth);
+  
+  try {
+    // req.auth is populated by the JWT middleware applied in server.js
+    const user = await User.findById(req.auth._id).select('-passwordHash');
+    
+    if (!user) {
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    res.json({
+      _id: user._id,
+      username: user.username
+    });
+  } catch (error) {
+    console.error('Auth check error:', error);
+    res.status(500).json({ message: 'Server error during auth check' });
+  }
 });
 
 // POST /api/auth/logout

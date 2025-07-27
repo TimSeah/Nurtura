@@ -81,9 +81,15 @@ app.use(cookieParser());
 // from the 'public' directory.
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api/auth', authRoutes);
 
-// any route under /api that needs login:
+// Apply JWT middleware to Auth/me
+app.use('/api/auth/me', jwtMiddleware({
+  secret: process.env.JWT_SECRET,
+  algorithms: ['HS256'],
+  getToken: req => req.cookies.token
+}));
+
+// any route under /api that needs logi, this is MIDDLEWARE
 app.use(
   '/api/threads',
   jwtMiddleware({
@@ -93,13 +99,15 @@ app.use(
   })
 );
 
+// Mount thread routes at auth
+app.use('/api/auth', authRoutes);
 // Mount thread routes at /api/threads
 app.use('/api/threads', threadRoutes)
 
 // --- Route Definitions ---
-// Import your route handlers.
-// You will create these files (e.g., './routes/index.js', './routes/events.js')
-// to define your API endpoints for different resources.
+// Import  route handlers.
+// create these files (e.g., './routes/index.js', './routes/events.js')
+// defineour API endpoints for different resources.
 const indexRouter = require('./routes/index');
 const eventsRouter = require('./routes/events');
 const journalsRouter = require('./routes/journal'); 
