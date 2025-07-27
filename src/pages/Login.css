@@ -5,15 +5,20 @@ html, body {
   padding: 0;
 }
 
+
+
 .login-page {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  /* match your sidebar gradient */
+  
   background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%);
   font-family: 'Inter', sans-serif;
-}
+} 
+  
+
+
 
 .login-register-link:hover {
   text-decoration: underline;
@@ -26,24 +31,30 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #2dd4bf, #059669);
+  background: linear-gradient(135deg, #2dd4bf, #059669); 
   padding: 2rem;
   width: 100%;
   max-width: 100%;
 }
 
 .login-card {
-  background: #fff;
-  /* bump width if you like: */
-  max-width: 600px;
-  margin: 0 auto;
-  /* more padding top/bottom to increase height: */
-  padding: 3rem 2rem;            /* ↑ here */
-  border-radius: 1rem;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  text-align: center;
-  /* you can also force a minimum height: */
-  min-height: 400px;            /* ↑ optional */
+  position: relative;    /* NEW */
+  overflow: hidden;      /* NEW—clips the bg if it overflows */
+}
+
+/* 2. The overlay background */
+.login-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;              /* shorthand for top:0; right:0; bottom:0; left:0 *
+  opacity: 0.2;          /* tweak to taste */
+  z-index: 0;
+}
+
+/* 3. Ensure your content renders above the overlay */
+.login-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .login-card .logo {
@@ -77,16 +88,12 @@ html, body {
   width: 100%;
   padding: 0.75rem 1rem;
   margin-bottom: 1rem;
-  border: 1px solid #d1d5db;
+  border: 3px solid #eeeef0;
   border-radius: 0.5rem;
   font-size: 1rem;
   transition: border-color .2s;
 }
 
-.login-card form input:focus {
-  outline: none;
-  border-color: #10b981;
-}
 
 .login-card form button {
   width: 100%;
@@ -108,4 +115,11 @@ html, body {
   margin-top: 1rem;
   font-size: 0.875rem;
   color: #4b5563;
+}
+
+/* make the footer text a bit smaller & darker */
+.login-card .login-footer {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #000000;           /* dark‑grey */  
 }

@@ -56,9 +56,13 @@ export default function Register() {
           />
           <button type="submit">Register</button>
         </form>
-        <p className="login-link">
-          Already have an account? <Link to="/login">Log in</Link>
+        <p className="register-footer">
+          Already have an account?{" "}
+          <Link to="/login" className="login-link">
+            Log in
+          </Link>
         </p>
+
       </div>
     </div>
   );

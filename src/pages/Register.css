@@ -27,14 +27,23 @@ html, body {
 }
 
 .register-card {
-  background: #fff;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 3rem 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  text-align: center;
-  min-height: 400px;
+  position: relative;    /* NEW */
+  overflow: hidden;      /* NEW—so the overlay respects the rounded corners */
+}
+
+/* 2. Add the “overlay” via a pseudo‑element */
+.register-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;              /* shorthand for top:0; right:0; bottom:0; left:0 */
+  opacity: 0.2;          /* tweak to taste */
+  z-index: 0;
+}
+
+/* 3. Elevate your content above the overlay */
+.register-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .register-card h1 {
@@ -47,7 +56,7 @@ html, body {
   width: 100%;
   padding: 0.75rem 1rem;
   margin-bottom: 1rem;
-  border: 1px solid #d1d5db;
+  border: 3px solid #ffffff;
   border-radius: 0.5rem;
   font-size: 1rem;
   transition: border-color .2s;
@@ -83,4 +92,26 @@ html, body {
 .login-link:hover {
   text-decoration: underline;
   cursor: pointer;
+}
+
+.register-footer {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.register-footer .login-link {
+  text-decoration: none;
+  color: #000000;
+}
+.register-footer .login-link:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* make the footer text a bit smaller & darker */
+.register-card .register-footer {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #000000;           /* dark‑grey */  
 }

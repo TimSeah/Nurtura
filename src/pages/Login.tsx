@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
-import logo from "./dashboard/components/pics/koala2.png"; // adjust path as needed
+import logo from "./dashboard/components/pics/WhiteKoala.png"; // adjust path as needed
 import "./Login.css";
 
 export default function Login() {
