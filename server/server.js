@@ -123,7 +123,15 @@ const { startReminderService } = require('./services/emailReminderService');
 
 // Assign imported routers to specific URL paths.
 app.use('/', indexRouter);
-app.use('/api/events', eventsRouter); 
+app.use(
+  '/api/events',
+  jwtMiddleware({
+    secret: process.env.JWT_SECRET,
+    algorithms: ['HS256'],
+    getToken: req => req.cookies.token
+  })
+);
+app.use('/api/events', eventsRouter);
 app.use('/api/journal', journalsRouter); 
 app.use('/api/threads', threadsRouter); 
 console.log('threadsRouter mounted at /api/threads');

@@ -10,37 +10,48 @@ const { sendReminderEmail } = require('../services/emailReminderService');
 
 router.get('/', async (req, res) => {
   try {
-    const events = await Event.find({}).sort({ date: 1, startTime: 1 });
+    //const events = await Event.find({}).sort({ date: 1, startTime: 1 });
+    const userId = req.auth._id;
+    const events = await Event.find({ userId }).sort({ date: 1, startTime: 1 });
     res.json(events);
   } catch (err) {
-    console.error('❌ Error fetching events:', err.message);
+    console.error(' Error fetching events:', err.message);
     res.status(500).json({ message: err.message });
   }
 });
 
 // Get today's events for dashboard
+/*
 router.get('/today', async (req, res) => {
   try {
     const today = new Date();
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
     
+    //const events = await Event.find({
+    //  date: {
+    //    $gte: startOfDay,
+    //    $lt: endOfDay
+    //  }
+    // }).sort({ startTime: 1 });
+    const userId = req.auth._id;
     const events = await Event.find({
-      date: {
-        $gte: startOfDay,
-        $lt: endOfDay
-      }
+    userId,
+    date: { $gte: startOfDay, $lt: endOfDay }
     }).sort({ startTime: 1 });
     
     res.json(events);
   } catch (err) {
-    console.error('❌ Error fetching today\'s events:', err.message);
+    console.error(' Error fetching today\'s events:', err.message);
     res.status(500).json({ message: err.message });
   }
 });
+*/
 
 router.post('/', async (req, res) => {
-  const { title, date, startTime, month, remark, userId, enableReminder, reminderEmail } = req.body;
+  
+  const { title, date, startTime, month, remark, enableReminder, reminderEmail } = req.body;
+  const userId = req.auth._id;
 
   const newEvent = new Event({
     title,
@@ -48,7 +59,7 @@ router.post('/', async (req, res) => {
     startTime,
     month,
     remark,
-    userId,
+    userId, //This comes from the JWT
     enableReminder: enableReminder || false,
     reminderSent: false, // Always start as false for new events
     reminderEmail: reminderEmail || ''
@@ -64,9 +75,10 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/today/:id', async (req, res) => {
+router.get('/today', async (req, res) => {
   try {
-    const userId = req.params.id;
+    //const userId = req.params.id;
+    const userId = req.auth._id;
     const now = new Date();
     const startToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0));
     const endToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
@@ -86,10 +98,11 @@ router.get('/today/:id', async (req, res) => {
   }
 });
 
-router.get('/month/:month/:id', async (req, res) => {
+router.get('/month/:month', async (req, res) => {
   try {
     const month = req.params.month;
-    const userId = req.params.id;
+    //const userId = req.params.id;
+    const userId = req.auth._id;
 
     const events = await Event.find({month: month, userId: userId}).sort({ date: 1, startTime: 1 });
     res.json(events);
@@ -101,7 +114,8 @@ router.get('/month/:month/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   try {
-    await Event.findByIdAndDelete(req.params.id);
+    //await Event.findByIdAndDelete(req.params.id);
+    await Event.findOneAndDelete({ _id: req.params.id, userId: req.auth._id });
     res.status(204).send();
   } catch (err) {
     console.error('❌ Error deleting event:', err.message);
@@ -111,7 +125,12 @@ router.delete('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
-    const updated = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    //const updated = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const updated = await Event.findOneAndUpdate(
+      { _id: req.params.id, userId: req.auth._id },
+      req.body,
+      { new: true, runValidators: true }
+    );
     res.json(updated);
   } catch (err) {
     console.error('❌ Error updating event:', err.message);
@@ -123,10 +142,14 @@ router.put('/:id', async (req, res) => {
 router.post('/:id/send-reminder', async (req, res) => {
   try {
     const eventId = req.params.id;
-    const event = await Event.findById(eventId);
+    //const event = await Event.findById(eventId);
+    const event = await Event.findOne({
+      _id:   eventId,
+      userId: req.auth._id
+    });
     
     if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
+       return res.status(404).json({ message: 'Event not found or access denied' });
     }
 
     const userSettings = await UserSettings.findOne({ userId: event.userId });
