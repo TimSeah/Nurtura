@@ -311,8 +311,9 @@ const Forum: React.FC = () => {
                   </p>
                 </div>
                 {/* Upvotes + Replies */}
-                <div className="ml-4 flex flex-col items-center justify-center text-sm text-gray-500 whitespace-nowrap">
-                  <button type="button" className="flex items-center gap-1">
+                <div className="ml-3 flex flex-col items-center justify-center text-sm text-gray-500 whitespace-nowrap">
+                  {/* Upvotes */}
+                  <div className="flex items-center gap-1 mr-1 min-w-[48px] justify-between">
                     <svg
                       className="w-4 h-4"
                       fill="currentColor"
@@ -320,9 +321,10 @@ const Forum: React.FC = () => {
                     >
                       <path d="M3 10h4v10h6V10h4L10 0 3 10z" />
                     </svg>
-                    {t.upvotes}
-                  </button>
-                  <div className="flex items-center gap-1 mt-1">
+                    <span className="font-mono text-right w-7">{t.upvotes}</span>
+                  </div>
+                  {/* Replies */}
+                  <div className="flex items-center gap-1 mt-1 mr-0.5 min-w-[48px] justify-between">
                     <svg
                       className="w-4 h-4"
                       fill="currentColor"
@@ -330,11 +332,37 @@ const Forum: React.FC = () => {
                     >
                       <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
                     </svg>
-                    {replyCounts[t._id] ?? 0}{" "}
+                    <span className="font-mono text-right w-7">
+                      {replyCounts[t._id] ?? 0}
+                    </span>
                   </div>
+                  {/* Flag */}
+                  {t.upvotes <= -10 && (
+                    <div
+                      className="mt-2 -ml-3 flex justify-center items-center min-w-[48px]"
+                      title="Flagged Thread"
+                    >
+                      <svg
+                        className="w-5 h-5 mr-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <g>
+                          <rect x="3" y="2" width="2" height="20" fill="#EF4444" />
+                          <path
+                            d="M5 4H19C19.5523 4 20 4.44772 20 5V14C20 14.5523 19.5523 15 19 15H5"
+                            fill="#EF4444"
+                          />
+                        </g>
+                      </svg>
+                      {/* Flagged */}
+                    </div>
+                  )}
+                  {/* Bin */}
                   {t.author == currentUser && (
                     <button
-                      className="mt-2 -ml-3 text-red-500 hover:text-red-700 transition"
+                      className="mt-2 -ml-3 text-red-500 hover:text-red-700 transition min-w-[48px] flex justify-center"
                       title="Delete Thread"
                       onClick={(e) => {
                         e.preventDefault();
@@ -343,7 +371,7 @@ const Forum: React.FC = () => {
                       }}
                     >
                       <svg
-                        className="w-5 h-5"
+                        className="w-5 h-5 mr-6"
                         fill="currentColor"
                         viewBox="0 0 24 24"
                       >
