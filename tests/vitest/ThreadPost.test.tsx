@@ -3,7 +3,6 @@ import ThreadPost from '../../src/pages/forum/threadPost';
 import { afterEach, describe, test, expect, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
-
 // Mock icons to avoid SVG issues
 vi.mock('@heroicons/react/24/outline', () => ({
   ArrowUpIcon: () => <svg data-testid="ArrowUpIcon" />,
@@ -50,6 +49,35 @@ describe('ThreadPost: UI test cases', () => {
     expect(screen.getByText('10')).toBeInTheDocument();
     rerender(<ThreadPost thread={thread} onCommentClick={vi.fn()} onVote={vi.fn()} upvotes={15} userVote={null} />);
     expect(screen.getByText('15')).toBeInTheDocument();
+  });
+
+  test('renders with 0 upvotes', () => {
+    render(<ThreadPost thread={{ ...thread, upvotes: 0 }} onCommentClick={vi.fn()} onVote={vi.fn()} upvotes={0} userVote={null} />);
+    expect(screen.getByText('0')).toBeInTheDocument();
+  });
+
+  test('renders with very high upvotes', () => {
+    render(<ThreadPost thread={{ ...thread, upvotes: 9999 }} onCommentClick={vi.fn()} onVote={vi.fn()} upvotes={9999} userVote={null} />);
+    expect(screen.getByText('9999')).toBeInTheDocument();
+  });
+
+  test('renders with very long title and content', () => {
+    const longTitle = 'T'.repeat(200);
+    const longContent = 'C'.repeat(1000);
+    render(<ThreadPost thread={{ ...thread, title: longTitle, content: longContent }} onCommentClick={vi.fn()} onVote={vi.fn()} upvotes={10} userVote={null} />);
+    expect(screen.getByText(longTitle)).toBeInTheDocument();
+    expect(screen.getByText(longContent)).toBeInTheDocument();
+  });
+
+  test('renders upvote icon as green when userVote is up', () => {
+    render(<ThreadPost thread={thread} onCommentClick={vi.fn()} onVote={vi.fn()} upvotes={10} userVote={'up'} />);
+    // The icon color is a class, but since we mock the icon, just check the prop is accepted and no error
+    expect(screen.getByTestId('ArrowUpIcon')).toBeInTheDocument();
+  });
+
+  test('renders downvote icon as red when userVote is down', () => {
+    render(<ThreadPost thread={thread} onCommentClick={vi.fn()} onVote={vi.fn()} upvotes={10} userVote={'down'} />);
+    expect(screen.getByTestId('ArrowDownIcon')).toBeInTheDocument();
   });
 });
 

@@ -66,8 +66,8 @@ const Forum: React.FC = () => {
         credentials: "include",
       });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-      const data: Thread[] = await res.json();
-      setThreads(data);
+      const data = await res.json();
+      setThreads(Array.isArray(data) ? data : []);
       console.log(threads);
     } catch (e: any) {
       setLoadError(e.message);

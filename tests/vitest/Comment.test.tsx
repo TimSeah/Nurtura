@@ -37,3 +37,26 @@ describe('Comment: UI test cases', () => {
     expect(screen.getByText('This is a comment.')).toBeInTheDocument();
   });
 });
+
+describe('Comment: boundary test cases', () => {
+  test('renders with very long content', () => {
+    const longContent = { ...comment, content: 'A'.repeat(1000) };
+    render(<Comment comment={longContent} />);
+    expect(screen.getByText('Bob')).toBeInTheDocument();
+    expect(screen.getByText('A'.repeat(1000))).toBeInTheDocument();
+  });
+
+  test('renders with very old date', () => {
+    const oldDate = { ...comment, date: '2000-01-01' };
+    render(<Comment comment={oldDate} />);
+    expect(screen.getByText('Bob')).toBeInTheDocument();
+    expect(screen.getByText(/years ago/i)).toBeInTheDocument();
+  });
+
+  test('renders with very recent date', () => {
+    const nowDate = { ...comment, date: new Date().toISOString() };
+    render(<Comment comment={nowDate} />);
+    expect(screen.getByText('Bob')).toBeInTheDocument();
+    expect(screen.getByText(/seconds? ago|minute ago|minutes ago/i)).toBeInTheDocument();
+  });
+});

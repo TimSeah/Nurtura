@@ -112,6 +112,64 @@ describe('ThreadDetail: UI test cases', () => {
     fireEvent.click(screen.getByRole('button', { name: /Post comment/i }));
     expect(screen.getByRole('alert')).toHaveTextContent(/Content is required/i);
   });
+
+  test('renders thread with 0 upvotes and 0 replies', async () => {
+    const zeroThread = { ...sampleThread, upvotes: 0, replies: 0 };
+    mockFetchOnce(zeroThread, true);
+    mockFetchOnce([], true);
+    renderWithRouter(<ThreadDetail />, { route: '/threads/1', path: '/threads/:id' });
+    expect(await screen.findByText('Test Thread')).toBeInTheDocument();
+    expect(screen.getByText('0')).toBeInTheDocument();
+  });
+
+  test('renders thread with very high upvotes and replies', async () => {
+    const highThread = { ...sampleThread, upvotes: 9999, replies: 9999 };
+    mockFetchOnce(highThread, true);
+    mockFetchOnce([], true);
+    renderWithRouter(<ThreadDetail />, { route: '/threads/1', path: '/threads/:id' });
+    expect(await screen.findByText('Test Thread')).toBeInTheDocument();
+    expect(screen.getByText('9999')).toBeInTheDocument();
+  });
+
+  test('renders thread with very long title and content', async () => {
+    const longThread = {
+      ...sampleThread,
+      title: 'T'.repeat(200),
+      content: 'C'.repeat(1000),
+    };
+    mockFetchOnce(longThread, true);
+    mockFetchOnce([], true);
+    renderWithRouter(<ThreadDetail />, { route: '/threads/1', path: '/threads/:id' });
+    expect(await screen.findByText('T'.repeat(200))).toBeInTheDocument();
+    expect(screen.getByText('C'.repeat(1000))).toBeInTheDocument();
+  });
+
+  test('renders comment with very long content', async () => {
+    const longComment = { _id: 3, threadId: '1', content: 'A'.repeat(1000), author: 'Long', date: new Date().toISOString() };
+    mockFetchOnce(sampleThread, true);
+    mockFetchOnce([longComment], true);
+    renderWithRouter(<ThreadDetail />, { route: '/threads/1', path: '/threads/:id' });
+    expect(await screen.findByText('A'.repeat(1000))).toBeInTheDocument();
+  });
+
+  test('posts a comment with max length', async () => {
+    mockFetchOnce(sampleThread, true);
+    mockFetchOnce(sampleComments, true);
+    renderWithRouter(
+      <AuthContext.Provider value={mockAuth}>
+        <ThreadDetail />
+      </AuthContext.Provider>, { route: '/threads/1', path: '/threads/:id' });
+    await screen.findByText('Test Thread');
+    fireEvent.click(screen.getByRole('button', { name: /comment/i }));
+    const maxContent = 'X'.repeat(1000);
+    fireEvent.change(screen.getByPlaceholderText(/Write a comment/i), { target: { value: maxContent } });
+    const newComment = { _id: 4, threadId: '1', content: maxContent, author: 'Good Commenter', date: new Date().toISOString() };
+    mockFetchOnce(newComment, true); // POST
+    mockFetchOnce([...sampleComments, newComment], true); // refresh comments
+    fireEvent.click(screen.getByRole('button', { name: /Post comment/i }));
+    await waitFor(() => expect(screen.queryByPlaceholderText(/Write a comment/i)).not.toBeInTheDocument());
+    expect(await screen.findByText(maxContent)).toBeInTheDocument();
+  });
 });
 
 describe('ThreadDetail: Integration test cases', () => {
