@@ -173,7 +173,8 @@ const Forum: React.FC = () => {
           <div className="flex gap-4">
             <button
               onClick={() => setShowForm(true)}
-              className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition"
+              // style={{ backgroundColor: "#0d7377" }}
+              className="text-white bg-teal-700 text-sm px-4 py-2 rounded-md shadow-sm hover:bg-teal-800 transition hover:shadow-md"
             >
               + New Thread
             </button>
@@ -181,16 +182,16 @@ const Forum: React.FC = () => {
               onClick={() => setShowUserThreads((prev) => !prev)}
               className={`${
                 showUserThreads
-                  ? "bg-gray-200 hover:bg-gray-300"
-                  : "bg-gray-200 hover:bg-gray-300"
-              } text-sm px-4 py-2 rounded-md shadow-sm transition`}
+                  ? "bg-teal-700 hover:bg-teal-800"
+                  : "bg-teal-700 hover:bg-teal-800"
+              } text-sm text-white px-4 py-2 rounded-md shadow-sm transition hover:shadow-md`}
             >
               {showUserThreads ? "Show All Threads" : "My Threads"}
             </button>
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              className="ml-1 text-[8px] bg-gray-200 h-13 px-2 pt-1 border border-gray-400 shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded"
+              className="ml-1 text-[8px] bg-green-100 h-13 px-2 pt-1 border border-gray-400 shadow-sm focus:border-green-800 focus:border-green-800 rounded hover:shadow-md"
             >
               <option value="recent">Most Recent</option>
               <option value="oldest">Oldest</option>
@@ -262,7 +263,7 @@ const Forum: React.FC = () => {
                     </button>
                     <button
                       type="submit"
-                      className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+                      className="bg-teal-700 text-white px-4 py-2 rounded-md hover:bg-teal-800 transition"
                     >
                       Create Thread
                     </button>
@@ -282,12 +283,12 @@ const Forum: React.FC = () => {
               <Link
                 key={t._id}
                 to={`/threads/${t._id}`}
-                className="flex items-start bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition border"
+                className="flex items-start bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm hover:border-green-800 hover:bg-green-50 transition shadow-md transition border"
               >
                 {/* Icon */}
                 {/* <div className={`w-10 h-10 flex items-center justify-center rounded-full mr-4 ${thread.color}`}> */}
                 <div
-                  className={`w-10 h-10 flex items-center justify-center rounded-full mr-4 bg-blue-100 text-blue-600`}
+                  className={`w-10 h-10 flex items-center justify-center rounded-full mr-4 bg-green-200 text-teal-700`}
                 >
                   <svg
                     className="w-6 h-6"
