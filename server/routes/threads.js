@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router(); // Create a new Express router
 const Thread = require('../models/thread'); // Import the Thread model
+const Comment = require('../models/Comment'); // Import the Thread model
 console.log('threads.js route file loaded');
 
 // --- GET All Threads ---
@@ -106,6 +107,18 @@ router.delete('/:id', async (req, res) => {
   } catch (err) {
     console.error('Error deleting thread:', err);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// GET /api/threads/:id/replies/count
+router.get('/:id/replies/count', async (req, res) => {
+  try {
+    const threadId = req.params.id;
+    const count = await Comment.countDocuments({ threadId });
+    res.json({ count });
+  } catch (err) {
+    console.error('Error counting replies:', err);
+    res.status(500).json({ message: err.message });
   }
 });
 
