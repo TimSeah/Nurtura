@@ -3,7 +3,7 @@ import "./Forum"
 import { useState, useEffect,useContext, type ChangeEvent } from "react";
 import { useParams } from "react-router-dom";
 import ThreadPost from "./threadPost";
-import Comment from "./comment";
+import Comment from "./Comment";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { AuthContext } from "../../contexts/AuthContext";
@@ -76,6 +76,10 @@ const ThreadDetail: React.FC = () => {
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
         
         const data: ThreadDetail = await res.json();
+        if (!data) {
+            setThread(null);
+            return;
+        }
         console.log('Received thread data:', data);
         console.log('User vote from backend:', data.userVote);
         console.log('Upvotes from backend:', data.upvotes);
@@ -84,42 +88,34 @@ const ThreadDetail: React.FC = () => {
         setUserVote(data.userVote);
         console.log('Frontend state updated');
         console.log('Local userVote state set to:', data.userVote);
-        
     } catch (e: any) {
         console.error('Error fetching thread:', e);
         setError(e.message);
     } finally {
         setLoading(false);
-    }
-};
-
-//  useEffect to log when userVote changes
-useEffect(() => {
-    console.log('userVote state changed to:', userVote);
-}, [userVote]);
-
-//  useEffect to log when thread changes
-useEffect(() => {
-    if (thread) {
-        console.log(' thread state changed:', {
-            title: thread.title,
-            upvotes: thread.upvotes,
-            userVote: thread.userVote
-        });
-    }
-}, [thread]);
-
-
-
-
-
-
-
+    }};
+    
+    // useEffect to log when userVote changes
+    useEffect(() => {
+        console.log('userVote state changed to:', userVote);
+    }, [userVote]);
+    
+    // useEffect to log when thread changes
+    useEffect(() => {
+        if (thread) {
+            console.log(' thread state changed:', {
+                title: thread.title,
+                upvotes: thread.upvotes,
+                userVote: thread.userVote
+            });
+        }
+    }, [thread]);
+    
     const fetchComments = async (threadId: string) => {
         try {
             const res = await fetch(`http://localhost:5000/api/threads/${threadId}/comments`, {
-  credentials: 'include'
-})
+                credentials: 'include'
+            })
             
             if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
             const data = await res.json();
@@ -128,129 +124,124 @@ useEffect(() => {
             setError(e.message);
         } finally {
             setLoading(false);
-        }
-    };
-    
-    useEffect(() => {
-        if (id) {
-            (async () => {
-                setLoading(true);
-                await Promise.all([fetchThread(id), fetchComments(id)]);
-                setLoading(false);
-            })();
-        }
-    }, [id]);
+        }};
+        
+        useEffect(() => {
+            if (id) {
+                (async () => {
+                    setLoading(true);
+                    await Promise.all([fetchThread(id), fetchComments(id)]);
+                    setLoading(false);
+                })();
+            }
+        }, [id]);
 
+    // THIS WAS THE WORKING REDDIT HANDLEVOTE !!!!!!!
+    /*
+    const handleVote = async (direction: 'up' | 'down') => {
+    if (!thread || !user) return;
 
+    let actualDirection: 'up' | 'down' | 'cancel' = direction;
+    let voteDelta = 0;
 
-
-
-// THIS WAS THE WORKING REDDIT HANDLEVOTE !!!!!!!
-/*
-const handleVote = async (direction: 'up' | 'down') => {
-  if (!thread || !user) return;
-
-  let actualDirection: 'up' | 'down' | 'cancel' = direction;
-  let voteDelta = 0;
-
-  if (userVote === direction) {
-    // Cancelling the same vote
-    actualDirection = 'cancel';
-    voteDelta = direction === 'up' ? -1 : +1;
-    setUserVote(null);
-  } else if (userVote === 'up' && direction === 'down') {
-    // Switching from up to down
-    voteDelta = -2;
-    setUserVote('down');
-  } else if (userVote === 'down' && direction === 'up') {
-    // Switching from down to up
-    voteDelta = +2;
-    setUserVote('up');
-  } else if (userVote === null) {
-    // First time voting
-    voteDelta = direction === 'up' ? +1 : -1;
-    setUserVote(direction);
-  }
-
-  try {
-  const res = await fetch(`http://localhost:5000/api/threads/${thread._id}/vote`, {
-    method: 'PATCH',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ direction: actualDirection }),
-  });
-
-  if (!res.ok) throw new Error(await res.text());
-
-  const updated = await res.json();
-
-  // Apply local optimistic update (optional)
-  let voteDelta = 0;
-  if (actualDirection === 'cancel') {
-    voteDelta = userVote === 'up' ? -1 : 1;
-  } else {
-    if (userVote === null) {
-      voteDelta = direction === 'up' ? 1 : -1;
+    if (userVote === direction) {
+        // Cancelling the same vote
+        actualDirection = 'cancel';
+        voteDelta = direction === 'up' ? -1 : +1;
+        setUserVote(null);
     } else if (userVote === 'up' && direction === 'down') {
-      voteDelta = -2;
+        // Switching from up to down
+        voteDelta = -2;
+        setUserVote('down');
     } else if (userVote === 'down' && direction === 'up') {
-      voteDelta = 2;
+        // Switching from down to up
+        voteDelta = +2;
+        setUserVote('up');
+    } else if (userVote === null) {
+        // First time voting
+        voteDelta = direction === 'up' ? +1 : -1;
+        setUserVote(direction);
     }
-  }
 
-  setThread(prev =>
-    prev
-      ? { ...prev, upvotes: updated.upvotes, userVote: updated.userVote }
-      : null
-  );
-} catch (err) {
-  console.error("Vote failed:", err);
-  alert("Vote failed");
-}
-};
-*/
-
-//Current Implementation Suggestion
-const handleVote = async (direction: 'up' | 'down') => {
-  if (!thread || !user) return;
-
-  console.log('Frontend: Vote clicked', direction);
-  console.log('Current userVote:', userVote);
-  console.log('Current upvotes:', thread.upvotes);
-
-  try {
+    try {
     const res = await fetch(`http://localhost:5000/api/threads/${thread._id}/vote`, {
-      method: 'PATCH',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ direction }),
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ direction: actualDirection }),
     });
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(`Server error: ${errorText}`);
-    }
+    if (!res.ok) throw new Error(await res.text());
 
     const updated = await res.json();
-    console.log('Backend response:', updated);
-    
-    // Update both thread state and local userVote state with backend response
+
+    // Apply local optimistic update (optional)
+    let voteDelta = 0;
+    if (actualDirection === 'cancel') {
+        voteDelta = userVote === 'up' ? -1 : 1;
+    } else {
+        if (userVote === null) {
+        voteDelta = direction === 'up' ? 1 : -1;
+        } else if (userVote === 'up' && direction === 'down') {
+        voteDelta = -2;
+        } else if (userVote === 'down' && direction === 'up') {
+        voteDelta = 2;
+        }
+    }
+
     setThread(prev =>
-      prev
+        prev
         ? { ...prev, upvotes: updated.upvotes, userVote: updated.userVote }
         : null
     );
-    setUserVote(updated.userVote);
-    
-    console.log('Frontend state updated');
-    console.log('New userVote:', updated.userVote);
-    console.log('New upvotes:', updated.upvotes);
-    
-  } catch (err) {
-    console.error(" Vote failed:", err);
-    alert(`Vote failed: ${err.message}`);
-  }
-};
+    } catch (err) {
+    console.error("Vote failed:", err);
+    alert("Vote failed");
+    }
+    };
+    */
+
+
+    //Current Implementation Suggestion
+    const handleVote = async (direction: 'up' | 'down') => {
+    if (!thread || !user) return;
+
+    console.log('Frontend: Vote clicked', direction);
+    console.log('Current userVote:', userVote);
+    console.log('Current upvotes:', thread.upvotes);
+
+    try {
+        const res = await fetch(`http://localhost:5000/api/threads/${thread._id}/vote`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ direction }),
+        });
+
+        if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Server error: ${errorText}`);
+        }
+
+        const updated = await res.json();
+        console.log('Backend response:', updated);
+        
+        // Update both thread state and local userVote state with backend response
+        setThread(prev =>
+        prev
+            ? { ...prev, upvotes: updated.upvotes, userVote: updated.userVote }
+            : null
+        );
+        setUserVote(updated.userVote);
+        
+        console.log('Frontend state updated');
+        console.log('New userVote:', updated.userVote);
+        console.log('New upvotes:', updated.upvotes);
+        
+    } catch (err: any) {
+        console.error(" Vote failed:", err);
+        alert(`Vote failed: ${err.message}`);
+    }};
 
 
 
@@ -302,10 +293,11 @@ const handleVote = async (direction: 'up' | 'down') => {
                 body: JSON.stringify({
                     threadId: id,
                     content: form.content,
-                    author: user.username, // To be replaced with actual user
+                    author: user.username,
                     date: new Date().toISOString()
                 }),
             });
+            setShowForm(false);
             if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
             const newComment: CommentDetail = await res.json();
             setComments(prev => [...prev, newComment]);

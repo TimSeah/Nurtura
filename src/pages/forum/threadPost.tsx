@@ -1,6 +1,6 @@
 import React from "react";
-import { calculateDaysAgo } from "../../utils/calDaysAgoUtil";
 import { ArrowUpIcon, ChatBubbleBottomCenterIcon, ArrowDownIcon } from '@heroicons/react/24/outline';
+import { parseISO, formatDistanceToNow } from 'date-fns';
 
 interface ThreadDetail{
     _id: number;
@@ -21,7 +21,13 @@ interface ThreadDetailProps {
   userVote: 'up' | 'down' | null;
 }
 
-const ThreadPost: React.FC<ThreadDetailProps> = ({ thread, onCommentClick, onVote,userVote }) => { // took out upvotes inside
+const ThreadPost: React.FC<ThreadDetailProps> = ({ 
+    thread,
+    upvotes,
+    onVote, 
+    onCommentClick,
+    userVote 
+}) => { // took out upvotes inside
     return (
     <article className="max-w-3xl mx-auto bg-white rounded-2xl shadow p-6">
         {/* Header */}
@@ -31,7 +37,7 @@ const ThreadPost: React.FC<ThreadDetailProps> = ({ thread, onCommentClick, onVot
             </h1>
             <div className="flex items-center text-sm text-gray-500 mt-1">
                 <span>
-                    By <span className="font-medium text-gray-700">{thread.author}</span> {calculateDaysAgo(thread.date)}
+                    By <span className="font-medium text-gray-700">{thread.author}</span> {formatDistanceToNow(parseISO(thread.date), { addSuffix: true })}
                 </span>
             </div>
         </header>
@@ -53,7 +59,7 @@ const ThreadPost: React.FC<ThreadDetailProps> = ({ thread, onCommentClick, onVot
                 userVote === 'up' ? 'text-green-600' : 'group-hover:text-green-600'
             }`}
             />
-            <span className="text-gray-600">{thread.upvotes}</span>
+            <span className="text-gray-600">{upvotes}</span>
         </button>
 
         

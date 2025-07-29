@@ -4,11 +4,19 @@ import { renderWithRouter } from './utils';
 import { mockFetchOnce } from './mockFetch';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
+import { AuthContext, AuthContextType } from '../../src/contexts/AuthContext';
 
 const sampleThreads = [
   { _id: 1, title: 'Hello', content: 'World', author: 'A good grandkid', date: new Date().toISOString(), upvotes: 3, replies: 0 },
   { _id: 2, title: 'Other', content: 'Thing', author: 'Someone else',    date: new Date().toISOString(), upvotes: 1, replies: 0 },
 ];
+
+const mockAuth: AuthContextType  = {
+  user: { username: 'A good grandkid' },
+  login: vi.fn(),
+  logout: vi.fn(),
+  loading: false
+};
 
 afterEach(() => {
   cleanup();
@@ -35,7 +43,11 @@ describe('Forum: UI test cases', () => {
 
   test('filters “My Threads”', async () => {
     mockFetchOnce(sampleThreads);
-    renderWithRouter(<Forum />);
+    renderWithRouter(
+      <AuthContext.Provider value={mockAuth}>
+        <Forum />
+      </AuthContext.Provider>
+    );
     await screen.findByText('Hello');
 
     fireEvent.click(screen.getByRole('button', { name: /My Threads/i }));

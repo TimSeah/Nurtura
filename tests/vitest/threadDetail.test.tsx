@@ -6,6 +6,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import { act, renderHook } from '@testing-library/react';
 import { useState } from 'react';
+import { AuthContext, AuthContextType } from '../../src/contexts/AuthContext';
 
 const sampleThread = {
   _id: 1,
@@ -17,10 +18,27 @@ const sampleThread = {
   replies: 1,
 };
 
+const mockAuth: AuthContextType  = {
+  user: { username: 'Good Commenter' },
+  login: vi.fn(),
+  logout: vi.fn(),
+  loading: false
+};
+
 const sampleComments = [
   { _id: 1, threadId: '1', content: 'First comment', author: 'Alice', date: new Date().toISOString() },
   { _id: 2, threadId: '1', content: 'Second comment', author: 'Bob', date: new Date().toISOString() },
 ];
+
+const navigateMock = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return { ...actual, useNavigate: () => navigateMock };
+});
+
+beforeEach(() => {
+  navigateMock.mockReset();
+});
 
 afterEach(() => {
   cleanup();
@@ -101,7 +119,10 @@ describe('ThreadDetail: Integration test cases', () => {
   test('posts a new comment and refreshes', async () => {
     mockFetchOnce(sampleThread, true); // thread fetch
     mockFetchOnce(sampleComments, true); // comments fetch
-    renderWithRouter(<ThreadDetail />, { route: '/threads/1', path: '/threads/:id' });
+    renderWithRouter(
+      <AuthContext.Provider value={mockAuth}>
+        <ThreadDetail />
+      </AuthContext.Provider>, { route: '/threads/1', path: '/threads/:id' });
     await screen.findByText('Test Thread');
     fireEvent.click(screen.getByRole('button', { name: /comment/i }));
     fireEvent.change(screen.getByPlaceholderText(/Write a comment/i), { target: { value: 'A new comment' } });
@@ -131,4 +152,131 @@ describe('ThreadDetail: Unit test cases', () => {
     });
     expect(result.current.form.content).toBe('abc');
   });
+});
+
+describe('ThreadDetail: Voting test cases (Integration)', () => {
+  // Integration: Upvote action updates UI from backend response
+  test('upvotes a thread', async () => {
+    mockFetchOnce({ ...sampleThread}, true); // thread fetch
+    mockFetchOnce(sampleComments, true); // comments fetch
+    renderWithRouter(
+      <AuthContext.Provider value={mockAuth}>
+        <ThreadDetail />
+      </AuthContext.Provider>, { route: '/threads/1', path: '/threads/:id' });
+    await screen.findByText('Test Thread');
+    // Simulate backend response for upvote
+    const updatedThread = { ...sampleThread, upvotes: sampleThread.upvotes + 1, userVote: 'up' };
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      json: async () => updatedThread,
+    } as any);
+    fireEvent.click(screen.getByLabelText(/Upvote/i));
+    await waitFor(() => expect(screen.getByText(updatedThread.upvotes)).toBeInTheDocument());
+  });
+
+  // Integration: Downvote action updates UI from backend response
+  test('downvotes a thread', async () => {
+    mockFetchOnce({ ...sampleThread}, true); // thread fetch
+    mockFetchOnce(sampleComments, true); // comments fetch
+    renderWithRouter(
+      <AuthContext.Provider value={mockAuth}>
+        <ThreadDetail />
+      </AuthContext.Provider>, { route: '/threads/1', path: '/threads/:id' });
+    await screen.findByText('Test Thread');
+    // Simulate backend response for downvote
+    const updatedThread = { ...sampleThread, upvotes: sampleThread.upvotes - 1, userVote: 'down' };
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      json: async () => updatedThread,
+    } as any);
+    fireEvent.click(screen.getByLabelText(/Downvote/i));
+    await waitFor(() => expect(screen.getByText(updatedThread.upvotes)).toBeInTheDocument());
+  });
+
+  // Integration: Switch vote from up to down updates UI from backend response
+  test('switches vote from up to down', async () => {
+    mockFetchOnce({ ...sampleThread, userVote: 'up', upvotes: 3 }, true); // thread fetch
+    mockFetchOnce(sampleComments, true); // comments fetch
+    renderWithRouter(
+      <AuthContext.Provider value={mockAuth}>
+        <ThreadDetail />
+      </AuthContext.Provider>, { route: '/threads/1', path: '/threads/:id' });
+    await screen.findByText('Test Thread');
+    // Simulate backend response for switch
+    const updatedThread = { ...sampleThread, upvotes: 1, userVote: 'down' };
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      json: async () => updatedThread,
+    } as any);
+    fireEvent.click(screen.getByLabelText(/Downvote/i));
+    await waitFor(() => expect(screen.getByText(updatedThread.upvotes)).toBeInTheDocument());
+  });
+
+  // Integration: Cancel upvote updates UI from backend response
+  test('cancels upvote', async () => {
+    mockFetchOnce({ ...sampleThread, userVote: 'up', upvotes: 3 }, true); // thread fetch
+    mockFetchOnce(sampleComments, true); // comments fetch
+    renderWithRouter(
+      <AuthContext.Provider value={mockAuth}>
+        <ThreadDetail />
+      </AuthContext.Provider>, { route: '/threads/1', path: '/threads/:id' });
+    await screen.findByText('Test Thread');
+    // Simulate backend response for cancel
+    const updatedThread = { ...sampleThread, upvotes: 2, userVote: null };
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      json: async () => updatedThread,
+    } as any);
+    fireEvent.click(screen.getByLabelText(/Upvote/i));
+    await waitFor(() => expect(screen.getByText(updatedThread.upvotes)).toBeInTheDocument());
+  });
+
+  // Integration: Not logged in, voting does nothing
+  test('does not allow voting if not logged in', async () => {
+    mockFetchOnce({ ...sampleThread, userVote: null }, true); // thread fetch
+    mockFetchOnce(sampleComments, true); // comments fetch
+    renderWithRouter(
+      <AuthContext.Provider value={mockAuth}>
+        <ThreadDetail />
+      </AuthContext.Provider>, { route: '/threads/1', path: '/threads/:id' });
+    await screen.findByText('Test Thread');
+    window.alert = vi.fn();
+    fireEvent.click(screen.getByLabelText(/Upvote/i));
+    expect(window.alert).not.toHaveBeenCalledWith(expect.stringContaining('Vote failed'));
+  });
+});
+
+describe('ThreadDetail: Auth/Back button test cases (UI/Integration)', () => {
+  const noUserAuth = {
+    ...mockAuth,
+    user: null,
+  };
+
+  // Integration: Not logged in, comment triggers alert
+  test('shows alert if not logged in and tries to comment', async () => {
+    mockFetchOnce(sampleThread, true);
+    mockFetchOnce(sampleComments, true);
+    renderWithRouter(
+      <AuthContext.Provider value={noUserAuth}>
+        <ThreadDetail />
+      </AuthContext.Provider>, { route: '/threads/1', path: '/threads/:id' });
+    await screen.findByText('Test Thread');
+    fireEvent.click(screen.getByRole('button', { name: /comment/i }));
+    fireEvent.change(screen.getByPlaceholderText(/Write a comment/i), { target: { value: 'Should not work' } });
+    window.alert = vi.fn();
+    fireEvent.click(screen.getByRole('button', { name: /Post comment/i }));
+    expect(window.alert).toHaveBeenCalledWith('You must be logged in to comment.');
+  });
+
+  
+  // Integration: Back button navigates back
+  test('Back to Forum button navigates back', async () => {
+    mockFetchOnce(sampleThread, true);
+    mockFetchOnce(sampleComments, true);
+    renderWithRouter(<ThreadDetail />, { route: '/threads/1', path: '/threads/:id' });
+    await screen.findByText('Test Thread');
+    fireEvent.click(screen.getByText(/Back to Forum/i));
+    expect(navigateMock).toHaveBeenCalledWith(-1);
+  });
+  
 });

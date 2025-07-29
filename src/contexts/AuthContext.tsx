@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 
-type AuthContextType = {
+export type AuthContextType = {
   user: { username: string } | null;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;

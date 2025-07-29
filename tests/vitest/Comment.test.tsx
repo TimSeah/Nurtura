@@ -1,12 +1,7 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Comment from '../../src/pages/forum/Comment';
-import * as calDaysAgoUtil from '../../src/utils/calDaysAgoUtil';
-import { afterEach, describe, test, expect, vi } from 'vitest';
+import { afterEach, describe, test, expect } from 'vitest';
 import { cleanup } from '@testing-library/react';
-
-// Mock calculateDaysAgo
-vi.spyOn(calDaysAgoUtil, 'calculateDaysAgo').mockImplementation(() => '5 days ago');
 
 afterEach(() => {
   cleanup();
@@ -26,7 +21,7 @@ describe('Comment: UI test cases', () => {
     render(<Comment comment={comment} />);
     expect(screen.getByText('Bob')).toBeInTheDocument();
     expect(screen.getByText('This is a comment.')).toBeInTheDocument();
-    expect(screen.getByText(/5 days ago/i)).toBeInTheDocument();
+    expect(screen.getByText(/years ago/i)).toBeInTheDocument();
   });
 
   test('renders correct structure and classes', () => {
@@ -40,12 +35,5 @@ describe('Comment: UI test cases', () => {
     render(<Comment comment={comment} />);
     expect(screen.getByText('Bob')).toBeInTheDocument();
     expect(screen.getByText('This is a comment.')).toBeInTheDocument();
-  });
-});
-
-describe('Comment: Integration test cases', () => {
-  test('integrates with calculateDaysAgo utility', () => {
-    render(<Comment comment={comment} />);
-    expect(calDaysAgoUtil.calculateDaysAgo).toHaveBeenCalledWith('2023-06-01');
   });
 });

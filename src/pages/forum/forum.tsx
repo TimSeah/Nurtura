@@ -12,9 +12,9 @@ import {
 } from "@headlessui/react";
 import "./Forum.css";
 import { Link } from "react-router-dom";
-import { calculateDaysAgo } from "../../utils/calDaysAgoUtil";
 import { useContext } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
+import { parseISO, formatDistanceToNow } from 'date-fns';
 
 const currentUser = "A good grandkid";
 
@@ -306,7 +306,7 @@ const Forum: React.FC = () => {
                   <p className="text-sm mt-1 text-blue-500">
                     By: {t.author}{" "}
                     <span className="text-gray-400">
-                      • {calculateDaysAgo(t.date)}
+                      • {formatDistanceToNow(parseISO(t.date), { addSuffix: true })}
                     </span>
                   </p>
                 </div>
