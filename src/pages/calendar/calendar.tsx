@@ -261,10 +261,10 @@ const Calendar: React.FC = () => {
     return cells;
   };
 
-  const defaultId = "123";
+  //const defaultId = "123";
 
   useEffect(() => {
-    if (!user?.username) return;
+    //if (!user?.username) return;  not in use as we have an AuthContext Provider
     const fetchEventsThisMonth = async () => {
       try {
         const response = await fetch(

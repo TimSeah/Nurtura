@@ -11,7 +11,7 @@ interface Journal {
 }
 
 interface JournalProps {
-  recipientId: string;
+  recipientId?: string;
 
 }
 
