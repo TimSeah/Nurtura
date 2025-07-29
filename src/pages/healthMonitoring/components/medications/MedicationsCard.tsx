@@ -86,6 +86,7 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
         `http://localhost:5000/api/care-recipients/${selectedRecipient._id}`,
         {
           method: "PUT",
+          credentials:"include",
           headers: {
             "Content-Type": "application/json",
           },

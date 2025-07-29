@@ -10,7 +10,12 @@ interface Journal {
   date: string; // Changed to string for easier handling
 }
 
-const Journal = () => {
+interface JournalProps {
+  recipientId: string;
+
+}
+
+const Journal: React.FC<JournalProps> = ({ recipientId }) => {
   const [journalList, setJournalList] = useState<Journal[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -24,12 +29,15 @@ const Journal = () => {
     return `${year}-${month}-${day}`;
   });
 
+  // We fetch the journals for this recipient (scoped for this user)
   useEffect(() => {
     const fetchJournals = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/journal/userId/123/recipientId/456"
+          `http://localhost:5000/api/journal?recipientId=${recipientId}`,
+          { credentials: "include" }
         );
+         if (!response.ok) throw new Error(`Error: ${response.status}`);
         const data: Journal[] = await response.json();
         setJournalList(data);
       } catch (error) {
@@ -37,18 +45,19 @@ const Journal = () => {
       }
     };
     fetchJournals();
-  }, []);
+  }, [recipientId]); //use this dependency
 
   const saveJournal = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/journal", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: "123", // hardcoded
-          recipientId: "456", // hardcoded
+          //userId: "123", // hardcoded
+          recipientId,//: "456", // hardcoded
           title: title.trim(),
           description,
           date,
@@ -79,7 +88,7 @@ const Journal = () => {
     }
   };
 
-  const dummyId = "456";
+  //const dummyId = "456";
 
   const [selectedJournal, setSelectedJournal] = useState<Journal | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -104,6 +113,7 @@ const Journal = () => {
         `http://localhost:5000/api/journal/journalId/${selectedJournal._id}`,
         {
           method: "PUT",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -142,6 +152,7 @@ const Journal = () => {
         `http://localhost:5000/api/journal/journalId/${selectedJournal._id}`,
         {
           method: "DELETE",
+          credentials: "include"
         }
       );
 
@@ -161,7 +172,7 @@ const Journal = () => {
     <>
       <div className="journal-post-container">
         <div className="journal-post">
-          <h2>New Journal Entry for ID: {dummyId}</h2>
+          <h2>New Journal Entry </h2>
           <div className="title-and-date">
             <input
               type="text"
@@ -179,7 +190,7 @@ const Journal = () => {
             />
           </div>
           <textarea
-            placeholder={`${dummyId}'s feelings and thoughts for today...`}
+            placeholder={`Your feelings and thoughts for today...`}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           ></textarea>
@@ -238,7 +249,7 @@ const Journal = () => {
             <button onClick={() => setSelectedJournal(null)}>Close</button>
           </div>
         )}
-        <h2>Your Journal Entries for ID: {dummyId}</h2>
+        <h2>Your Journal Entries </h2>
         <div className="journal-entries-container">
           {journalList.length === 0 ? (
             <p>No journal entries found</p>
