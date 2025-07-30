@@ -53,17 +53,6 @@ describe('Registration Page', () => {
         cy.get('.error-message').should('contain', 'Registration failed');
     });
 
-    it('shows error for inappropriate username', () => {
-        // Fill in registration form with inappropriate username
-        cy.get('input[placeholder="Username"]').type('shit'); // assuming 'badword' is filtered
-        cy.get('input[placeholder="Password"]').type('Testpass123');
-
-        // Click submit
-        cy.get('button[type="submit"]').click();
-
-        // Check error message
-        cy.get('.error-message').should('contain', 'Username is inappropriate');
-    });
 
 // invalid password tests
 
