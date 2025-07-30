@@ -3,11 +3,17 @@ const jwt      = require('jsonwebtoken');
 const bcrypt   = require('bcrypt');
 const User     = require('../models/User');
 const router   = express.Router();
+//const Filter = require('bad-words'); 
+//const filter = new Filter(); 
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
+    /*
+    if (filter.isProfane(username)) {
+      return res.status(400).json({ message: "Inappropriate username" });
+    } */
     const hash = await bcrypt.hash(password, 10);
     const u = await User.create({ username, passwordHash: hash });
     res.status(201).json({ message: 'ok' });

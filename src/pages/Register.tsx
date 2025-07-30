@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+//import { Filter } from "bad-words"; // for filtering inappropriate usernames
 import "./Register.css";
 import { set } from "date-fns";
 
@@ -11,9 +12,18 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false); // for toggling password visibility
   const [errorMessage, setErrorMessage] = useState(""); // for handling form errors, e.g. invalid password
   const navigate = useNavigate();
+  //const filter = new Filter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    /*if (filter.isProfane(username)) {
+      // Check for profanity in username
+      //alert("Username contains inappropriate language");
+      setErrorMessage("Username is inappropriate");
+      return;
+    } */
+
     if (password.length < 8) {
       // Check password length
       //alert("Password must be at least 8 characters long");
@@ -29,6 +39,7 @@ export default function Register() {
       );
       return;
     }
+    // submit registration
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
