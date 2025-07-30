@@ -1,4 +1,4 @@
-describe('Cypress Studio Demo', () => {
+describe('UC 4: Leaving A Comment', () => {
   it('Leaving a comment', () => {
     cy.visit('/');
     cy.get('[placeholder="Username"]').type('Jason');
