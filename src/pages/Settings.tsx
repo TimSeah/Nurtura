@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { User, Bell, Shield, Palette, Save } from 'lucide-react';
 import './Settings.css';
+import { AuthContext } from "../contexts/AuthContext";
 
 const Settings: React.FC = () => {
+  const { user } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
     profile: {
-      name: 'Sarah Johnson',
-      email: 'sarah.johnson@email.com',
-      phone: '(555) 123-4567',
-      address: '123 Main Street, Springfield, IL 62701',
-      emergencyContact: 'Michael Johnson - (555) 987-6543'
+      name: user?.username || '',//'Sarah Johnson',
+      email: '',//sarah.johnson@email.com',
+      phone: '',//(555) 123-4567',
+      address: '',//123 Main Street, Springfield, IL 62701',
+      emergencyContact: ''//Michael Johnson - (555) 987-6543'
     },
     notifications: {
       emailAlerts: true,
@@ -41,15 +43,21 @@ const Settings: React.FC = () => {
     const loadSettings = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/user-settings/123');
-        if (response.ok) {
-          const data = await response.json();
-          setSettings({
-            profile: data.profile || settings.profile,
-            notifications: data.notifications || settings.notifications,
-            privacy: data.privacy || settings.privacy,
-            appearance: data.appearance || settings.appearance
-          });
+        const res = await fetch('/api/user-settings', { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          setSettings(prev => ({
+            profile: {
+              name: data.profile?.name || user?.username || '',
+              email: data.profile?.email || '',
+              phone: data.profile?.phone || '',
+              address: data.profile?.address || '',
+              emergencyContact: data.profile?.emergencyContact || ''
+            },
+            notifications: data.notifications || prev.notifications,
+            privacy: data.privacy || prev.privacy,
+            appearance: data.appearance || prev.appearance
+          }));
         }
       } catch (error) {
         console.error('Error loading settings:', error);
@@ -59,7 +67,7 @@ const Settings: React.FC = () => {
     };
 
     loadSettings();
-  }, []);
+  }, [user]);
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -81,15 +89,16 @@ const Settings: React.FC = () => {
   const saveSettings = async () => {
     try {
       setSaving(true);
-      const response = await fetch('http://localhost:5000/api/user-settings/123', {
+      const res = await fetch('/api/user-settings', {
         method: 'PUT',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(settings),
       });
 
-      if (response.ok) {
+      if (res.ok) {
         alert('Settings saved successfully!');
       } else {
         throw new Error('Failed to save settings');
@@ -141,6 +150,7 @@ const Settings: React.FC = () => {
               <p>Update your personal information and contact details.</p>
               
               <div className="form-grid">
+                {/* Full Name, Email, Phone, etc. */}
                 <div className="form-group">
                   <label>Full Name</label>
                   <input

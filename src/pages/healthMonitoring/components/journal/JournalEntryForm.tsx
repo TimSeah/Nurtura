@@ -33,11 +33,12 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
     try {
       const response = await fetch("http://localhost:5000/api/journal", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: "123", // TODO: Get from user context
+          //userId: "123", // TODO: Get from user context
           recipientId: recipientId,
           title: title.trim(),
           description,

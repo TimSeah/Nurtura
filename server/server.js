@@ -132,12 +132,41 @@ app.use(
   })
 );
 app.use('/api/events', eventsRouter);
+
+app.use(
+  '/api/journal',
+  jwtMiddleware({
+    secret: process.env.JWT_SECRET,
+    algorithms: ['HS256'],
+    getToken: req => req.cookies.token
+  })
+);
 app.use('/api/journal', journalsRouter); 
 app.use('/api/threads', threadsRouter); 
 console.log('threadsRouter mounted at /api/threads');
 app.use('/api/threads/:threadId/comments', commentRouter);
+
+
+app.use(
+  '/api/user-settings',
+  jwtMiddleware({
+    secret: process.env.JWT_SECRET,
+    algorithms: ['HS256'],
+    getToken: req => req.cookies.token
+  })
+);
 app.use('/api/user-settings', userSettingsRouter);
 app.use('/api/vital-signs', vitalSignsRouter);
+
+
+app.use(
+  '/api/care-recipients',
+  jwtMiddleware({
+    secret: process.env.JWT_SECRET,
+    algorithms: ['HS256'],
+    getToken: req => req.cookies.token
+  })
+);
 app.use('/api/care-recipients', careRecipientsRouter);
 app.use('/api/alerts', alertsRouter);
 

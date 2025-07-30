@@ -49,7 +49,8 @@ const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:5000/api/journal/userId/123/recipientId/${recipientId}`
+        `http://localhost:5000/api/journal?recipientId=${recipientId}`,
+        { credentials: 'include' }
       );
       
       if (response.ok) {
@@ -72,19 +73,14 @@ const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/journal/journalId/${selectedJournal._id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title: editTitle,
-            description: editDescription,
-            date: editDate,
-          }),
-        }
-      );
+   `http://localhost:5000/api/journal/${selectedJournal._id}`,
+      {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: editTitle, description: editDescription, date: editDate })
+      }
+    );
 
       if (!response.ok) {
         throw new Error("Failed to update journal");
@@ -115,10 +111,8 @@ const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/journal/journalId/${selectedJournal._id}`,
-        {
-          method: "DELETE",
-        }
+        `http://localhost:5000/api/journal/${selectedJournal._id}`,
+        { method: 'DELETE', credentials: 'include' }
       );
 
       if (!response.ok) {

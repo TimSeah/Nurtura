@@ -5,6 +5,15 @@ import {
   waitFor,
   act,
 } from "@testing-library/react";
+import { AuthContext } from "../../src/contexts/AuthContext";
+
+const fakeCtx = {
+  user: { username: "test‑user" },
+  loading: false,
+  login: async () => {}, // stub
+  logout: () => {}, // stub
+};
+
 // src/setupTests.ts
 import "@testing-library/jest-dom"; // Only this import is needed
 import userEvent from "@testing-library/user-event";
@@ -21,7 +30,7 @@ const mockEvents = [
     startTime: "14:00",
     remark: "Quarterly planning",
     month: "July",
-    // userId: "123",
+    //userId: "123",  grabs req.auth._id from the JWT cookie, so the client never needs to send it
   },
   {
     _id: "2",
@@ -30,7 +39,7 @@ const mockEvents = [
     startTime: "10:30",
     remark: "Bring medical reports",
     month: "July",
-    // userId: "123",
+    //userId: "123", grabs req.auth._id from the JWT cookie, so the client never needs to send it
   },
 ];
 
@@ -153,7 +162,7 @@ describe("Calendar Component", () => {
         startTime: "09:00",
         remark: "Test remark",
         month: "July",
-        // userId: "123",
+        //userId: "123",   grabs req.auth._id from the JWT cookie, so the client never needs to send it
         enableReminder: true,
         reminderSent: false,
       }),
@@ -212,7 +221,7 @@ describe("Calendar Component", () => {
         startTime: "11:11",
         remark: "Updated",
         month: "July",
-        // userId: "123",
+        //userId: "123",  grabs req.auth._id from the JWT cookie, so the client never needs to send it
       }),
     });
   });
