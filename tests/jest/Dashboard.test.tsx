@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Dashboard from "../../src/pages/dashboard/Dashboard";
 import { AuthContext } from "../../src/contexts/AuthContext";
@@ -11,6 +11,7 @@ jest.mock("../../src/services/apiService", () => ({
   apiService: {
     getTodaysEvents: jest.fn(),
     addVitalSigns: jest.fn(),
+    getRecentVitalSigns: jest.fn(),
   },
 }));
 
@@ -55,35 +56,81 @@ describe("Dashboard Component", () => {
     },
   ];
 
-  const renderDashboard = () => {
+  const mockRecentActivities = [
+    {
+      id: "1",
+      _id: "1",
+      recipientName: "Eleanor",
+      vitalType: "medication",
+      value: "Blood pressure medication",
+      unit: "",
+      recordedAt: new Date().toISOString(),
+      description: "Blood pressure medication taken by Eleanor",
+      priority: "medium",
+      time: "2 hours ago",
+    },
+    {
+      id: "2",
+      _id: "2", 
+      recipientName: "John",
+      vitalType: "blood_glucose",
+      value: "125",
+      unit: "mg/dL",
+      recordedAt: new Date().toISOString(),
+      description: "Blood glucose reading recorded: 125 mg/dL",
+      priority: "low",
+      time: "1 hour ago",
+    },
+    {
+      id: "3",
+      _id: "3",
+      recipientName: "John", 
+      vitalType: "appointment",
+      value: "Cardiology appointment",
+      unit: "",
+      recordedAt: new Date().toISOString(),
+      description: "Cardiology appointment scheduled for John",
+      priority: "high",
+      time: "30 minutes ago",
+    },
+  ];
+
+  const renderDashboard = async () => {
     const completeMockAuthContext = {
       ...mockAuthContext,
       loading: false, // Add the missing property
       refreshToken: jest.fn(), // Add other required properties if any
     };
-    return render(
-      <MemoryRouter>
-        <AuthContext.Provider value={completeMockAuthContext}>
-          <Dashboard />
-        </AuthContext.Provider>
-      </MemoryRouter>
-    );
+    await act(async () => {
+      render(
+        <MemoryRouter>
+          <AuthContext.Provider value={completeMockAuthContext}>
+            <Dashboard />
+          </AuthContext.Provider>
+        </MemoryRouter>
+      );
+    });
   };
 
   beforeEach(() => {
     (apiService.getTodaysEvents as jest.Mock).mockReset();
     (apiService.addVitalSigns as jest.Mock).mockReset();
+    (apiService.getRecentVitalSigns as jest.Mock).mockReset();
+    
+    // Default mocks to prevent errors
+    (apiService.getTodaysEvents as jest.Mock).mockResolvedValue([]);
+    (apiService.getRecentVitalSigns as jest.Mock).mockResolvedValue([]);
   });
 
-  test("renders welcome message with username", () => {
-    renderDashboard();
+  test("renders welcome message with username", async () => {
+    await renderDashboard();
     expect(
       screen.getByText((content) => content.includes("Welcome back,"))
     ).toBeInTheDocument();
   });
 
-  test("displays all dashboard stats cards", () => {
-    renderDashboard();
+  test("displays all dashboard stats cards", async () => {
+    await renderDashboard();
 
     expect(screen.getByText("Monitor Recipients")).toBeInTheDocument();
     expect(screen.getByText("View Calendar")).toBeInTheDocument();
@@ -97,7 +144,7 @@ describe("Dashboard Component", () => {
 
   test("displays no events message when there are no tasks", async () => {
     (apiService.getTodaysEvents as jest.Mock).mockResolvedValue([]);
-    renderDashboard();
+    await renderDashboard();
 
     await waitFor(() => {
       expect(
@@ -108,7 +155,7 @@ describe("Dashboard Component", () => {
 
   test("displays today's tasks when events exist", async () => {
     (apiService.getTodaysEvents as jest.Mock).mockResolvedValue(mockEvents);
-    renderDashboard();
+    await renderDashboard();
 
     await waitFor(() => {
       expect(screen.getByText("Doctor Appointment")).toBeInTheDocument();
@@ -120,18 +167,23 @@ describe("Dashboard Component", () => {
     });
   });
 
-  test("displays recent activities", () => {
-    renderDashboard();
+  test("displays recent activities", async () => {
+    (apiService.getTodaysEvents as jest.Mock).mockResolvedValue([]);
+    (apiService.getRecentVitalSigns as jest.Mock).mockResolvedValue(mockRecentActivities);
 
-    expect(
-      screen.getByText("Blood pressure medication taken by Eleanor")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Blood glucose reading recorded: 125 mg/dL")
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Cardiology appointment scheduled for John")
-    ).toBeInTheDocument();
+    await renderDashboard();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Blood pressure medication taken by Eleanor")
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Blood glucose reading recorded: 125 mg/dL")
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Cardiology appointment scheduled for John")
+      ).toBeInTheDocument();
+    });
   });
 
   test("handles API errors gracefully", async () => {
@@ -140,7 +192,7 @@ describe("Dashboard Component", () => {
     );
 
     const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
-    renderDashboard();
+    await renderDashboard();
 
     await waitFor(() => {
       expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -152,8 +204,8 @@ describe("Dashboard Component", () => {
     consoleErrorSpy.mockRestore();
   });
 
-  test("navigates to correct routes from stats cards", () => {
-    renderDashboard();
+  test("navigates to correct routes from stats cards", async () => {
+    await renderDashboard();
 
     const healthLink = screen
       .getByText("Monitor Recipients")
@@ -166,14 +218,19 @@ describe("Dashboard Component", () => {
     expect(calendarLink?.href).toContain("/calendar");
   });
 
-  test("displays priority indicators for activities", () => {
-    renderDashboard();
+  test("displays priority indicators for activities", async () => {
+    (apiService.getTodaysEvents as jest.Mock).mockResolvedValue([]);
+    (apiService.getRecentVitalSigns as jest.Mock).mockResolvedValue(mockRecentActivities);
 
-    const highPriority = screen
-      .getByText("Cardiology appointment scheduled for John")
-      .closest(".activity-item")
-      ?.querySelector(".activity-priority");
+    await renderDashboard();
 
-    expect(highPriority).toHaveClass("priority-high");
+    await waitFor(() => {
+      const highPriority = screen
+        .getByText("Cardiology appointment scheduled for John")
+        .closest(".activity-item")
+        ?.querySelector(".activity-priority");
+
+      expect(highPriority).toHaveClass("priority-high");
+    });
   });
 });

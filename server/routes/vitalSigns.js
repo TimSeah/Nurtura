@@ -1,6 +1,103 @@
 const express = require('express');
 const router = express.Router();
 const VitalSigns = require('../models/VitalSigns');
+const CareRecipient = require('../models/CareRecipient');
+
+// Get recent vital signs for dashboard (all recipients)
+router.get('/recent/dashboard', async (req, res) => {
+  try {
+    const userId = req.auth._id; // Get authenticated user ID
+    const limit = parseInt(req.query.limit) || 10;
+    
+    // Get care recipients for this user first
+    const careRecipients = await CareRecipient.find({ userId }).select('_id name');
+    const recipientIds = careRecipients.map(recipient => recipient._id);
+    
+    // Get recent vital signs for user's care recipients
+    const recentVitalSigns = await VitalSigns.find({
+      recipientId: { $in: recipientIds }
+    })
+      .sort({ dateTime: -1 })
+      .limit(limit)
+      .lean();
+    
+    // Transform the data for dashboard display
+    const activities = recentVitalSigns.map(vital => {
+      const recipient = careRecipients.find(r => r._id.toString() === vital.recipientId.toString());
+      
+      return {
+        id: vital._id.toString(),
+        type: 'vital',
+        description: formatVitalSignDescription(vital, recipient?.name || 'Patient'),
+        time: formatTimeAgo(vital.dateTime),
+        priority: getPriorityFromVitalType(vital.vitalType, vital.value),
+        vitalType: vital.vitalType,
+        value: vital.value,
+        unit: vital.unit
+      };
+    });
+    
+    res.json(activities);
+  } catch (err) {
+    console.error('Error fetching recent vital signs for dashboard:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Helper functions
+function formatVitalSignDescription(vital, recipientName) {
+  const vitalTypeNames = {
+    'blood_pressure': 'Blood pressure',
+    'heart_rate': 'Heart rate',
+    'temperature': 'Temperature',
+    'weight': 'Weight',
+    'blood_sugar': 'Blood glucose',
+    'oxygen_saturation': 'Oxygen saturation'
+  };
+  
+  const typeName = vitalTypeNames[vital.vitalType] || vital.vitalType;
+  
+  return `${typeName} reading recorded: ${vital.value} ${vital.unit} for ${recipientName}`;
+}
+
+function formatTimeAgo(dateTime) {
+  const now = new Date();
+  const past = new Date(dateTime);
+  const diffInHours = Math.floor((now - past) / (1000 * 60 * 60));
+  
+  if (diffInHours < 1) {
+    const diffInMinutes = Math.floor((now - past) / (1000 * 60));
+    return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
+  } else if (diffInHours < 24) {
+    return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
+  } else {
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
+  }
+}
+
+function getPriorityFromVitalType(vitalType, value) {
+  // Simple priority logic - you can enhance this based on medical ranges
+  switch (vitalType) {
+    case 'blood_pressure':
+      // Assuming format like "120/80"
+      const [systolic] = value.split('/').map(Number);
+      if (systolic > 140) return 'high';
+      if (systolic < 90) return 'medium';
+      return 'low';
+    case 'blood_sugar':
+      const bloodSugar = parseInt(value);
+      if (bloodSugar > 180 || bloodSugar < 70) return 'high';
+      if (bloodSugar > 140) return 'medium';
+      return 'low';
+    case 'heart_rate':
+      const heartRate = parseInt(value);
+      if (heartRate > 100 || heartRate < 60) return 'medium';
+      return 'low';
+    default:
+      return 'low';
+  }
+}
 
 // Get all vital signs for a recipient
 router.get('/:recipientId', async (req, res) => {
