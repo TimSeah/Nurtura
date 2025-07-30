@@ -189,22 +189,34 @@ const Forum: React.FC = () => {
         <p>Ask questions to or help out another caregiver.</p>
       </div>
       <div className="max-w-5xl mx-auto px-4 bg-gray-50 min-h-screen">
-        <div className="flex justify-between items-center mb-6">
+        <div className="justify-between items-center mb-6">
           {/* <h1 className="text-3xl font-bold text-gray-800">Forum</h1> */}
           <div className="flex gap-4">
-            <div>
+            <div className="relative w-max">
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              className="ml-1 text-[8px] bg-green-100 h-13 px-2 pt-1 border border-gray-400 shadow-sm focus:border-green-800 focus:border-green-800 rounded hover:shadow-md"
+              className="appearance-none ml-1 text-sm bg-green-100 h-13 px-2 pt-1 border border-gray-400 shadow-sm focus:border-green-800 rounded hover:shadow-md"
             >
               <option value="recent">Most Recent</option>
               <option value="oldest">Oldest</option>
               <option value="comments">Most Comments</option>
               <option value="likes">Most Upvotes</option>
             </select>
+            <span className="pointer-events-none absolute right-3 top-7 -translate-y-1/2 text-gray-500">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
             </div>
-            <div className="flex gap-4 ml-100">
+            <div className="flex gap-4 ml-auto">
             <button
               onClick={() => setShowUserThreads((prev) => !prev)}
               className={`${
