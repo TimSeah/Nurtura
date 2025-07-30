@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import MedicationsCard from "../../src/pages/healthMonitoring/components/medications/MedicationsCard";
 import { CareRecipient } from "../../src/types";
