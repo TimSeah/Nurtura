@@ -100,38 +100,8 @@ const Dashboard: React.FC = () => {
     },
   ];
 
-  const recentActivities: RecentActivity[] = [
-    {
-      id: "1",
-      type: "medication",
-      description: "Blood pressure medication taken by Eleanor",
-      time: "2 hours ago",
-      priority: "low",
-    },
-    {
-      id: "2",
-      type: "vital",
-      description: "Blood glucose reading recorded: 125 mg/dL",
-      time: "4 hours ago",
-      priority: "medium",
-    },
-    {
-      id: "3",
-      type: "appointment",
-      description: "Cardiology appointment scheduled for John",
-      time: "6 hours ago",
-      priority: "high",
-    },
-    {
-      id: "4",
-      type: "care",
-      description: "Daily care routine completed for Mary",
-      time: "8 hours ago",
-      priority: "low",
-    },
-  ];
-
   const [todayEvents, setTodayEvents] = useState<Event[]>([]);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -205,10 +175,16 @@ const Dashboard: React.FC = () => {
 
   const loadRecentActivities = async () => {
     try {
-      // You can enhance this to fetch real activities from backend
-      // For now, keeping the mock data structure
+      // Fetch recent vital signs from backend
+      const vitalSignsActivities = await apiService.getRecentVitalSigns(5);
+      
+      // You can also fetch other types of activities here and combine them
+      // For now, we'll just use vital signs data
+      setRecentActivities(vitalSignsActivities);
     } catch (error) {
       console.error("Error loading recent activities:", error);
+      // Fallback to empty array or show error message
+      setRecentActivities([]);
     }
   };
 
@@ -283,25 +259,32 @@ const Dashboard: React.FC = () => {
             </h2>
           </div>
           <div className="activity-list">
-            {recentActivities.map((activity) => {
-              const Icon = getActivityIcon(activity.type);
-              return (
-                <div key={activity.id} className="activity-item">
-                  <div className="activity-icon">
-                    <Icon />
+            {recentActivities.length === 0 ? (
+              <div className="no-activities">
+                <p>No recent vital signs recorded.</p>
+                <p className="activity-time">Start monitoring health by adding vital signs!</p>
+              </div>
+            ) : (
+              recentActivities.map((activity) => {
+                const Icon = getActivityIcon(activity.type);
+                return (
+                  <div key={activity.id} className="activity-item">
+                    <div className="activity-icon">
+                      <Icon />
+                    </div>
+                    <div className="activity-content">
+                      <p>{activity.description}</p>
+                      <span className="activity-time">{activity.time}</span>
+                    </div>
+                    <div
+                      className={`activity-priority ${getPriorityClass(
+                        activity.priority
+                      )}`}
+                    />
                   </div>
-                  <div className="activity-content">
-                    <p>{activity.description}</p>
-                    <span className="activity-time">{activity.time}</span>
-                  </div>
-                  <div
-                    className={`activity-priority ${getPriorityClass(
-                      activity.priority
-                    )}`}
-                  />
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </div>
       </div>

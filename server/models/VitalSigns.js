@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const vitalSignsSchema = new mongoose.Schema({
   recipientId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'CareRecipient',
     required: true
   },
   vitalType: {

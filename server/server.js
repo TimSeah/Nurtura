@@ -156,6 +156,15 @@ app.use(
   })
 );
 app.use('/api/user-settings', userSettingsRouter);
+
+app.use(
+  '/api/vital-signs',
+  jwtMiddleware({
+    secret: process.env.JWT_SECRET,
+    algorithms: ['HS256'],
+    getToken: req => req.cookies.token
+  })
+);
 app.use('/api/vital-signs', vitalSignsRouter);
 
 
