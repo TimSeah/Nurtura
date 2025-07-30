@@ -71,7 +71,7 @@ html, body {
   width: 100%;
   padding: 0.75rem;
   background: #10b981;
-  color: white;
+  color: black;
   font-size: 1rem;
   border: none;
   border-radius: 0.5rem;
@@ -114,4 +114,83 @@ html, body {
   margin-top: 0.5rem;
   font-size: 0.875rem;
   color: #000000;           /* dark‑grey */  
+}
+
+/* Ensure register-card doesn't shrink or compress */
+.register-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.1);
+  margin:0 auto;
+}
+
+
+
+/* New: Style for error messages */
+
+.register-card .error-message {
+  color: #dc2626; 
+  font-size: 0.875rem;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+  text-align: top;
+  display: block;
+  width: 100%;
+}
+
+
+
+.input-wrapper {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* 1. Make the wrapper a flex container, center everything vertically */
+.password-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;   /* you already have this, but just double-check */
+  width: 100%;
+  margin-bottom: 1rem;  /* keep consistent spacing */
+}
+
+/* 2. Give the input plenty of right padding so text never runs under the icon */
+.password-wrapper input {
+  flex: 1;
+  padding-right: 2.5rem;  /* room for the icon */
+  /* (keep your existing padding-top/bottom here) */
+  /* e.g. padding: 0.75rem 1rem 0.75rem 1rem; */
+  margin-bottom: 0;
+}
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+}
+
+/* target the password input in its exact context */
+.register-card form .password-wrapper input {
+  margin-bottom: 0 !important;
+}
+
+
+/* Remove the browser’s native “show password” button */
+input[type="password"] {
+  -webkit-appearance: none;  /* Safari & Chrome */
+  appearance: none;          /* standard */
+}
+
+/* For older Microsoft browsers (Edge/IE) */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
 }

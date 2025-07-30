@@ -168,35 +168,52 @@ const Forum: React.FC = () => {
         <p>Ask questions to or help out another caregiver.</p>
       </div>
       <div className="max-w-5xl mx-auto px-4 bg-gray-50 min-h-screen">
-        <div className="flex justify-between items-center mb-6">
+        <div className="justify-between items-center mb-6">
           {/* <h1 className="text-3xl font-bold text-gray-800">Forum</h1> */}
           <div className="flex gap-4">
-            <button
-              onClick={() => setShowForm(true)}
-              className="bg-blue-600 text-white text-sm px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition"
-            >
-              + New Thread
-            </button>
-            <button
-              onClick={() => setShowUserThreads((prev) => !prev)}
-              className={`${
-                showUserThreads
-                  ? "bg-gray-200 hover:bg-gray-300"
-                  : "bg-gray-200 hover:bg-gray-300"
-              } text-sm px-4 py-2 rounded-md shadow-sm transition`}
-            >
-              {showUserThreads ? "Show All Threads" : "My Threads"}
-            </button>
+            <div className="relative w-max">
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              className="ml-1 text-[8px] bg-gray-200 h-13 px-2 pt-1 border border-gray-400 shadow-sm focus:ring-blue-500 focus:border-blue-500 rounded"
+              className="appearance-none ml-1 text-sm bg-green-100 h-13 px-2 pt-1 border border-gray-400 shadow-sm focus:border-green-800 rounded hover:shadow-md"
             >
               <option value="recent">Most Recent</option>
               <option value="oldest">Oldest</option>
               <option value="comments">Most Comments</option>
               <option value="likes">Most Upvotes</option>
             </select>
+            <span className="pointer-events-none absolute right-3 top-7 -translate-y-1/2 text-gray-500">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
+            </div>
+            <div className="flex gap-4 ml-auto">
+            <button
+              onClick={() => setShowUserThreads((prev) => !prev)}
+              className={`${
+                showUserThreads
+                  ? "bg-teal-700 hover:bg-teal-800"
+                  : "bg-teal-700 hover:bg-teal-800"
+              } text-sm text-white px-4 py-2 rounded-md shadow-sm transition hover:shadow-md`}
+            >
+              {showUserThreads ? "Show All Threads" : "My Threads"}
+            </button>
+            <button
+              onClick={() => setShowForm(true)}
+              // style={{ backgroundColor: "#0d7377" }}
+              className="text-white bg-teal-700 text-sm px-4 py-2 rounded-md shadow-sm hover:bg-teal-800 transition hover:shadow-md"
+            >
+              + New Thread
+            </button>
+            </div>
           </div>
         </div>
 
@@ -262,7 +279,7 @@ const Forum: React.FC = () => {
                     </button>
                     <button
                       type="submit"
-                      className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+                      className="bg-teal-700 text-white px-4 py-2 rounded-md hover:bg-teal-800 transition"
                     >
                       Create Thread
                     </button>
@@ -282,12 +299,12 @@ const Forum: React.FC = () => {
               <Link
                 key={t._id}
                 to={`/threads/${t._id}`}
-                className="flex items-start bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition border"
+                className="flex items-start bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm hover:border-green-800 hover:bg-green-50 transition shadow-md transition border"
               >
                 {/* Icon */}
                 {/* <div className={`w-10 h-10 flex items-center justify-center rounded-full mr-4 ${thread.color}`}> */}
                 <div
-                  className={`w-10 h-10 flex items-center justify-center rounded-full mr-4 bg-blue-100 text-blue-600`}
+                  className={`w-10 h-10 flex items-center justify-center rounded-full mr-4 bg-green-200 text-teal-700`}
                 >
                   <svg
                     className="w-6 h-6"
@@ -311,8 +328,9 @@ const Forum: React.FC = () => {
                   </p>
                 </div>
                 {/* Upvotes + Replies */}
-                <div className="ml-4 flex flex-col items-center justify-center text-sm text-gray-500 whitespace-nowrap">
-                  <button type="button" className="flex items-center gap-1">
+                <div className="ml-3 flex flex-col items-center justify-center text-sm text-gray-500 whitespace-nowrap">
+                  {/* Upvotes */}
+                  <div className="flex items-center gap-1 mr-1 min-w-[48px] justify-between">
                     <svg
                       className="w-4 h-4"
                       fill="currentColor"
@@ -320,9 +338,10 @@ const Forum: React.FC = () => {
                     >
                       <path d="M3 10h4v10h6V10h4L10 0 3 10z" />
                     </svg>
-                    {t.upvotes}
-                  </button>
-                  <div className="flex items-center gap-1 mt-1">
+                    <span data-testid="upvotes" className="font-mono text-right w-7">{t.upvotes}</span>
+                  </div>
+                  {/* Replies */}
+                  <div className="flex items-center gap-1 mt-1 mr-0.5 min-w-[48px] justify-between">
                     <svg
                       className="w-4 h-4"
                       fill="currentColor"
@@ -330,12 +349,38 @@ const Forum: React.FC = () => {
                     >
                       <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
                     </svg>
-                    {t.replies} {/* replies */}
+                    <span data-testid="replies" className="font-mono text-right w-7">
+                      {t.replies ?? 0}
+                    </span>
                   </div>
+                  {/* Flag */}
+                  {t.upvotes <= -10 && (
+                    <div
+                      className="mt-2 -ml-3 flex justify-center items-center min-w-[48px]"
+                      title="Flagged Thread"
+                    >
+                      <svg
+                        className="w-5 h-5 mr-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <g>
+                          <rect x="3" y="2" width="2" height="20" fill="#EF4444" />
+                          <path
+                            d="M5 4H19C19.5523 4 20 4.44772 20 5V14C20 14.5523 19.5523 15 19 15H5"
+                            fill="#EF4444"
+                          />
+                        </g>
+                      </svg>
+                      {/* Flagged */}
+                    </div>
+                  )}
+                  {/* Bin */}
                   {(t.author === user?.email ||
                     t.author === user?.username) && ( // updated logic to check if current user is author, fixes bug where delete button does not appear
                     <button
-                      className="mt-2 -ml-3 text-red-500 hover:text-red-700 transition"
+                      className="mt-2 -ml-3 text-red-500 hover:text-red-700 transition min-w-[48px] flex justify-center"
                       title="Delete Thread"
                       onClick={(e) => {
                         e.preventDefault();
@@ -344,7 +389,7 @@ const Forum: React.FC = () => {
                       }}
                     >
                       <svg
-                        className="w-5 h-5"
+                        className="w-5 h-5 mr-6"
                         fill="currentColor"
                         viewBox="0 0 24 24"
                       >

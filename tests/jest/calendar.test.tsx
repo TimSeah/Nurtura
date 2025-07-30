@@ -8,12 +8,11 @@ import {
 import { AuthContext } from "../../src/contexts/AuthContext";
 
 const fakeCtx = {
-  user: { username: 'test‑user' },
+  user: { username: "test‑user" },
   loading: false,
-  login: async () => {},       // stub
-  logout: () => {},            // stub
+  login: async () => {}, // stub
+  logout: () => {}, // stub
 };
-
 
 // src/setupTests.ts
 import "@testing-library/jest-dom"; // Only this import is needed
@@ -116,7 +115,7 @@ describe("Calendar Component", () => {
               startTime: "09:00",
               remark: "Test remark",
               month: "July",
-              userId: "123",
+              // userId: "123",
             },
           ]),
       }); // Re-fetch updated event list
@@ -178,9 +177,7 @@ describe("Calendar Component", () => {
       })
       .mockResolvedValueOnce({ ok: true });
 
-    render(
-    <Calendar />
- );
+    render(<Calendar />);
 
     jest.useRealTimers();
 

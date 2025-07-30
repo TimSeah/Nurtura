@@ -13,8 +13,9 @@ const userSettingsSchema = new mongoose.Schema({
     },
     email: {
       type: String,
-      required: true
-    },
+      //required: true  (removed true for now)
+      default: ''
+    }, 
     phone: {
       type: String,
       default: ''
