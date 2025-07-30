@@ -39,6 +39,13 @@ describe('Email Reminder Integration Tests', () => {
     // Setup Express app
     app = express();
     app.use(express.json());
+    
+    // Mock JWT authentication middleware for testing
+    app.use('/api/events', (req, res, next) => {
+      req.auth = { _id: 'user123' }; // Mock authenticated user
+      next();
+    });
+    
     app.use('/api/events', eventsRouter);
   });
 
@@ -153,7 +160,7 @@ describe('Email Reminder Integration Tests', () => {
     test('respects notification preferences', async () => {
       // Create user with reminders disabled
       await UserSettings.create({
-        userId: 'user456',
+        userId: 'user123',
         profile: {
           name: 'Bob Wilson',
           email: 'bob.wilson@example.com'
@@ -169,7 +176,7 @@ describe('Email Reminder Integration Tests', () => {
         startTime: '10:30',
         remark: 'Regular cleaning',
         month: 'July',
-        userId: 'user456',
+        userId: 'user123',
         enableReminder: true,
         reminderSent: false
       });
@@ -191,7 +198,7 @@ describe('Email Reminder Integration Tests', () => {
         startTime: '10:30',
         remark: 'Annual check',
         month: 'July',
-        userId: 'nonexistent_user', // User that doesn't exist
+        userId: 'user123', // Use the authenticated user ID
         enableReminder: true,
         reminderSent: false
       });
@@ -209,7 +216,7 @@ describe('Email Reminder Integration Tests', () => {
 
     test('email content includes all event details', async () => {
       await UserSettings.create({
-        userId: 'user999',
+        userId: 'user123',
         profile: {
           name: 'Charlie Brown',
           email: 'charlie.brown@example.com'
@@ -225,7 +232,7 @@ describe('Email Reminder Integration Tests', () => {
         startTime: '14:15',
         remark: 'Bring previous test results and list of current medications',
         month: 'July',
-        userId: 'user999',
+        userId: 'user123',
         enableReminder: true,
         reminderSent: false
       });
@@ -248,7 +255,7 @@ describe('Email Reminder Integration Tests', () => {
       mockSendMail.mockRejectedValueOnce(new Error('SMTP server unavailable'));
 
       await UserSettings.create({
-        userId: 'user111',
+        userId: 'user123',
         profile: {
           name: 'Diana Prince',
           email: 'diana.prince@example.com'
@@ -264,7 +271,7 @@ describe('Email Reminder Integration Tests', () => {
         startTime: '10:30',
         remark: 'Yearly physical',
         month: 'July',
-        userId: 'user111',
+        userId: 'user123',
         enableReminder: true,
         reminderSent: false
       });
@@ -282,7 +289,7 @@ describe('Email Reminder Integration Tests', () => {
     test('handles multiple events efficiently', async () => {
       // Create user
       await UserSettings.create({
-        userId: 'bulk_user',
+        userId: 'user123',
         profile: {
           name: 'Bulk User',
           email: 'bulk@example.com'
@@ -301,7 +308,7 @@ describe('Email Reminder Integration Tests', () => {
           startTime: '10:30',
           remark: `Remark for appointment ${i + 1}`,
           month: 'July',
-          userId: 'bulk_user',
+          userId: 'user123',
           enableReminder: true,
           reminderSent: false
         });
@@ -309,7 +316,7 @@ describe('Email Reminder Integration Tests', () => {
       await Event.insertMany(events);
 
       // Test sending reminders for multiple events
-      const createdEvents = await Event.find({ userId: 'bulk_user' });
+      const createdEvents = await Event.find({ userId: 'user123' });
       
       const startTime = Date.now();
       
@@ -331,7 +338,7 @@ describe('Email Reminder Integration Tests', () => {
   describe('Data Validation', () => {
     test('validates event data before sending email', async () => {
       await UserSettings.create({
-        userId: 'validator_user',
+        userId: 'user123',
         profile: {
           name: 'Validator User',
           email: 'validator@example.com'
@@ -348,7 +355,7 @@ describe('Email Reminder Integration Tests', () => {
         startTime: '10:30',
         remark: 'Basic remark',
         month: 'July',
-        userId: 'validator_user',
+        userId: 'user123',
         enableReminder: true,
         reminderSent: false
       });
