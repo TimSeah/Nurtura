@@ -209,20 +209,20 @@ describe('Forum: UI test cases', () => {
     const zeroLink = (await screen.findByText('First')).closest('a')!;
     const zero = within(zeroLink);
     expect(
-      zero.getByRole('button', { name: '0' })      // upvotes
-    ).toBeInTheDocument();
+      zero.getByTestId('upvotes')  // upvotes
+    ).toHaveTextContent('0');
     expect(
-      zero.getByText('9999', { selector: 'div' })  // replies
-    ).toBeInTheDocument();
+      zero.getByTestId('replies')  // replies
+    ).toHaveTextContent('9999');
 
     const maxLink = screen.getByText('Second').closest('a')!;
     const max = within(maxLink);
     expect(
-      max.getByRole('button', { name: '9999' })    // upvotes
-    ).toBeInTheDocument();
+      max.getByTestId('upvotes')  // upvotes
+    ).toHaveTextContent('9999');
     expect(
-      max.getByText('0', { selector: 'div' })      // replies
-    ).toBeInTheDocument();
+      max.getByTestId('replies')  // replies
+    ).toHaveTextContent('0');
   });
 });
 

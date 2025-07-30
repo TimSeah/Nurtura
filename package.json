@@ -13,7 +13,8 @@
     "test:vitest": "vitest run",
     "test:jest": "jest --runInBand",
     "watch:vitest": "vitest",
-    "watch:jest": "jest --watch"
+    "watch:jest": "jest --watch",
+    "cy:open": "cypress open"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
