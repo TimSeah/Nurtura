@@ -171,23 +171,7 @@ const Forum: React.FC = () => {
         <div className="flex justify-between items-center mb-6">
           {/* <h1 className="text-3xl font-bold text-gray-800">Forum</h1> */}
           <div className="flex gap-4">
-            <button
-              onClick={() => setShowForm(true)}
-              // style={{ backgroundColor: "#0d7377" }}
-              className="text-white bg-teal-700 text-sm px-4 py-2 rounded-md shadow-sm hover:bg-teal-800 transition hover:shadow-md"
-            >
-              + New Thread
-            </button>
-            <button
-              onClick={() => setShowUserThreads((prev) => !prev)}
-              className={`${
-                showUserThreads
-                  ? "bg-teal-700 hover:bg-teal-800"
-                  : "bg-teal-700 hover:bg-teal-800"
-              } text-sm text-white px-4 py-2 rounded-md shadow-sm transition hover:shadow-md`}
-            >
-              {showUserThreads ? "Show All Threads" : "My Threads"}
-            </button>
+            <div>
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
@@ -198,6 +182,26 @@ const Forum: React.FC = () => {
               <option value="comments">Most Comments</option>
               <option value="likes">Most Upvotes</option>
             </select>
+            </div>
+            <div className="flex gap-4 ml-100">
+            <button
+              onClick={() => setShowUserThreads((prev) => !prev)}
+              className={`${
+                showUserThreads
+                  ? "bg-teal-700 hover:bg-teal-800"
+                  : "bg-teal-700 hover:bg-teal-800"
+              } text-sm text-white px-4 py-2 rounded-md shadow-sm transition hover:shadow-md`}
+            >
+              {showUserThreads ? "Show All Threads" : "My Threads"}
+            </button>
+            <button
+              onClick={() => setShowForm(true)}
+              // style={{ backgroundColor: "#0d7377" }}
+              className="text-white bg-teal-700 text-sm px-4 py-2 rounded-md shadow-sm hover:bg-teal-800 transition hover:shadow-md"
+            >
+              + New Thread
+            </button>
+            </div>
           </div>
         </div>
 
