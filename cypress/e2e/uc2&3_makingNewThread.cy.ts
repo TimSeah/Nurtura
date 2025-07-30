@@ -1,4 +1,4 @@
-describe('UC 3: Making A New Thread', () => {
+describe('UC 2&3: Making A New Thread', () => {
 
   /* ==== Test Created with Cypress Studio ==== */
   it('Making a thread, viewing and deleting it', function() {
