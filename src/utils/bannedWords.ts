@@ -1,6 +1,6 @@
 // src/utils/bannedWords.ts
 export const bannedWords = [
-  "fuck", "shit", "bitch", "asshole", "nigger", "slut", "cunt", "dick", "whore", "leehern", "cock", "faggot", "jerk", "rape", "rapist", "kill", "sucker", "bastard", "idiot", "fucker", "shithead",
+  "fuck", "shit", "bitch", "asshole", "nigger", "slut", "cunt", "dick", "whore", "cock", "faggot", "jerk", "rape", "rapist", "kill", "sucker", "bastard", "idiot", "fucker", "shithead",
 
   "abbo", "abo", "abortion", "addict", "addicts", "adult",
   "alla", "amateur", "american", "anal", "analannie", "analsex",
