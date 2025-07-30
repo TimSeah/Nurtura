@@ -89,7 +89,8 @@ const Forum: React.FC = () => {
       await Promise.all(
         threads.map(async (t) => {
           const res = await fetch(
-            `http://localhost:5000/api/threads/${t._id}/replies/count`
+            `http://localhost:5000/api/threads/${t._id}/replies/count`,
+            { credentials: 'include' }
           );
           const data = await res.json();
           counts[t._id] = data.count;
