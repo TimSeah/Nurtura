@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import logo from "./dashboard/components/pics/WhiteKoala.png"; // adjust path as needed
+import logoBlack from "./dashboard/components/pics/koala.png";
 import "./Login.css";
 
 export default function Login() {
@@ -26,7 +27,7 @@ export default function Login() {
       {/* ← NEW HEADER */}
       <div className="login-header">
         <div className="login-title-with-icon">
-          <img src={logo} alt="Nurtura Logo" className="login-logo-icon" />
+          <img src={logoBlack} alt="Nurtura Logo" className="login-logo-icon" />
           <h2 className="login-welcome">Welcome to Nurtura!</h2>
         </div>
       </div>

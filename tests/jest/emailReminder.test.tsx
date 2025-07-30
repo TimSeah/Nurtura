@@ -24,7 +24,7 @@ const mockEvents = [
     month: "July",
     userId: "123",
     enableReminder: true,
-    reminderSent: false
+    reminderSent: false,
   },
   {
     _id: "2",
@@ -35,7 +35,7 @@ const mockEvents = [
     month: "July",
     userId: "123",
     enableReminder: true,
-    reminderSent: true
+    reminderSent: true,
   },
 ];
 
@@ -85,7 +85,7 @@ describe("Calendar Component - Email Reminder Features", () => {
 
       // Test Reminder button should not appear for new events
       expect(screen.queryByText("Test Reminder")).not.toBeInTheDocument();
-      
+
       // But other buttons should be there
       expect(screen.getByText("Save")).toBeInTheDocument();
       expect(screen.getByText("Cancel")).toBeInTheDocument();
@@ -99,11 +99,12 @@ describe("Calendar Component - Email Reminder Features", () => {
         })
         .mockResolvedValueOnce({
           ok: true,
-          json: () => Promise.resolve({
-            success: true,
-            message: 'Test reminder sent successfully',
-            email: 'user@example.com'
-          }),
+          json: () =>
+            Promise.resolve({
+              success: true,
+              message: "Test reminder sent successfully",
+              email: "user@example.com",
+            }),
         });
 
       render(<Calendar />);
@@ -126,14 +127,18 @@ describe("Calendar Component - Email Reminder Features", () => {
 
       // Verify API call was made
       const fetchMock = fetch as jest.Mock;
-      expect(fetchMock.mock.calls[1][0]).toBe("http://localhost:5000/api/events/1/send-reminder");
+      expect(fetchMock.mock.calls[1][0]).toBe(
+        "http://localhost:5000/api/events/1/send-reminder"
+      );
       expect(fetchMock.mock.calls[1][1]).toMatchObject({
         method: "POST",
       });
 
       // Verify success alert
       await waitFor(() => {
-        expect(global.alert).toHaveBeenCalledWith("Test reminder sent successfully!");
+        expect(global.alert).toHaveBeenCalledWith(
+          "Test reminder sent successfully!"
+        );
       });
     });
 
@@ -168,7 +173,9 @@ describe("Calendar Component - Email Reminder Features", () => {
 
       // Verify failure alert
       await waitFor(() => {
-        expect(global.alert).toHaveBeenCalledWith("Failed to send test reminder");
+        expect(global.alert).toHaveBeenCalledWith(
+          "Failed to send test reminder"
+        );
       });
     });
 
@@ -200,7 +207,9 @@ describe("Calendar Component - Email Reminder Features", () => {
 
       // Verify error alert
       await waitFor(() => {
-        expect(global.alert).toHaveBeenCalledWith("Error sending test reminder");
+        expect(global.alert).toHaveBeenCalledWith(
+          "Error sending test reminder"
+        );
       });
     });
 
@@ -235,7 +244,9 @@ describe("Calendar Component - Email Reminder Features", () => {
 
       // Verify correct API call for second event
       const fetchMock = fetch as jest.Mock;
-      expect(fetchMock.mock.calls[1][0]).toBe("http://localhost:5000/api/events/2/send-reminder");
+      expect(fetchMock.mock.calls[1][0]).toBe(
+        "http://localhost:5000/api/events/2/send-reminder"
+      );
     });
 
     test("test reminder preserves edit form state", async () => {
@@ -259,13 +270,17 @@ describe("Calendar Component - Email Reminder Features", () => {
       fireEvent.click(screen.getByText("Doctor Appointment"));
 
       await waitFor(() => {
-        expect(screen.getByDisplayValue("Doctor Appointment")).toBeInTheDocument();
+        expect(
+          screen.getByDisplayValue("Doctor Appointment")
+        ).toBeInTheDocument();
       });
 
       // Modify the title
       const titleInput = screen.getByDisplayValue("Doctor Appointment");
       await act(async () => {
-        fireEvent.change(titleInput, { target: { value: "Modified Appointment" } });
+        fireEvent.change(titleInput, {
+          target: { value: "Modified Appointment" },
+        });
       });
 
       // Click Test Reminder
@@ -275,7 +290,9 @@ describe("Calendar Component - Email Reminder Features", () => {
 
       // Form should still be open and modifications preserved
       await waitFor(() => {
-        expect(screen.getByDisplayValue("Modified Appointment")).toBeInTheDocument();
+        expect(
+          screen.getByDisplayValue("Modified Appointment")
+        ).toBeInTheDocument();
         expect(screen.getByText("Save")).toBeInTheDocument();
         expect(screen.getByText("Cancel")).toBeInTheDocument();
       });
@@ -307,8 +324,10 @@ describe("Calendar Component - Email Reminder Features", () => {
 
   describe("Event Creation with Reminders", () => {
     test("creates new event with reminder enabled by default", async () => {
-      (fetch as jest.Mock)
-        .mockResolvedValue({ ok: true, json: () => Promise.resolve([]) });
+      (fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve([]),
+      });
 
       await act(async () => {
         render(<Calendar />);
@@ -325,7 +344,9 @@ describe("Calendar Component - Email Reminder Features", () => {
       });
 
       await waitFor(() => {
-        expect(screen.getByText("Schedule Event in 2023-7-15")).toBeInTheDocument();
+        expect(
+          screen.getByText("Schedule Event in 2023-7-15")
+        ).toBeInTheDocument();
       });
 
       // Fill in the form
@@ -336,7 +357,9 @@ describe("Calendar Component - Email Reminder Features", () => {
       await act(async () => {
         fireEvent.change(titleInput, { target: { value: "New Appointment" } });
         fireEvent.change(timeInput, { target: { value: "09:00" } });
-        fireEvent.change(remarkInput, { target: { value: "Test appointment" } });
+        fireEvent.change(remarkInput, {
+          target: { value: "Test appointment" },
+        });
       });
 
       // Submit
@@ -344,15 +367,17 @@ describe("Calendar Component - Email Reminder Features", () => {
         ok: true,
         json: () => Promise.resolve({ _id: "3" }),
       });
-      
+
       await act(async () => {
         fireEvent.click(screen.getByText("Save"));
       });
 
       // Verify the API call includes reminder fields
       const fetchMock = fetch as jest.Mock;
-      const createCall = fetchMock.mock.calls.find(call => call[1]?.method === 'POST');
-      
+      const createCall = fetchMock.mock.calls.find(
+        (call) => call[1]?.method === "POST"
+      );
+
       expect(createCall).toBeTruthy();
       const requestBody = JSON.parse(createCall[1].body);
       expect(requestBody.enableReminder).toBe(true);
@@ -364,19 +389,18 @@ describe("Calendar Component - Email Reminder Features", () => {
     test("reminder functionality respects user email settings", async () => {
       // This test would verify that reminders work with user settings
       // In a full integration test, we'd mock the user settings API
-      const mockEventsWithSettings = mockEvents.map(event => ({
+      const mockEventsWithSettings = mockEvents.map((event) => ({
         ...event,
         userSettings: {
           notifications: { appointmentReminders: true },
-          profile: { email: 'user@example.com' }
-        }
+          profile: { email: "user@example.com" },
+        },
       }));
 
-      (fetch as jest.Mock)
-        .mockResolvedValue({
-          ok: true,
-          json: () => Promise.resolve(mockEventsWithSettings),
-        });
+      (fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockEventsWithSettings),
+      });
 
       await act(async () => {
         render(<Calendar />);
@@ -406,7 +430,9 @@ describe("Calendar Component - Email Reminder Features", () => {
       });
 
       await waitFor(() => {
-        expect(global.alert).toHaveBeenCalledWith("Test reminder sent successfully!");
+        expect(global.alert).toHaveBeenCalledWith(
+          "Test reminder sent successfully!"
+        );
       });
     });
   });

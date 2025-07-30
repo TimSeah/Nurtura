@@ -38,9 +38,6 @@ const Forum: React.FC = () => {
   const [form, setForm] = useState({ title: "", content: "" });
   const [showUserThreads, setShowUserThreads] = useState(false);
   const [sortOption, setSortOption] = useState("recent");
-  const [replyCounts, setReplyCounts] = useState<{ [threadId: string]: number }>(
-    {}
-  );
 
   const sortedThreads = [...threads].sort((a, b) => {
     switch (sortOption) {
@@ -82,24 +79,6 @@ const Forum: React.FC = () => {
   useEffect(() => {
     fetchThreads();
   }, []);
-
-  useEffect(() => {
-    const fetchReplyCounts = async () => {
-      const counts: { [threadId: string]: number } = {};
-      await Promise.all(
-        threads.map(async (t) => {
-          const res = await fetch(
-            `http://localhost:5000/api/threads/${t._id}/replies/count`,
-            { credentials: 'include' }
-          );
-          const data = await res.json();
-          counts[t._id] = data.count;
-        })
-      );
-      setReplyCounts(counts);
-    };
-    if (threads.length > 0) fetchReplyCounts();
-  }, [threads]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -189,22 +168,34 @@ const Forum: React.FC = () => {
         <p>Ask questions to or help out another caregiver.</p>
       </div>
       <div className="max-w-5xl mx-auto px-4 bg-gray-50 min-h-screen">
-        <div className="flex justify-between items-center mb-6">
+        <div className="justify-between items-center mb-6">
           {/* <h1 className="text-3xl font-bold text-gray-800">Forum</h1> */}
           <div className="flex gap-4">
-            <div>
+            <div className="relative w-max">
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              className="ml-1 text-[8px] bg-green-100 h-13 px-2 pt-1 border border-gray-400 shadow-sm focus:border-green-800 focus:border-green-800 rounded hover:shadow-md"
+              className="appearance-none ml-1 text-sm bg-green-100 h-13 px-2 pt-1 border border-gray-400 shadow-sm focus:border-green-800 rounded hover:shadow-md"
             >
               <option value="recent">Most Recent</option>
               <option value="oldest">Oldest</option>
               <option value="comments">Most Comments</option>
               <option value="likes">Most Upvotes</option>
             </select>
+            <span className="pointer-events-none absolute right-3 top-7 -translate-y-1/2 text-gray-500">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
             </div>
-            <div className="flex gap-4 ml-100">
+            <div className="flex gap-4 ml-auto">
             <button
               onClick={() => setShowUserThreads((prev) => !prev)}
               className={`${
@@ -347,7 +338,7 @@ const Forum: React.FC = () => {
                     >
                       <path d="M3 10h4v10h6V10h4L10 0 3 10z" />
                     </svg>
-                    <span className="font-mono text-right w-7">{t.upvotes}</span>
+                    <span data-testid="upvotes" className="font-mono text-right w-7">{t.upvotes}</span>
                   </div>
                   {/* Replies */}
                   <div className="flex items-center gap-1 mt-1 mr-0.5 min-w-[48px] justify-between">
@@ -358,8 +349,8 @@ const Forum: React.FC = () => {
                     >
                       <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
                     </svg>
-                    <span className="font-mono text-right w-7">
-                      {replyCounts[t._id] ?? 0}
+                    <span data-testid="replies" className="font-mono text-right w-7">
+                      {t.replies ?? 0}
                     </span>
                   </div>
                   {/* Flag */}
