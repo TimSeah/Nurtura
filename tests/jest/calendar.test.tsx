@@ -10,8 +10,8 @@ import { AuthContext } from "../../src/contexts/AuthContext";
 const fakeCtx = {
   user: { username: "test‑user" },
   loading: false,
-  login: async () => {}, // stub
-  logout: () => {}, // stub
+  login: async () => Promise.resolve(true), // stub
+  logout: async () => Promise.resolve(), // stub
 };
 
 // src/setupTests.ts
@@ -46,6 +46,11 @@ const mockEvents = [
 describe("Calendar Component", () => {
   beforeEach(() => {
     (fetch as jest.Mock).mockReset();
+    // Default mock for month fetch
+    (fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve([]),
+    });
     jest.useFakeTimers().setSystemTime(new Date("2023-07-21"));
   });
 
@@ -53,32 +58,68 @@ describe("Calendar Component", () => {
     jest.useRealTimers();
   });
 
-  test("renders current month and year", () => {
-    render(<Calendar />);
+  test("renders current month and year", async () => {
+    await act(async () => {
+      render(
+        <AuthContext.Provider value={fakeCtx}>
+          <Calendar />
+        </AuthContext.Provider>
+      );
+    });
     expect(screen.getByText("July 2023")).toBeInTheDocument();
   });
 
-  test("navigates to next month", () => {
-    render(<Calendar />);
-    fireEvent.click(screen.getByText("Next Month >"));
+  test("navigates to next month", async () => {
+    await act(async () => {
+      render(
+        <AuthContext.Provider value={fakeCtx}>
+          <Calendar />
+        </AuthContext.Provider>
+      );
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByText("Next Month >"));
+    });
     expect(screen.getByText("August 2023")).toBeInTheDocument();
   });
 
-  test("navigates to previous month", () => {
-    render(<Calendar />);
-    fireEvent.click(screen.getByText("< Previous Month"));
+  test("navigates to previous month", async () => {
+    await act(async () => {
+      render(
+        <AuthContext.Provider value={fakeCtx}>
+          <Calendar />
+        </AuthContext.Provider>
+      );
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByText("< Previous Month"));
+    });
     expect(screen.getByText("June 2023")).toBeInTheDocument();
   });
 
-  test("highlights current day", () => {
-    render(<Calendar />);
+  test("highlights current day", async () => {
+    await act(async () => {
+      render(
+        <AuthContext.Provider value={fakeCtx}>
+          <Calendar />
+        </AuthContext.Provider>
+      );
+    });
     const todayCell = screen.getByText("21").closest(".calendar-day");
     expect(todayCell).toHaveClass("today");
   });
 
-  test("opens event form on day click", () => {
-    render(<Calendar />);
-    fireEvent.click(screen.getByText("15"));
+  test("opens event form on day click", async () => {
+    await act(async () => {
+      render(
+        <AuthContext.Provider value={fakeCtx}>
+          <Calendar />
+        </AuthContext.Provider>
+      );
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByText("15"));
+    });
     expect(screen.getByText("Schedule Event in 2023-7-15")).toBeInTheDocument();
   });
 
@@ -88,7 +129,13 @@ describe("Calendar Component", () => {
       json: () => Promise.resolve(mockEvents),
     });
 
-    render(<Calendar />);
+    await act(async () => {
+      render(
+        <AuthContext.Provider value={fakeCtx}>
+          <Calendar />
+        </AuthContext.Provider>
+      );
+    });
 
     await waitFor(() => {
       expect(screen.getByText("Team Meeting")).toBeInTheDocument();
@@ -120,11 +167,20 @@ describe("Calendar Component", () => {
           ]),
       }); // Re-fetch updated event list
 
-    render(<Calendar />);
+    await act(async () => {
+      render(
+        <AuthContext.Provider value={fakeCtx}>
+          <Calendar />
+        </AuthContext.Provider>
+      );
+    });
     // screen.debug();
 
     // Open form for day 25
-    fireEvent.click(await screen.findByText("2"));
+    const dayElement = await screen.findByText("2");
+    await act(async () => {
+      fireEvent.click(dayElement);
+    });
 
     await waitFor(() => {
       expect(
@@ -177,13 +233,21 @@ describe("Calendar Component", () => {
       })
       .mockResolvedValueOnce({ ok: true });
 
-    render(<Calendar />);
+    await act(async () => {
+      render(
+        <AuthContext.Provider value={fakeCtx}>
+          <Calendar />
+        </AuthContext.Provider>
+      );
+    });
 
     jest.useRealTimers();
 
     await screen.findByText("Team Meeting");
 
-    fireEvent.click(screen.getByText("Team Meeting"));
+    await act(async () => {
+      fireEvent.click(screen.getByText("Team Meeting"));
+    });
 
     const titleInput = screen.getByDisplayValue("Team Meeting");
     const timeInput = screen.getByDisplayValue("14:00");
@@ -234,17 +298,27 @@ describe("Calendar Component", () => {
       })
       .mockResolvedValueOnce({ ok: true }); // Delete
 
-    render(<Calendar />);
+    await act(async () => {
+      render(
+        <AuthContext.Provider value={fakeCtx}>
+          <Calendar />
+        </AuthContext.Provider>
+      );
+    });
     screen.debug();
 
     // Wait for events to load
     await screen.findByText("Team Meeting");
 
     // Click on event to edit
-    fireEvent.click(screen.getByText("Team Meeting"));
+    await act(async () => {
+      fireEvent.click(screen.getByText("Team Meeting"));
+    });
 
     // Delete
-    fireEvent.click(screen.getByText("Delete"));
+    await act(async () => {
+      fireEvent.click(screen.getByText("Delete"));
+    });
 
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(
