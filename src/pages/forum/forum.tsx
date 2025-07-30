@@ -38,9 +38,6 @@ const Forum: React.FC = () => {
   const [form, setForm] = useState({ title: "", content: "" });
   const [showUserThreads, setShowUserThreads] = useState(false);
   const [sortOption, setSortOption] = useState("recent");
-  const [replyCounts, setReplyCounts] = useState<{ [threadId: string]: number }>(
-    {}
-  );
 
   const sortedThreads = [...threads].sort((a, b) => {
     switch (sortOption) {
@@ -82,24 +79,6 @@ const Forum: React.FC = () => {
   useEffect(() => {
     fetchThreads();
   }, []);
-
-  useEffect(() => {
-    const fetchReplyCounts = async () => {
-      const counts: { [threadId: string]: number } = {};
-      await Promise.all(
-        threads.map(async (t) => {
-          const res = await fetch(
-            `http://localhost:5000/api/threads/${t._id}/replies/count`,
-            { credentials: 'include' }
-          );
-          const data = await res.json();
-          counts[t._id] = data.count;
-        })
-      );
-      setReplyCounts(counts);
-    };
-    if (threads.length > 0) fetchReplyCounts();
-  }, [threads]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -359,7 +338,7 @@ const Forum: React.FC = () => {
                     >
                       <path d="M3 10h4v10h6V10h4L10 0 3 10z" />
                     </svg>
-                    <span className="font-mono text-right w-7">{t.upvotes}</span>
+                    <span data-testid="upvotes" className="font-mono text-right w-7">{t.upvotes}</span>
                   </div>
                   {/* Replies */}
                   <div className="flex items-center gap-1 mt-1 mr-0.5 min-w-[48px] justify-between">
@@ -370,8 +349,8 @@ const Forum: React.FC = () => {
                     >
                       <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h1v3l3-3h8a2 2 0 002-2z" />
                     </svg>
-                    <span className="font-mono text-right w-7">
-                      {replyCounts[t._id] ?? 0}
+                    <span data-testid="replies" className="font-mono text-right w-7">
+                      {t.replies ?? 0}
                     </span>
                   </div>
                   {/* Flag */}
