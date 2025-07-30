@@ -322,5 +322,17 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// GET /api/threads/:id/replies/count
+router.get('/:id/replies/count', async (req, res) => {
+  try {
+    const threadId = req.params.id;
+    const count = await Comment.countDocuments({ threadId });
+    res.json({ count });
+  } catch (err) {
+    console.error('Error counting replies:', err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Export the router so it can be used by the main Express app (server.js)
 module.exports = router;

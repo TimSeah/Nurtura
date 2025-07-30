@@ -3,13 +3,15 @@ const router = express.Router();
 const UserSettings = require('../models/UserSettings');
 
 // Get user settings
-router.get('/:userId', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const { userId } = req.params;
+    //const { userId } = req.params;
+    const userId = req.auth._id;
     
     let settings = await UserSettings.findOne({ userId });
     
     // If settings don't exist, create default settings
+    /*
     if (!settings) {
       settings = new UserSettings({
         userId,
@@ -23,6 +25,20 @@ router.get('/:userId', async (req, res) => {
       });
       await settings.save();
     }
+      */
+
+    if (!settings) {
+      settings = await UserSettings.create({
+        userId,
+        profile: {
+          name: req.auth.username,           // default from JWT
+          email: '',                         // you can leave blank or pull from JWT
+          /* … */
+        },
+        /* … */
+        // need await settings.save()  ??
+      });
+    }
     
     res.json(settings);
   } catch (error) {
@@ -32,14 +48,14 @@ router.get('/:userId', async (req, res) => {
 });
 
 // Update user settings
-router.put('/:userId', async (req, res) => {
+router.put('/', async (req, res) => {
   try {
-    const { userId } = req.params;
-    const updateData = req.body;
+    const userId = req.auth._id;
+    
     
     const settings = await UserSettings.findOneAndUpdate(
       { userId },
-      updateData,
+      req.body,
       { new: true, upsert: true, runValidators: true }
     );
     
