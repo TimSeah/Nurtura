@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+
 describe('UC 6: Input Events To Calendar', () => {
   it('logs in, navigates to calendar, and adds an event', () => {
     // Step 1: Visit login page

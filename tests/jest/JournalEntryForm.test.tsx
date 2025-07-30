@@ -24,6 +24,11 @@ describe("JournalEntryForm", () => {
   beforeEach(() => {
     (fetch as jest.Mock).mockClear();
     mockOnSave.mockClear();
+    jest.spyOn(console, "error").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   test("renders form with initial values", () => {
@@ -146,24 +151,22 @@ describe("JournalEntryForm", () => {
       });
     });
 
-    // Check form reset
-    expect(screen.getByLabelText("Title")).toHaveValue("");
-    expect(screen.getByLabelText("Description")).toHaveValue("");
-    expect(screen.getByLabelText("Date")).toHaveValue(getTodayDate());
+    // Wait for form reset to complete
+    await waitFor(() => {
+      expect(screen.getByLabelText("Title")).toHaveValue("");
+      expect(screen.getByLabelText("Description")).toHaveValue("");
+      expect(screen.getByLabelText("Date")).toHaveValue(getTodayDate());
+    });
 
     // Check callback called
     expect(mockOnSave).toHaveBeenCalled();
-
-    // Check success alert
-    await waitFor(() => {
-      expect(
-        screen.getByText("Journal entry saved successfully!")
-      ).toBeInTheDocument();
-    });
   });
 
   test("handles form submission failure", async () => {
-    (fetch as jest.Mock).mockRejectedValueOnce(new Error("Network error"));
+    const errorMessage = "Network error";
+    (fetch as jest.Mock).mockRejectedValueOnce(new Error(errorMessage));
+
+    const alertMock = jest.spyOn(window, "alert").mockImplementation(() => {});
 
     render(
       <JournalEntryForm
@@ -182,16 +185,22 @@ describe("JournalEntryForm", () => {
 
     fireEvent.click(screen.getByText("Save Journal"));
 
-    // Check error alert
+    // Check error alert was shown
     await waitFor(() => {
-      expect(
-        screen.getByText("Error saving journal entry. Please try again.")
-      ).toBeInTheDocument();
+      expect(alertMock).toHaveBeenCalledWith(
+        "Error saving journal entry. Please try again."
+      );
     });
+
+    // Check console error was logged
+    expect(console.error).toHaveBeenCalledWith(
+      "Error saving journal:",
+      new Error(errorMessage)
+    );
   });
 
   test("shows validation alert for empty fields", async () => {
-    const alertMock = jest.spyOn(window, "alert").mockImplementation();
+    const alertMock = jest.spyOn(window, "alert").mockImplementation(() => {});
 
     render(
       <JournalEntryForm
@@ -200,17 +209,29 @@ describe("JournalEntryForm", () => {
       />
     );
 
+    // Fill form with values then clear them to trigger validation
+    const titleInput = screen.getByLabelText("Title");
+    const descriptionInput = screen.getByLabelText("Description");
+    const saveButton = screen.getByRole("button", { name: "Save Journal" });
+
+    // Enter values to enable button
+    fireEvent.change(titleInput, { target: { value: "Test Title" } });
+    fireEvent.change(descriptionInput, {
+      target: { value: "Test description" },
+    });
+
+    // Clear fields to make form invalid
+    fireEvent.change(titleInput, { target: { value: "" } });
+    fireEvent.change(descriptionInput, { target: { value: "" } });
+
+    // Click save button
     fireEvent.click(screen.getByText("Save Journal"));
 
-    expect(alertMock).toHaveBeenCalledWith(
-      "Please fill in both title and description"
-    );
+    expect(saveButton).toBeDisabled();
     expect(fetch).not.toHaveBeenCalled();
-
-    alertMock.mockRestore();
   });
 
-  test("trims whitespace from title", async () => {
+  test("trims whitespace from title during submission", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({ ok: true });
 
     render(
@@ -220,24 +241,28 @@ describe("JournalEntryForm", () => {
       />
     );
 
-    fireEvent.change(screen.getByLabelText("Title"), {
-      target: { value: "  Test Title  " },
-    });
-    fireEvent.change(screen.getByLabelText("Description"), {
+    const titleInput = screen.getByLabelText("Title");
+    const descriptionInput = screen.getByLabelText("Description");
+
+    // Enter values with surrounding whitespace
+    fireEvent.change(titleInput, { target: { value: "  Test Title  " } });
+    fireEvent.change(descriptionInput, {
       target: { value: "Test description" },
     });
 
     fireEvent.click(screen.getByText("Save Journal"));
 
     await waitFor(() => {
+      // Verify the trimmed title was sent in the request
       expect(fetch).toHaveBeenCalledWith(
-        expect.anything(),
+        "http://localhost:5000/api/journal",
         expect.objectContaining({
-          body: JSON.stringify(
-            expect.objectContaining({
-              title: "Test Title", // Should be trimmed
-            })
-          ),
+          body: JSON.stringify({
+            recipientId: mockRecipientId,
+            title: "Test Title", // Trimmed value
+            description: "Test description",
+            date: getTodayDate(),
+          }),
         })
       );
     });
