@@ -12,9 +12,6 @@ import {
   Bell,
 } from "lucide-react";
 import "./Dashboard.css";
-import VitalSignsModal from "../../components/VitalSignsModal";
-import AppointmentModal from "../../components/AppointmentModal";
-import CareNoteModal from "../../components/CareNoteModal";
 import { apiService } from "../../services/apiService";
 import type {
   VitalSignsData,
@@ -50,7 +47,7 @@ const Dashboard: React.FC = () => {
   const [showVitalSignsModal, setShowVitalSignsModal] = useState(false);
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [showCareNoteModal, setShowCareNoteModal] = useState(false);
-  const { user } = useContext(AuthContext); 
+  const { user } = useContext(AuthContext);
 
   const handleVitalSignsSave = async (data: VitalSignsData) => {
     try {
@@ -220,7 +217,10 @@ const Dashboard: React.FC = () => {
       <div className="dashboard-header">
         <img src={koala}></img>
         <h1>
-          Welcome back, <span className="gradient-name-header">{user ? user.username : "Guest"} </span>
+          Welcome back,{" "}
+          <span className="gradient-name-header">
+            {user ? user.username : "Guest"}{" "}
+          </span>
         </h1>
         <p>How can we help you today?</p>
       </div>
@@ -305,25 +305,6 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Modals */}
-      <VitalSignsModal
-        isOpen={showVitalSignsModal}
-        onClose={() => setShowVitalSignsModal(false)}
-        onSave={handleVitalSignsSave}
-      />
-
-      <AppointmentModal
-        isOpen={showAppointmentModal}
-        onClose={() => setShowAppointmentModal(false)}
-        onSave={handleAppointmentSave}
-      />
-
-      <CareNoteModal
-        isOpen={showCareNoteModal}
-        onClose={() => setShowCareNoteModal(false)}
-        onSave={handleCareNoteSave}
-      />
     </div>
   );
 };

@@ -21,7 +21,7 @@ const mockEvents = [
     startTime: "14:00",
     remark: "Quarterly planning",
     month: "July",
-    userId: "123",
+    // userId: "123",
   },
   {
     _id: "2",
@@ -30,7 +30,7 @@ const mockEvents = [
     startTime: "10:30",
     remark: "Bring medical reports",
     month: "July",
-    userId: "123",
+    // userId: "123",
   },
 ];
 
@@ -106,7 +106,7 @@ describe("Calendar Component", () => {
               startTime: "09:00",
               remark: "Test remark",
               month: "July",
-              userId: "123",
+              // userId: "123",
             },
           ]),
       }); // Re-fetch updated event list
@@ -153,7 +153,7 @@ describe("Calendar Component", () => {
         startTime: "09:00",
         remark: "Test remark",
         month: "July",
-        userId: "123",
+        // userId: "123",
         enableReminder: true,
         reminderSent: false,
       }),
@@ -212,7 +212,7 @@ describe("Calendar Component", () => {
         startTime: "11:11",
         remark: "Updated",
         month: "July",
-        userId: "123",
+        // userId: "123",
       }),
     });
   });

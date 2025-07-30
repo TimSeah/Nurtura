@@ -182,7 +182,7 @@ const Calendar: React.FC = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newEvent),
-        credentials: "include"
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -208,7 +208,7 @@ const Calendar: React.FC = () => {
     try {
       await fetch(`http://localhost:5000/api/events/${event._id}`, {
         method: "DELETE",
-        credentials: "include"
+        credentials: "include",
         // headers: { "Content-Type": "application/json"},
         // body: JSON.stringify(event),
       });
@@ -264,12 +264,12 @@ const Calendar: React.FC = () => {
   const defaultId = "123";
 
   useEffect(() => {
-    if (!user?.username) return;
+    // if (!user?.username) return;
     const fetchEventsThisMonth = async () => {
       try {
         const response = await fetch(
           `http://localhost:5000/api/events/month/${monthNames[month]}`,
-          {credentials: "include"}
+          { credentials: "include" }
         );
         if (!response.ok)
           throw new Error("Failed to fetch events for this month");
@@ -399,7 +399,7 @@ const Calendar: React.FC = () => {
                           `http://localhost:5000/api/events/${event._id}/send-reminder`,
                           {
                             method: "POST",
-                            credentials: "include"
+                            credentials: "include",
                           }
                         );
                         if (response.ok) {
