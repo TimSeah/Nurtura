@@ -1,7 +1,7 @@
 describe('Cypress Studio Demo', () => {
   it('Leaving a comment', () => {
     cy.visit('/');
-    cy.get('[placeholder="Username"]').type('Jason');
+    cy.get('[placeholder="Username"]').type('Ryan');
     cy.get('[placeholder="Password"]').type('Password1234');
     cy.get('.login-button').click();
     cy.url().should('eq', 'http://localhost:5173/');
@@ -14,7 +14,7 @@ describe('Cypress Studio Demo', () => {
     cy.get('#content').click();
     cy.get('#content').type('Let me give him a hand :)');
     cy.get('.text-white').click();
-    cy.get('.text-gray-700').should('contain', 'Jason');
+    cy.get('.text-gray-700').should('contain', 'Ryan');
     cy.get('.text-gray-500').should('contain','less than a minute ago');
     cy.get('.text-gray-500').should('contain','Let me give him a hand :)');
   })
