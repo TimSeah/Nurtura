@@ -2,11 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-<<<<<<< HEAD
-// import { Filter } from "bad-words"; // for filtering inappropriate usernames
-=======
 //import { Filter } from "bad-words"; // for filtering inappropriate usernames
->>>>>>> 9863464f017bdee7ec021f582ceed01b70fc0d77
 import "./Register.css";
 import { set } from "date-fns";
 
@@ -16,30 +12,17 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false); // for toggling password visibility
   const [errorMessage, setErrorMessage] = useState(""); // for handling form errors, e.g. invalid password
   const navigate = useNavigate();
-<<<<<<< HEAD
-  // const filter = new Filter();
-=======
   //const filter = new Filter();
->>>>>>> 9863464f017bdee7ec021f582ceed01b70fc0d77
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-<<<<<<< HEAD
-    // if (filter.isProfane(username)) {
-    //   // Check for profanity in username
-    //   //alert("Username contains inappropriate language");
-    //   setErrorMessage("Username is inappropriate");
-    //   return;
-    // }
-=======
     /*if (filter.isProfane(username)) {
       // Check for profanity in username
       //alert("Username contains inappropriate language");
       setErrorMessage("Username is inappropriate");
       return;
     } */
->>>>>>> 9863464f017bdee7ec021f582ceed01b70fc0d77
 
     if (password.length < 8) {
       // Check password length
