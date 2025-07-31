@@ -28,13 +28,61 @@ describe('Registration Page', () => {
   });
 
 // invalid username tests
+
+
+
+    it("rejects usernames with spaces", () => {
+        cy.visit("http://localhost:5173/register");
+        cy.get('input[placeholder="Username"]').type("john doe");
+        cy.get('input[placeholder="Password"]').type("Validpass123");
+        cy.get('button[type="submit"]').click();
+        cy.get(".error-message").should(
+        "contain",
+        "Username can only contain letters, numbers, and underscores"
+        );
+    });
+
+    it("rejects usernames with special characters", () => {
+        cy.visit("http://localhost:5173/register");
+        cy.get('input[placeholder="Username"]').type("user@name!");
+        cy.get('input[placeholder="Password"]').type("Validpass123");
+        cy.get('button[type="submit"]').click();
+        cy.get(".error-message").should(
+        "contain",
+        "Username can only contain letters, numbers, and underscores"
+        );
+    });
+    it("rejects usernames with inappropriate words", () => {
+        cy.visit("http://localhost:5173/register");
+        cy.get('input[placeholder="Username"]').type("hinigger123");
+        cy.get('input[placeholder="Password"]').type("Validpass123");
+        cy.get('button[type="submit"]').click();
+        cy.get(".error-message").should(
+            "contain",
+            "Username is inappropriate."
+        );
+    });
+    it("rejects usernames with profanity", () => {
+        const testCases = [
+        "fuckuser",
+        "kingnigger",
+        "12thbitchlord",
+        "fuck_me",
+        "hinigger123",
+        ];
+
+        testCases.forEach((offensiveUsername) => {
+        cy.visit("http://localhost:5173/register");
+        cy.get('input[placeholder="Username"]').type(offensiveUsername);
+        cy.get('input[placeholder="Password"]').type("Validpass123");
+        cy.get('button[type="submit"]').click();
+        cy.get(".error-message").should("contain", "Username is inappropriate");
+        });
+    });
+
     it("prevents submission if username is empty", () => {
         cy.visit("http://localhost:5173/register");
-
-        // Only fill in password
         cy.get('input[placeholder="Password"]').type("Validpass123");
-
-        // Try to click register
         cy.get('button[type="submit"]').click();
 
         // The browser will stop form submission, so we can assert URL stays
@@ -42,13 +90,10 @@ describe('Registration Page', () => {
     });
 
     it('shows error for existing username', () => {
-        // Fill in registration form with existing username
         cy.get('input[placeholder="Username"]').type('Bob'); // assuming 'Bob' already exists
         cy.get('input[placeholder="Password"]').type('Testpass123');
-
         // Click submit
         cy.get('button[type="submit"]').click();
-
         // Check error message
         cy.get('.error-message').should('contain', 'Registration failed');
     });

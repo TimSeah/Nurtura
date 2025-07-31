@@ -179,6 +179,26 @@
   gap: 1rem;
 }
 
+.no-activities {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  color: #64748b;
+}
+
+.no-activities p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.no-activities .activity-time {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
 .activity-item {
   display: flex;
   align-items: flex-start;

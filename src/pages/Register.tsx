@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-//import { Filter } from "bad-words"; // for filtering inappropriate usernames
+import { bannedWords } from "../utils/bannedWords";
 import "./Register.css";
 import { set } from "date-fns";
 
@@ -12,28 +12,44 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false); // for toggling password visibility
   const [errorMessage, setErrorMessage] = useState(""); // for handling form errors, e.g. invalid password
   const navigate = useNavigate();
-  //const filter = new Filter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    /*if (filter.isProfane(username)) {
-      // Check for profanity in username
-      //alert("Username contains inappropriate language");
-      setErrorMessage("Username is inappropriate");
+    const isValidUsername = /^[a-zA-Z0-9_]+$/.test(username);
+
+    // check if username contains only alphanumeric characters and underscores
+    if (!isValidUsername) {
+      setErrorMessage(
+        "Username can only contain letters, numbers, and underscores."
+      );
       return;
-    } */
+    }
+
+    // Check if username is appropriate
+
+    // Normalize the username
+    const normalizedUsername = username
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9]/g, ""); // removes special characters and spaces
+
+    // Build regex and test possible inappropriate patterns
+    const pattern = new RegExp(`(${bannedWords.join("|")})`, "i");
+    const containsOffensiveWord = pattern.test(normalizedUsername);
+
+    if (containsOffensiveWord) {
+      setErrorMessage("Username is inappropriate.");
+      return;
+    }
 
     if (password.length < 8) {
       // Check password length
-      //alert("Password must be at least 8 characters long");
       setErrorMessage("Password must be at least 8 characters long");
       return;
     }
     const hasNumber = /\d/.test(password); // check if password contains a number
     const hasLetter = /[a-zA-Z]/.test(password); // check if password contains a letter
     if (!hasNumber || !hasLetter) {
-      //alert("Password must contain at least one letter and one number");
       setErrorMessage(
         "Password must contain at least one letter and one number"
       );
@@ -50,7 +66,6 @@ export default function Register() {
       navigate("/login");
     } else {
       const err = await res.json();
-      //alert(`Registration failed: ${err.message}`);
       setErrorMessage(`Registration failed: ${err.message}`);
     }
   };

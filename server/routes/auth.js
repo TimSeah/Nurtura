@@ -3,17 +3,49 @@ const jwt      = require('jsonwebtoken');
 const bcrypt   = require('bcrypt');
 const User     = require('../models/User');
 const router   = express.Router();
-//const Filter = require('bad-words'); 
-//const filter = new Filter(); 
+const bannedWords = require('../utils/bannedWords'); // Assuming you have a list of banned words
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
-    /*
-    if (filter.isProfane(username)) {
-      return res.status(400).json({ message: "Inappropriate username" });
-    } */
+
+    // Username Validation 
+
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      return res.status(400).json({
+        message: "Username can only contain letters, numbers, and underscores"
+      });
+    }
+
+    if (username.length < 3 || username.length > 20) {
+      return res.status(400).json({
+        message: "Username must be between 3 and 20 characters"
+      });
+    }
+
+    // Normalize username to check embedded offensive words
+    const normalized = username.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const isOffensive = bannedWords.some(word => normalized.includes(word));
+
+    if (isOffensive) {
+      return res.status(400).json({ message: "Username is inappropriate" });
+    }
+
+    // Password Validation 
+
+    if (password.length < 8) {
+      return res.status(400).json({ message: "Password must be at least 8 characters long" });
+    }
+
+    const hasNumber = /\d/.test(password);
+    const hasLetter = /[a-zA-Z]/.test(password);
+    if (!hasNumber || !hasLetter) {
+      return res.status(400).json({
+        message: "Password must contain at least one letter and one number"
+      });
+    }
+
     const hash = await bcrypt.hash(password, 10);
     const u = await User.create({ username, passwordHash: hash });
     res.status(201).json({ message: 'ok' });
