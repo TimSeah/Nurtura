@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../contexts/AuthContext";
 import "./Calendar.css";
 
 interface Event {
@@ -8,7 +9,7 @@ interface Event {
   startTime: string;
   remark: string;
   month: string;
-  userId: string;
+  userId?: string;
   reminderSent?: boolean;
   reminderEmail?: string;
   enableReminder?: boolean;
@@ -52,6 +53,7 @@ function getFirstDayOfMonth(year: number, month: number): number {
 }
 
 const Calendar: React.FC = () => {
+  const { user } = useContext(AuthContext);
   const today = new Date();
   const [currentDate, setCurrentDate] = useState(
     new Date(today.getFullYear(), today.getMonth())
@@ -139,6 +141,7 @@ const Calendar: React.FC = () => {
       await fetch(`http://localhost:5000/api/events/${event._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(updatedEvent),
       });
 
@@ -169,7 +172,7 @@ const Calendar: React.FC = () => {
       startTime: formData.hour,
       remark: formData.remark,
       month: monthNames[month],
-      userId: defaultId, // CHANGE TO ACTUAL USER ID LATER
+      //userId: user!.username, // CHANGE TO ACTUAL USER ID LATER
       enableReminder: true, // Enable reminders by default
       reminderSent: false,
     };
@@ -179,6 +182,7 @@ const Calendar: React.FC = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newEvent),
+        credentials: "include",
       });
 
       if (response.ok) {
@@ -204,6 +208,7 @@ const Calendar: React.FC = () => {
     try {
       await fetch(`http://localhost:5000/api/events/${event._id}`, {
         method: "DELETE",
+        credentials: "include",
         // headers: { "Content-Type": "application/json"},
         // body: JSON.stringify(event),
       });
@@ -256,13 +261,15 @@ const Calendar: React.FC = () => {
     return cells;
   };
 
-  const defaultId = "123";
+  //const defaultId = "123";
 
   useEffect(() => {
+    //if (!user?.username) return;  not in use as we have an AuthContext Provider
     const fetchEventsThisMonth = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/events/month/${monthNames[month]}/${defaultId}`
+          `http://localhost:5000/api/events/month/${monthNames[month]}`,
+          { credentials: "include" }
         );
         if (!response.ok)
           throw new Error("Failed to fetch events for this month");
@@ -289,7 +296,7 @@ const Calendar: React.FC = () => {
 
     fetchEventsThisMonth();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year, month]);
+  }, [year, month, user?.username]);
 
   return (
     <div className="health-tracking">
@@ -392,6 +399,7 @@ const Calendar: React.FC = () => {
                           `http://localhost:5000/api/events/${event._id}/send-reminder`,
                           {
                             method: "POST",
+                            credentials: "include",
                           }
                         );
                         if (response.ok) {

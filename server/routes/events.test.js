@@ -13,6 +13,13 @@ jest.mock('../services/emailReminderService');
 // Create test app
 const app = express();
 app.use(express.json());
+
+// Mock JWT authentication middleware
+app.use('/api/events', (req, res, next) => {
+  req.auth = { _id: 'user123' }; // Mock authenticated user
+  next();
+});
+
 app.use('/api/events', eventsRouter);
 
 describe('Events API - Email Reminder Endpoint', () => {
@@ -42,7 +49,7 @@ describe('Events API - Email Reminder Endpoint', () => {
     };
 
     test('sends test reminder successfully', async () => {
-      Event.findById = jest.fn().mockResolvedValue(mockEvent);
+      Event.findOne = jest.fn().mockResolvedValue(mockEvent);
       UserSettings.findOne = jest.fn().mockResolvedValue(mockUserSettings);
       sendReminderEmail.mockResolvedValue(true);
 
@@ -56,7 +63,10 @@ describe('Events API - Email Reminder Endpoint', () => {
         email: 'john.doe@example.com'
       });
 
-      expect(Event.findById).toHaveBeenCalledWith('650a1b2c3d4e5f6789012345');
+      expect(Event.findOne).toHaveBeenCalledWith({
+        _id: '650a1b2c3d4e5f6789012345',
+        userId: 'user123'
+      });
       expect(UserSettings.findOne).toHaveBeenCalledWith({ userId: 'user123' });
       expect(sendReminderEmail).toHaveBeenCalledWith(
         mockEvent,
@@ -67,21 +77,21 @@ describe('Events API - Email Reminder Endpoint', () => {
     });
 
     test('returns 404 when event not found', async () => {
-      Event.findById = jest.fn().mockResolvedValue(null);
+      Event.findOne = jest.fn().mockResolvedValue(null);
 
       const response = await request(app)
         .post('/api/events/650a1b2c3d4e5f6789012345/send-reminder')
         .expect(404);
 
       expect(response.body).toEqual({
-        message: 'Event not found'
+        message: 'Event not found or access denied'
       });
 
       expect(sendReminderEmail).not.toHaveBeenCalled();
     });
 
     test('returns 400 when user has no email', async () => {
-      Event.findById = jest.fn().mockResolvedValue(mockEvent);
+      Event.findOne = jest.fn().mockResolvedValue(mockEvent);
       UserSettings.findOne = jest.fn().mockResolvedValue({
         userId: 'user123',
         profile: {
@@ -102,7 +112,7 @@ describe('Events API - Email Reminder Endpoint', () => {
     });
 
     test('returns 400 when user settings not found', async () => {
-      Event.findById = jest.fn().mockResolvedValue(mockEvent);
+      Event.findOne = jest.fn().mockResolvedValue(mockEvent);
       UserSettings.findOne = jest.fn().mockResolvedValue(null);
 
       const response = await request(app)
@@ -117,7 +127,7 @@ describe('Events API - Email Reminder Endpoint', () => {
     });
 
     test('returns 500 when email sending fails', async () => {
-      Event.findById = jest.fn().mockResolvedValue(mockEvent);
+      Event.findOne = jest.fn().mockResolvedValue(mockEvent);
       UserSettings.findOne = jest.fn().mockResolvedValue(mockUserSettings);
       sendReminderEmail.mockResolvedValue(false);
 
@@ -132,7 +142,7 @@ describe('Events API - Email Reminder Endpoint', () => {
     });
 
     test('handles database errors', async () => {
-      Event.findById = jest.fn().mockRejectedValue(new Error('Database connection failed'));
+      Event.findOne = jest.fn().mockRejectedValue(new Error('Database connection failed'));
 
       const response = await request(app)
         .post('/api/events/650a1b2c3d4e5f6789012345/send-reminder')
@@ -166,7 +176,7 @@ describe('Events API - Email Reminder Endpoint', () => {
     });
 
     test('works with minimal user settings', async () => {
-      Event.findById = jest.fn().mockResolvedValue(mockEvent);
+      Event.findOne = jest.fn().mockResolvedValue(mockEvent);
       UserSettings.findOne = jest.fn().mockResolvedValue({
         userId: 'user123',
         profile: {
@@ -197,7 +207,7 @@ describe('Events API - Email Reminder Endpoint', () => {
         type: 'medical'
       };
 
-      Event.findById = jest.fn().mockResolvedValue(fullMockEvent);
+      Event.findOne = jest.fn().mockResolvedValue(fullMockEvent);
       UserSettings.findOne = jest.fn().mockResolvedValue(mockUserSettings);
       sendReminderEmail.mockResolvedValue(true);
 

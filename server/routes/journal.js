@@ -1,106 +1,65 @@
-// backend/routes/journal.js
-
 const express = require('express');
-const router = express.Router(); 
+const router  = express.Router();
 const Journal = require('../models/Journal');
 
+// List journals for one recipient (and only this user)
 router.get('/', async (req, res) => {
-  try {
-    // Find all journals in the database.
-    const journals = await Journal.find({});
-    res.json(journals);
+  const { recipientId } = req.query;                 // e.g. /api/journal?recipientId=abc
+  const filter = { userId: req.auth._id };           // from JWT
+  if (recipientId) filter.recipientId = recipientId;
 
+  try {
+    const journals = await Journal.find(filter).sort({ date: -1 });
+    res.json(journals);
   } catch (err) {
-    console.error('Error fetching journals: ', err);
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 });
 
+// Create a new journal entry
 router.post('/', async (req, res) => {
-
-  const { userId, recipientId, title, description, date } = req.body;
-
-  const newJournal = new Journal({
-    userId,
-    recipientId,
-    title,
-    description,
-    date
-  });
-
+  const { recipientId, title, description, date } = req.body;
   try {
-    const savedJournal = await newJournal.save();
-    res.status(201).json(savedJournal);
-
+    const newJ = new Journal({
+      userId:       req.auth._id,   // always from JWT
+      recipientId, title, description, date
+    });
+    const saved = await newJ.save();
+    res.status(201).json(saved);
   } catch (err) {
-    console.error('Error creating journal: ', err);
-    res.status(400).json({ message: err.message }); 
-
+    console.error(err);
+    res.status(400).json({ message: err.message });
   }
 });
 
-router.get('/userId/:id/recipientId/:recipientId', async (req, res) => {
-
-  const userId = req.params.id;
-  const recipientId = req.params.recipientId;
-
+// Update an entry (only if it belongs to this user)
+router.put('/:id', async (req, res) => {
   try {
-    // Find all journals in the database.
-    const journals = await Journal.find({userId: userId, recipientId: recipientId});
-    res.json(journals);
-
-  } catch (err) {
-    console.error('Error fetching journals: ', err);
-    res.status(500).json({ message: err.message });
-  }
-});
-
-router.get('/journalId/:id', async (req, res) => {
-  const journalId = req.params.id;
-  try {
-    // Find a specific journal by ID.
-    const journal = await Journal.findById(journalId);
-    if (!journal) {
-      return res.status(404).json({ message: 'Journal not found' });
-    }
-    res.json(journal);
-  } catch (err) {
-    console.error('Error fetching journal: ', err);
-    res.status(500).json({ message: err.message });
-  }
-});
-
-router.put('/journalId/:id', async (req, res) => {
-  const journalId = req.params.id;
-  try {
-    const updatedJournal = await Journal.findByIdAndUpdate(
-      journalId,
+    const updated = await Journal.findOneAndUpdate(
+      { _id: req.params.id, userId: req.auth._id },
       req.body,
-      { new: true } // Return the updated document
+      { new: true }
     );
-    
-    if (!updatedJournal) {
-      return res.status(404).json({ message: 'Journal not found' });
-    }
-    res.json(updatedJournal);
+    if (!updated) return res.status(404).json({ message: 'Not found' });
+    res.json(updated);
   } catch (err) {
-    console.error('Error updating journal: ', err);
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 });
 
-
-router.delete('/journalId/:id', async (req, res) => {
-  const journalId = req.params.id;
+// Delete an entry (only if it belongs to this user)
+router.delete('/:id', async (req, res) => {
   try {
-    const deletedJournal = await Journal.findByIdAndDelete(journalId);
-    
-    if (!deletedJournal) {
-      return res.status(404).json({ message: 'Journal not found' });
-    }
-    res.json({ message: 'Journal deleted successfully' });
+    const deleted = await Journal.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.auth._id
+    });
+    if (!deleted) return res.status(404).json({ message: 'Not found' });
+    res.json({ message: 'Deleted' });
   } catch (err) {
-    console.error('Error deleting journal: ', err);
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 });

@@ -7,6 +7,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 const threadRoutes = require('./routes/threads');
+const { expressjwt: jwtMiddleware } = require('express-jwt');
+const authRoutes = require('./routes/auth');
+
 
 const app = express();
 
@@ -55,7 +58,10 @@ mongoose.connect(process.env.MONGO_URI, {
 // Enable CORS for all origins.
 // IMPORTANT: In production, you should restrict this to your frontend's specific domain:
 // app.use(cors({ origin: 'http://localhost:3000' })); // Example for development
-app.use(cors());
+app.use(cors({
+  origin: true,        // reflect request.origin back in ACAO
+  credentials: true,   // allow cookies/auth headers
+}));
 
 // Log HTTP requests to the console in 'dev' format (colorful, concise output)
 app.use(logger('dev'));
@@ -75,13 +81,33 @@ app.use(cookieParser());
 // from the 'public' directory.
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+// Apply JWT middleware to Auth/me
+app.use('/api/auth/me', jwtMiddleware({
+  secret: process.env.JWT_SECRET,
+  algorithms: ['HS256'],
+  getToken: req => req.cookies.token
+}));
+
+// any route under /api that needs logi, this is MIDDLEWARE
+app.use(
+  '/api/threads',
+  jwtMiddleware({
+    secret: process.env.JWT_SECRET,
+    algorithms: ['HS256'],
+    getToken: req => req.cookies.token
+  })
+);
+
+// Mount thread routes at auth
+app.use('/api/auth', authRoutes);
 // Mount thread routes at /api/threads
 app.use('/api/threads', threadRoutes)
 
 // --- Route Definitions ---
-// Import your route handlers.
-// You will create these files (e.g., './routes/index.js', './routes/events.js')
-// to define your API endpoints for different resources.
+// Import  route handlers.
+// create these files (e.g., './routes/index.js', './routes/events.js')
+// defineour API endpoints for different resources.
 const indexRouter = require('./routes/index');
 const eventsRouter = require('./routes/events');
 const journalsRouter = require('./routes/journal'); 
@@ -97,13 +123,59 @@ const { startReminderService } = require('./services/emailReminderService');
 
 // Assign imported routers to specific URL paths.
 app.use('/', indexRouter);
-app.use('/api/events', eventsRouter); 
+app.use(
+  '/api/events',
+  jwtMiddleware({
+    secret: process.env.JWT_SECRET,
+    algorithms: ['HS256'],
+    getToken: req => req.cookies.token
+  })
+);
+app.use('/api/events', eventsRouter);
+
+app.use(
+  '/api/journal',
+  jwtMiddleware({
+    secret: process.env.JWT_SECRET,
+    algorithms: ['HS256'],
+    getToken: req => req.cookies.token
+  })
+);
 app.use('/api/journal', journalsRouter); 
 app.use('/api/threads', threadsRouter); 
 console.log('threadsRouter mounted at /api/threads');
 app.use('/api/threads/:threadId/comments', commentRouter);
+
+
+app.use(
+  '/api/user-settings',
+  jwtMiddleware({
+    secret: process.env.JWT_SECRET,
+    algorithms: ['HS256'],
+    getToken: req => req.cookies.token
+  })
+);
 app.use('/api/user-settings', userSettingsRouter);
+
+app.use(
+  '/api/vital-signs',
+  jwtMiddleware({
+    secret: process.env.JWT_SECRET,
+    algorithms: ['HS256'],
+    getToken: req => req.cookies.token
+  })
+);
 app.use('/api/vital-signs', vitalSignsRouter);
+
+
+app.use(
+  '/api/care-recipients',
+  jwtMiddleware({
+    secret: process.env.JWT_SECRET,
+    algorithms: ['HS256'],
+    getToken: req => req.cookies.token
+  })
+);
 app.use('/api/care-recipients', careRecipientsRouter);
 app.use('/api/alerts', alertsRouter);
 

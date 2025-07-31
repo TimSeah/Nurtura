@@ -1,5 +1,5 @@
 import React from "react";
-import { calculateDaysAgo } from "../../utils/calDaysAgoUtil";
+import { parseISO, formatDistanceToNow } from 'date-fns';
 
 interface CommentDetail{
     _id: number;
@@ -18,7 +18,7 @@ const Comment: React.FC<CommentDetailProps> = ({ comment }) => {
         <article className="p-6 text-base bg-white rounded-lg">
             <footer className="flex justify-between items-center mb-2">
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                    By <span className="font-medium text-gray-700">{comment.author}</span> {calculateDaysAgo(comment.date)}
+                    By <span className="font-medium text-gray-700">{comment.author}</span> {formatDistanceToNow(parseISO(comment.date), { addSuffix: true })}
                 </div>
             </footer>
             <p className="text-gray-500 text-left">

@@ -5,7 +5,10 @@ const CareRecipient = require('../models/CareRecipient');
 // Get all care recipients
 router.get('/', async (req, res) => {
   try {
-    const careRecipients = await CareRecipient.find({ isActive: true })
+    console.log('JWT payload:', req.auth);
+    const careRecipients = await CareRecipient.find({ isActive: true,
+      userId: req.auth._id
+     })
       .sort({ name: 1 });
     res.json(careRecipients);
   } catch (err) {
@@ -17,8 +20,12 @@ router.get('/', async (req, res) => {
 // Get specific care recipient
 router.get('/:id', async (req, res) => {
   try {
+    console.log('JWT payload:', req.auth);
     const { id } = req.params;
-    const careRecipient = await CareRecipient.findById(id);
+    const careRecipient = await CareRecipient.findOne({
+      _id: id,
+      userId: req.auth._id
+    });
     if (!careRecipient) {
       return res.status(404).json({ message: 'Care recipient not found' });
     }
@@ -32,7 +39,11 @@ router.get('/:id', async (req, res) => {
 // Create new care recipient
 router.post('/', async (req, res) => {
   try {
-    const careRecipient = new CareRecipient(req.body);
+    //const careRecipient = new CareRecipient(req.body);
+    const careRecipient = new CareRecipient({
+      ...req.body,
+      userId: req.auth._id
+    });
     const savedCareRecipient = await careRecipient.save();
     res.status(201).json(savedCareRecipient);
   } catch (err) {
@@ -45,9 +56,9 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const updatedCareRecipient = await CareRecipient.findByIdAndUpdate(
-      id, 
-      req.body, 
+    const updatedCareRecipient = await CareRecipient.findOneAndUpdate(
+      { _id: id, userId: req.auth._id },
+      req.body,
       { new: true }
     );
     if (!updatedCareRecipient) {
@@ -64,7 +75,10 @@ router.put('/:id', async (req, res) => {
 router.post('/:id/medications', async (req, res) => {
   try {
     const { id } = req.params;
-    const careRecipient = await CareRecipient.findById(id);
+    const careRecipient = await CareRecipient.findOne({
+      _id: id,
+      userId: req.auth._id
+    });
     if (!careRecipient) {
       return res.status(404).json({ message: 'Care recipient not found' });
     }
@@ -82,7 +96,10 @@ router.post('/:id/medications', async (req, res) => {
 router.put('/:id/medications/:medicationId', async (req, res) => {
   try {
     const { id, medicationId } = req.params;
-    const careRecipient = await CareRecipient.findById(id);
+    const careRecipient = await CareRecipient.findOne({
+      _id: id,
+      userId: req.auth._id
+    });
     if (!careRecipient) {
       return res.status(404).json({ message: 'Care recipient not found' });
     }
@@ -105,7 +122,10 @@ router.put('/:id/medications/:medicationId', async (req, res) => {
 router.delete('/:id/medications/:medicationId', async (req, res) => {
   try {
     const { id, medicationId } = req.params;
-    const careRecipient = await CareRecipient.findById(id);
+    const careRecipient = await CareRecipient.findOne({
+      _id: id,
+      userId: req.auth._id
+    });
     if (!careRecipient) {
       return res.status(404).json({ message: 'Care recipient not found' });
     }
@@ -123,9 +143,9 @@ router.delete('/:id/medications/:medicationId', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const updatedCareRecipient = await CareRecipient.findByIdAndUpdate(
-      id, 
-      { isActive: false }, 
+    const updatedCareRecipient = await CareRecipient.findOneAndUpdate(
+      { _id: id, userId: req.auth._id },
+      { isActive: false },
       { new: true }
     );
     if (!updatedCareRecipient) {

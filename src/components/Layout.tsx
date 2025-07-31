@@ -1,5 +1,7 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useContext } from "react";
+import { Link, useLocation,useNavigate } from "react-router-dom";
+import { Outlet } from 'react-router-dom';
+import { AuthContext } from "../contexts/AuthContext";
 import {
   Home,
   Calendar,
@@ -11,16 +13,19 @@ import {
   Heart,
   Menu,
   X,
+  LogOut
 } from "lucide-react";
 import "./Layout.css";
 
-interface LayoutProps {
+/*interface LayoutProps {
   children: React.ReactNode;
-}
+} */
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const { logout } = useContext(AuthContext);
+  const navigate  = useNavigate()
 
   const navigationItems = [
     { path: "/", label: "Dashboard", icon: Home },
@@ -36,6 +41,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -79,10 +89,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </Link>
               );
             })}
+            {/* ↓ LOGOUT BUTTON ↓ */}
+            <button
+              className="nav-item logout-button"
+              onClick={handleLogout}
+            >
+              <LogOut className="nav-icon" />
+              <span className="nav-label">Log Out</span>
+            </button>
           </div>
         </nav>
 
-        <main className="main-content">{children}</main>
+        <main className="main-content">
+          <Outlet />
+        </main>
       </div>
     </div>
   );

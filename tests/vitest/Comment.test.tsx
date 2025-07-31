@@ -1,12 +1,7 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Comment from '../../src/pages/forum/Comment';
-import * as calDaysAgoUtil from '../../src/utils/calDaysAgoUtil';
-import { afterEach, describe, test, expect, vi } from 'vitest';
+import { afterEach, describe, test, expect } from 'vitest';
 import { cleanup } from '@testing-library/react';
-
-// Mock calculateDaysAgo
-vi.spyOn(calDaysAgoUtil, 'calculateDaysAgo').mockImplementation(() => '5 days ago');
 
 afterEach(() => {
   cleanup();
@@ -26,7 +21,7 @@ describe('Comment: UI test cases', () => {
     render(<Comment comment={comment} />);
     expect(screen.getByText('Bob')).toBeInTheDocument();
     expect(screen.getByText('This is a comment.')).toBeInTheDocument();
-    expect(screen.getByText(/5 days ago/i)).toBeInTheDocument();
+    expect(screen.getByText(/years ago/i)).toBeInTheDocument();
   });
 
   test('renders correct structure and classes', () => {
@@ -43,9 +38,25 @@ describe('Comment: UI test cases', () => {
   });
 });
 
-describe('Comment: Integration test cases', () => {
-  test('integrates with calculateDaysAgo utility', () => {
-    render(<Comment comment={comment} />);
-    expect(calDaysAgoUtil.calculateDaysAgo).toHaveBeenCalledWith('2023-06-01');
+describe('Comment: boundary test cases', () => {
+  test('renders with very long content', () => {
+    const longContent = { ...comment, content: 'A'.repeat(1000) };
+    render(<Comment comment={longContent} />);
+    expect(screen.getByText('Bob')).toBeInTheDocument();
+    expect(screen.getByText('A'.repeat(1000))).toBeInTheDocument();
+  });
+
+  test('renders with very old date', () => {
+    const oldDate = { ...comment, date: '2000-01-01' };
+    render(<Comment comment={oldDate} />);
+    expect(screen.getByText('Bob')).toBeInTheDocument();
+    expect(screen.getByText(/years ago/i)).toBeInTheDocument();
+  });
+
+  test('renders with very recent date', () => {
+    const nowDate = { ...comment, date: new Date().toISOString() };
+    render(<Comment comment={nowDate} />);
+    expect(screen.getByText('Bob')).toBeInTheDocument();
+    expect(screen.getByText(/seconds? ago|minute ago|minutes ago/i)).toBeInTheDocument();
   });
 });

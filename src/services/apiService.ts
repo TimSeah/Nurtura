@@ -5,7 +5,9 @@ class ApiService {
   private async request(endpoint: string, options: RequestInit = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     const config: RequestInit = {
+      credentials: 'include',
       headers: {
+        
         'Content-Type': 'application/json',
         ...options.headers,
       },
@@ -68,6 +70,10 @@ class ApiService {
 
   async getVitalSignsByType(recipientId: string, vitalType: string) {
     return this.request(`/vital-signs/${recipientId}/${vitalType}`);
+  }
+
+  async getRecentVitalSigns(limit: number = 10) {
+    return this.request(`/vital-signs/recent/dashboard?limit=${limit}`);
   }
 
   async addVitalSigns(vitalData: any) {

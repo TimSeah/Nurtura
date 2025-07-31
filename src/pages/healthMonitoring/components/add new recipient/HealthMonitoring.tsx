@@ -42,6 +42,7 @@ const HealthMonitoring: React.FC<HealthMonitoringProps> = ({ onSaveSuccess, onCa
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include", // include cookies for authentication
           body: JSON.stringify(newRecepient),
         }
       );

@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
 
+const voteSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  direction: { type: String, enum: ['up', 'down'], required: true } // removed cancel inside
+}, { _id: false });
+
 const threadSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -23,6 +28,7 @@ const threadSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    votes:    [voteSchema] // <-- holds { userId, direction }
   
 }, { 
     timestamps: true
