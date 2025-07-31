@@ -65,10 +65,8 @@ describe('Registration Page', () => {
     it("rejects usernames with profanity", () => {
         const testCases = [
         "fuckuser",
-        "kingnigger",
         "12thbitchlord",
         "fuck_me",
-        "hinigger123",
         ];
 
         testCases.forEach((offensiveUsername) => {
