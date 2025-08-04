@@ -226,40 +226,48 @@ const HealthTracking: React.FC = () => {
         </p>
       </div>
       {/* Care Recipient Selector */}
-      <CareRecipientSelector
-        careRecipients={careRecipients}
-        selectedRecipient={selectedRecipient}
-        loading={loading}
-        error={error}
-        isAddingRecipient={isAddingRecipient}
-        onRecipientChange={handleRecipientChange}
-        onAddRecipient={() => setIsAddingRecipient(true)}
-        onRetry={() => loadCareRecipients()}
-        onRecipientUpdated={loadCareRecipients}
-      />
+      <div data-testid="care-recipient-selector">
+        <CareRecipientSelector
+          careRecipients={careRecipients}
+          selectedRecipient={selectedRecipient}
+          loading={loading}
+          error={error}
+          isAddingRecipient={isAddingRecipient}
+          onRecipientChange={handleRecipientChange}
+          onAddRecipient={() => setIsAddingRecipient(true)}
+          onRetry={() => loadCareRecipients()}
+          onRecipientUpdated={loadCareRecipients}
+        />
+      </div>
 
       {/* Medications Card */}
-      <MedicationsCard 
-        selectedRecipient={selectedRecipientData || null} 
-        onMedicationAdded={handleMedicationAdded}
-      />
+      <div data-testid="medications-card">
+        <MedicationsCard 
+          selectedRecipient={selectedRecipientData || null} 
+          onMedicationAdded={handleMedicationAdded}
+        />
+      </div>
 
       {selectedRecipientData && (
         <>
           {/* Recent Readings */}
-          <ReadingsCard
-            selectedRecipient={selectedRecipientData}
-            vitalReadings={vitalReadings}
-            onAddReading={() => setShowAddForm(true)}
-            onReadingUpdated={() => loadVitalReadings(selectedRecipient)}
-          />
+          <div data-testid="readings-card">
+            <ReadingsCard
+              selectedRecipient={selectedRecipientData}
+              vitalReadings={vitalReadings}
+              onAddReading={() => setShowAddForm(true)}
+              onReadingUpdated={() => loadVitalReadings(selectedRecipient)}
+            />
+          </div>
 
           {/* Health Trends Chart */}
-          <TrendsCard vitalReadings={vitalReadings} />
+          <div data-testid="trends-card">
+            <TrendsCard vitalReadings={vitalReadings} />
+          </div>
 
           {/* Journal Entries Section */}
           {selectedRecipientData && (
-            <div style={{ marginTop: '2rem' }}>
+            <div style={{ marginTop: '2rem' }} data-testid="journal-entries-card">
               <JournalEntriesCard 
                 key={`journal-${selectedRecipient}-${journalRefreshKey}`}
                 recipientId={selectedRecipient}
@@ -281,6 +289,7 @@ const HealthTracking: React.FC = () => {
           <div className="form-group">
             <label>Vital Type</label>
             <select
+              data-testid="vital-type-select"
               value={selectedVitalType}
               onChange={(e) => setSelectedVitalType(e.target.value)}
               required
@@ -298,6 +307,7 @@ const HealthTracking: React.FC = () => {
             <div className="vital-input-container">
               <input
                 type="text"
+                data-testid="vital-value-input"
                 value={newVitalForm.value}
                 onChange={(e) =>
                   setNewVitalForm((prev) => ({ ...prev, value: e.target.value }))
@@ -323,6 +333,7 @@ const HealthTracking: React.FC = () => {
             <label>Date & Time</label>
             <input
               type="datetime-local"
+              data-testid="vital-datetime-input"
               value={newVitalForm.dateTime}
               onChange={(e) =>
                 setNewVitalForm((prev) => ({
@@ -336,6 +347,7 @@ const HealthTracking: React.FC = () => {
           <div className="form-group">
             <label>Notes (Optional)</label>
             <textarea
+              data-testid="vital-notes-input"
               value={newVitalForm.notes}
               onChange={(e) =>
                 setNewVitalForm((prev) => ({ ...prev, notes: e.target.value }))

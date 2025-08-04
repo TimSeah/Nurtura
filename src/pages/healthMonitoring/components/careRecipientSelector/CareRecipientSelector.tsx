@@ -174,6 +174,7 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
                 className={`recipient-card ${
                   selectedRecipient === recipient._id ? "selected" : ""
                 }`}
+                data-testid="care-recipient-card"
                 onClick={() => recipient._id && onRecipientChange(recipient._id)}
               >
                 {/* Action buttons - only show when selected */}

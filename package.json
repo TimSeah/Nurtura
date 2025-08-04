@@ -14,7 +14,9 @@
     "test:jest": "jest --runInBand",
     "watch:vitest": "vitest",
     "watch:jest": "jest --watch",
-    "cy:open": "cypress open"
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:run:health": "cypress run --spec 'cypress/e2e/uc10_healthTrackingMonitoring.cy.ts'"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

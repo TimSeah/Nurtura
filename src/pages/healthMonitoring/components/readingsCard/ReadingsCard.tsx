@@ -212,6 +212,7 @@ const ReadingsCard: React.FC<ReadingsCardProps> = ({
           <div className="filter-container">
             {/* <Filter className="filter-icon" /> */}
             <select 
+              data-testid="readings-filter"
               value={selectedFilter} 
               onChange={(e) => handleFilterChange(e.target.value)}
               className="filter-select"
@@ -259,6 +260,7 @@ const ReadingsCard: React.FC<ReadingsCardProps> = ({
                 <div 
                   key={reading._id} 
                   className="reading-card"
+                  data-testid="reading-card"
                   onClick={() => setSelectedReading(reading)}
                 >
                   <div className="reading-icon">
@@ -284,7 +286,7 @@ const ReadingsCard: React.FC<ReadingsCardProps> = ({
         
         {/* Pagination Controls */}
         {filteredReadings.length > itemsPerPage && (
-          <div className="pagination-controls">
+          <div className="pagination-controls" data-testid="pagination-controls">
             <button 
               className="pagination-btn"
               onClick={handlePrevPage}
