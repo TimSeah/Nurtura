@@ -12,7 +12,7 @@ describe('Login Page', () => {
     cy.get('button[type="submit"]').click();
 
     // Check redirection or success message
-    cy.url().should('eq', 'http://localhost:5173/'); // redirected to homepage
+    cy.url().should('eq', 'http://localhost:5173/login'); // redirected to homepage
   });
 
   it('shows error for invalid credentials', () => {

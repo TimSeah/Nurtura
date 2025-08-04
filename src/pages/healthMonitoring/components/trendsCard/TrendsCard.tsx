@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -44,18 +44,27 @@ interface TrendsCardProps {
 const TrendsCard: React.FC<TrendsCardProps> = ({ vitalReadings }) => {
   // Get available vital types from the readings first
   const availableVitalTypes = useMemo(() => {
-    const types = Array.from(new Set(vitalReadings.map(reading => reading.vitalType)));
+    const types = Array.from(
+      new Set(vitalReadings.map((reading) => reading.vitalType))
+    );
     return types.sort();
   }, [vitalReadings]);
 
   // Initialize selectedVitalType with the first available type or default to blood_pressure
-  const [selectedVitalType, setSelectedVitalType] = useState<VitalSignsData["vitalType"]>(() => {
-    return availableVitalTypes.length > 0 ? availableVitalTypes[0] : "blood_pressure";
+  const [selectedVitalType, setSelectedVitalType] = useState<
+    VitalSignsData["vitalType"]
+  >(() => {
+    return availableVitalTypes.length > 0
+      ? availableVitalTypes[0]
+      : "blood_pressure";
   });
 
   // Update selectedVitalType when availableVitalTypes changes and current selection is not available
-  React.useEffect(() => {
-    if (availableVitalTypes.length > 0 && !availableVitalTypes.includes(selectedVitalType)) {
+  useEffect(() => {
+    if (
+      availableVitalTypes.length > 0 &&
+      !availableVitalTypes.includes(selectedVitalType)
+    ) {
       setSelectedVitalType(availableVitalTypes[0]);
     }
   }, [availableVitalTypes, selectedVitalType]);
@@ -71,11 +80,11 @@ const TrendsCard: React.FC<TrendsCardProps> = ({ vitalReadings }) => {
 
     // Group readings by date
     const readingsByDate = new Map<string, VitalSignsData[]>();
-    
+
     relevantReadings.forEach((reading) => {
       const date = new Date(reading.dateTime);
       const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
-      
+
       if (!readingsByDate.has(dateStr)) {
         readingsByDate.set(dateStr, []);
       }
@@ -84,7 +93,7 @@ const TrendsCard: React.FC<TrendsCardProps> = ({ vitalReadings }) => {
 
     // Get last 7 days of data (not last 7 readings)
     const sortedDates = Array.from(readingsByDate.keys()).slice(-7);
-    
+
     const mappedData = sortedDates.map((dateStr) => {
       const dayReadings = readingsByDate.get(dateStr)!;
       // Use the latest reading of the day
@@ -98,18 +107,24 @@ const TrendsCard: React.FC<TrendsCardProps> = ({ vitalReadings }) => {
           date: dateStr,
           systolic: systolic || 0,
           diastolic: diastolic || 0,
-          time: new Date(latestReading.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          totalReadings: dayReadings.length
+          time: new Date(latestReading.dateTime).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          totalReadings: dayReadings.length,
         };
       } else {
         const numericValue = parseFloat(latestReading.value) || 0;
-        return { 
-          date: dateStr, 
+        return {
+          date: dateStr,
           value: numericValue,
-          time: new Date(latestReading.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          time: new Date(latestReading.dateTime).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
           totalReadings: dayReadings.length,
           // For heart rate, also add a 'rate' property for backward compatibility
-          ...(vitalType === "heart_rate" && { rate: numericValue })
+          ...(vitalType === "heart_rate" && { rate: numericValue }),
         };
       }
     });
@@ -117,7 +132,10 @@ const TrendsCard: React.FC<TrendsCardProps> = ({ vitalReadings }) => {
     return mappedData;
   };
 
-  const chartData = useMemo(() => getChartData(selectedVitalType), [selectedVitalType, vitalReadings]);
+  const chartData = useMemo(
+    () => getChartData(selectedVitalType),
+    [selectedVitalType, vitalReadings]
+  );
 
   const getVitalTypeLabel = (type: VitalSignsData["vitalType"]) => {
     switch (type) {
@@ -180,17 +198,21 @@ const TrendsCard: React.FC<TrendsCardProps> = ({ vitalReadings }) => {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload; // Get the full data object
-      
+
       return (
         <div className="custom-tooltip">
           <p className="tooltip-label">{`Date: ${label}`}</p>
-          {data.time && (
-            <p className="tooltip-time">{`Time: ${data.time}`}</p>
-          )}
+          {data.time && <p className="tooltip-time">{`Time: ${data.time}`}</p>}
           {payload.map((entry: any, index: number) => (
-            <p key={index} className="tooltip-entry" style={{ color: entry.color }}>
+            <p
+              key={index}
+              className="tooltip-entry"
+              style={{ color: entry.color }}
+            >
               {`${entry.name}: ${entry.value}`}
-              {selectedVitalType === "blood_pressure" ? "" : getVitalUnit(selectedVitalType)}
+              {selectedVitalType === "blood_pressure"
+                ? ""
+                : getVitalUnit(selectedVitalType)}
             </p>
           ))}
           {data.totalReadings > 1 && (
@@ -318,7 +340,11 @@ const TrendsCard: React.FC<TrendsCardProps> = ({ vitalReadings }) => {
         <div className="vital-selector">
           <select
             value={selectedVitalType}
-            onChange={(e) => setSelectedVitalType(e.target.value as VitalSignsData["vitalType"])}
+            onChange={(e) =>
+              setSelectedVitalType(
+                e.target.value as VitalSignsData["vitalType"]
+              )
+            }
             className="vital-type-select"
           >
             {availableVitalTypes.map((type) => (
@@ -340,7 +366,10 @@ const TrendsCard: React.FC<TrendsCardProps> = ({ vitalReadings }) => {
           renderChart()
         ) : (
           <div className="empty-state">
-            <p>No {getVitalTypeLabel(selectedVitalType).toLowerCase()} readings available.</p>
+            <p>
+              No {getVitalTypeLabel(selectedVitalType).toLowerCase()} readings
+              available.
+            </p>
             <p>Add some readings to see the trend chart.</p>
           </div>
         )}

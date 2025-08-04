@@ -44,14 +44,12 @@ export default function Register() {
 
     if (password.length < 8) {
       // Check password length
-      //alert("Password must be at least 8 characters long");
       setErrorMessage("Password must be at least 8 characters long");
       return;
     }
     const hasNumber = /\d/.test(password); // check if password contains a number
     const hasLetter = /[a-zA-Z]/.test(password); // check if password contains a letter
     if (!hasNumber || !hasLetter) {
-      //alert("Password must contain at least one letter and one number");
       setErrorMessage(
         "Password must contain at least one letter and one number"
       );
@@ -68,7 +66,6 @@ export default function Register() {
       navigate("/login");
     } else {
       const err = await res.json();
-      //alert(`Registration failed: ${err.message}`);
       setErrorMessage(`Registration failed: ${err.message}`);
     }
   };

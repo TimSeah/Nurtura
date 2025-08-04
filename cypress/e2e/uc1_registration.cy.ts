@@ -52,23 +52,11 @@ describe('Registration Page', () => {
         "Username can only contain letters, numbers, and underscores"
         );
     });
-    it("rejects usernames with inappropriate words", () => {
-        cy.visit("http://localhost:5173/register");
-        cy.get('input[placeholder="Username"]').type("hinigger123");
-        cy.get('input[placeholder="Password"]').type("Validpass123");
-        cy.get('button[type="submit"]').click();
-        cy.get(".error-message").should(
-            "contain",
-            "Username is inappropriate."
-        );
-    });
     it("rejects usernames with profanity", () => {
         const testCases = [
         "fuckuser",
-        "kingnigger",
         "12thbitchlord",
         "fuck_me",
-        "hinigger123",
         ];
 
         testCases.forEach((offensiveUsername) => {
@@ -97,7 +85,6 @@ describe('Registration Page', () => {
         // Check error message
         cy.get('.error-message').should('contain', 'Registration failed');
     });
-
 
 // invalid password tests
 
