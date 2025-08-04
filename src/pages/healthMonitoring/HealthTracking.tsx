@@ -235,6 +235,7 @@ const HealthTracking: React.FC = () => {
         onRecipientChange={handleRecipientChange}
         onAddRecipient={() => setIsAddingRecipient(true)}
         onRetry={() => loadCareRecipients()}
+        onRecipientUpdated={loadCareRecipients}
       />
 
       {/* Medications Card */}
@@ -250,6 +251,7 @@ const HealthTracking: React.FC = () => {
             selectedRecipient={selectedRecipientData}
             vitalReadings={vitalReadings}
             onAddReading={() => setShowAddForm(true)}
+            onReadingUpdated={() => loadVitalReadings(selectedRecipient)}
           />
 
           {/* Health Trends Chart */}

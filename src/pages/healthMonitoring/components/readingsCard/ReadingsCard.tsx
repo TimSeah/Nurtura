@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Plus, Heart, Activity, Thermometer, Scale, Droplets, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Heart, Activity, Thermometer, Scale, Droplets, ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react";
 import { CareRecipient } from "../../../../types";
 import "./ReadingsCard.css";
 
@@ -23,15 +23,23 @@ interface ReadingsCardProps {
   selectedRecipient: CareRecipient | null;
   vitalReadings: VitalSignsData[];
   onAddReading: () => void;
+  onReadingUpdated?: () => void;
 }
 
 const ReadingsCard: React.FC<ReadingsCardProps> = ({
   selectedRecipient,
   vitalReadings,
   onAddReading,
+  onReadingUpdated,
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const [selectedReading, setSelectedReading] = useState<VitalSignsData | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState("");
+  const [editUnit, setEditUnit] = useState("");
+  const [editDateTime, setEditDateTime] = useState("");
+  const [editNotes, setEditNotes] = useState("");
   const itemsPerPage = 4; // 2 rows × 2 columns = 4 items per page
 
   // Filter readings based on selected filter
@@ -52,6 +60,87 @@ const ReadingsCard: React.FC<ReadingsCardProps> = ({
   const handleFilterChange = (filter: string) => {
     setSelectedFilter(filter);
     setCurrentPage(0);
+  };
+
+  // Initialize edit form when a reading is selected
+  React.useEffect(() => {
+    if (selectedReading) {
+      setEditValue(selectedReading.value);
+      setEditUnit(selectedReading.unit);
+      // Format datetime for datetime-local input
+      const date = new Date(selectedReading.dateTime);
+      const formattedDateTime = date.toISOString().slice(0, 16);
+      setEditDateTime(formattedDateTime);
+      setEditNotes(selectedReading.notes || "");
+      setIsEditing(false);
+    }
+  }, [selectedReading]);
+
+  // Handle reading update
+  const handleEditReading = async () => {
+    if (!selectedReading) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/vital-signs/${selectedReading._id}`,
+        {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            value: editValue, 
+            unit: editUnit, 
+            dateTime: editDateTime, 
+            notes: editNotes 
+          })
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update reading");
+      }
+
+      // Notify parent component to refresh data
+      if (onReadingUpdated) {
+        onReadingUpdated();
+      }
+
+      setSelectedReading(null);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating reading:", error);
+      alert('Error updating reading. Please try again.');
+    }
+  };
+
+  // Handle reading deletion
+  const handleDeleteReading = async () => {
+    if (!selectedReading) return;
+
+    if (!window.confirm('Are you sure you want to delete this reading?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/vital-signs/${selectedReading._id}`,
+        { method: 'DELETE', credentials: 'include' }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete reading");
+      }
+
+      // Notify parent component to refresh data
+      if (onReadingUpdated) {
+        onReadingUpdated();
+      }
+
+      setSelectedReading(null);
+    } catch (error) {
+      console.error("Error deleting reading:", error);
+      alert('Error deleting reading. Please try again.');
+    }
   };
 
   // Pagination handlers
@@ -167,7 +256,11 @@ const ReadingsCard: React.FC<ReadingsCardProps> = ({
               const Icon = getVitalIcon(reading.vitalType);
               const { date, time } = formatDateTime(reading.dateTime);
               return (
-                <div key={reading._id} className="reading-card">
+                <div 
+                  key={reading._id} 
+                  className="reading-card"
+                  onClick={() => setSelectedReading(reading)}
+                >
                   <div className="reading-icon">
                     <Icon />
                   </div>
@@ -221,6 +314,100 @@ const ReadingsCard: React.FC<ReadingsCardProps> = ({
           </div>
         )}
       </div>
+
+      {/* Reading Detail Modal */}
+      {selectedReading && (
+        <div className="reading-modal-overlay" onClick={() => setSelectedReading(null)}>
+          <div className="reading-modal" onClick={(e) => e.stopPropagation()}>
+            {isEditing ? (
+              <div className="edit-reading-form">
+                <h3>Edit Reading</h3>
+                <div className="form-group">
+                  <label>Vital Type</label>
+                  <input
+                    type="text"
+                    value={getVitalDisplayName(selectedReading.vitalType)}
+                    disabled
+                    className="disabled-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Value</label>
+                  <input
+                    type="text"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Unit</label>
+                  <input
+                    type="text"
+                    value={editUnit}
+                    onChange={(e) => setEditUnit(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Date & Time</label>
+                  <input
+                    type="datetime-local"
+                    value={editDateTime}
+                    onChange={(e) => setEditDateTime(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Notes</label>
+                  <textarea
+                    value={editNotes}
+                    onChange={(e) => setEditNotes(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+                <div className="modal-actions">
+                  <button onClick={handleEditReading} className="btn btn-primary">
+                    Save Changes
+                  </button>
+                  <button onClick={() => setIsEditing(false)} className="btn btn-secondary">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="reading-detail-header">
+                  <h3>{getVitalDisplayName(selectedReading.vitalType)}</h3>
+                  <div className="reading-detail-time">
+                    {formatDateTime(selectedReading.dateTime).date} at {formatDateTime(selectedReading.dateTime).time}
+                  </div>
+                </div>
+                <div className="reading-detail-content">
+                  <div className="reading-detail-value">
+                    <strong>{selectedReading.value} {selectedReading.unit}</strong>
+                  </div>
+                  {selectedReading.notes && (
+                    <div className="reading-detail-notes">
+                      <strong>Notes:</strong> {selectedReading.notes}
+                    </div>
+                  )}
+                </div>
+                <div className="modal-actions">
+                  <button onClick={() => setIsEditing(true)} className="btn btn-secondary">
+                    <Edit className="btn-icon" />
+                    Edit
+                  </button>
+                  <button onClick={handleDeleteReading} className="btn btn-danger">
+                    <Trash2 className="btn-icon" />
+                    Delete
+                  </button>
+                  <button onClick={() => setSelectedReading(null)} className="btn btn-secondary">
+                    Close
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
