@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Plus, Heart, Activity, Thermometer, Scale, Droplets, ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react";
 import { CareRecipient } from "../../../../types";
 import "./ReadingsCard.css";
@@ -63,7 +63,7 @@ const ReadingsCard: React.FC<ReadingsCardProps> = ({
   };
 
   // Initialize edit form when a reading is selected
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedReading) {
       setEditValue(selectedReading.value);
       setEditUnit(selectedReading.unit);

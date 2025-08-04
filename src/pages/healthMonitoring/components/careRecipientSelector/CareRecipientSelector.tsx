@@ -184,6 +184,7 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedCareRecipient(recipient);
+                        setIsEditing(true);
                       }}
                       title="Edit recipient"
                     >
