@@ -176,6 +176,54 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
                 }`}
                 onClick={() => recipient._id && onRecipientChange(recipient._id)}
               >
+                {/* Action buttons - only show when selected */}
+                {selectedRecipient === recipient._id && (
+                  <div className="recipient-actions">
+                    <button
+                      className="action-btn edit-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedCareRecipient(recipient);
+                      }}
+                      title="Edit recipient"
+                    >
+                      <Edit className="action-icon" />
+                    </button>
+                    <button
+                      className="action-btn delete-btn"
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        if (!window.confirm('Are you sure you want to delete this care recipient? This action cannot be undone.')) {
+                          return;
+                        }
+                        
+                        try {
+                          const response = await fetch(
+                            `http://localhost:5000/api/care-recipients/${recipient._id}`,
+                            { method: 'DELETE', credentials: 'include' }
+                          );
+
+                          if (!response.ok) {
+                            throw new Error("Failed to delete care recipient");
+                          }
+
+                          if (onRecipientUpdated) {
+                            onRecipientUpdated();
+                          }
+
+                          alert("Care recipient deleted successfully!");
+                        } catch (error) {
+                          console.error("Error deleting care recipient:", error);
+                          alert('Error deleting care recipient. Please try again.');
+                        }
+                      }}
+                      title="Delete recipient"
+                    >
+                      <Trash2 className="action-icon" />
+                    </button>
+                  </div>
+                )}
+
                 <div className="recipient-info">
                   <h3>{recipient.name}</h3>
                   <p>
@@ -204,50 +252,6 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
                   )}
                 </div>
               </button>
-              <div className="recipient-actions">
-                <button
-                  className="action-btn edit-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedCareRecipient(recipient);
-                  }}
-                  title="Edit recipient"
-                >
-                  <Edit className="action-icon" />
-                </button>
-                <button
-                  className="action-btn delete-btn"
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    if (!window.confirm('Are you sure you want to delete this care recipient? This action cannot be undone.')) {
-                      return;
-                    }
-                    
-                    try {
-                      const response = await fetch(
-                        `http://localhost:5000/api/care-recipients/${recipient._id}`,
-                        { method: 'DELETE', credentials: 'include' }
-                      );
-
-                      if (!response.ok) {
-                        throw new Error("Failed to delete care recipient");
-                      }
-
-                      if (onRecipientUpdated) {
-                        onRecipientUpdated();
-                      }
-
-                      alert("Care recipient deleted successfully!");
-                    } catch (error) {
-                      console.error("Error deleting care recipient:", error);
-                      alert('Error deleting care recipient. Please try again.');
-                    }
-                  }}
-                  title="Delete recipient"
-                >
-                  <Trash2 className="action-icon" />
-                </button>
-              </div>
             </div>
           ))
         )}
