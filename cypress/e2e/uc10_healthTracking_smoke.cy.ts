@@ -35,13 +35,21 @@ describe('UC 10: Health Tracking - Smoke Tests', () => {
           cy.contains('Add Reading').click();
         });
         
+        // Set up alert spy before form submission
+        cy.window().then((win) => {
+          cy.stub(win, 'alert').as('windowAlert');
+        });
+        
         cy.get('[data-testid="vital-type-select"]').select('heart_rate');
         cy.get('[data-testid="vital-value-input"]').type('75');
         cy.get('[data-testid="vital-datetime-input"]').type('2025-08-05T14:00');
         cy.contains('button', 'Save Reading').click();
         
-        // Verify success
-        cy.contains('Vital signs recorded successfully', { timeout: 10000 }).should('be.visible');
+        // Verify success alert was called
+        cy.get('@windowAlert').should('have.been.calledWith', 'Vital signs recorded successfully!');
+        
+        // Verify form closed (indicating success)
+        cy.get('[data-testid="vital-type-select"]', { timeout: 5000 }).should('not.exist');
       }
     });
   });
