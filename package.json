@@ -21,6 +21,7 @@
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/vite": "^4.1.11",
     "@types/date-fns": "^2.5.3",
+    "axios": "^1.11.0",
     "bad-words": "^4.0.0",
     "bcrypt": "^6.0.0",
     "cypress": "^14.5.3",

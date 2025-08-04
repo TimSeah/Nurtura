@@ -117,6 +117,7 @@ const userSettingsRouter = require('./routes/userSettings');
 const vitalSignsRouter = require('./routes/vitalSigns');
 const careRecipientsRouter = require('./routes/careRecipients');
 const alertsRouter = require('./routes/alerts');
+const externalResourcesRouter = require('./routes/externalResources');
 
 // Import and start email reminder service
 const { startReminderService } = require('./services/emailReminderService');
@@ -178,6 +179,8 @@ app.use(
 );
 app.use('/api/care-recipients', careRecipientsRouter);
 app.use('/api/alerts', alertsRouter);
+app.use('/api/external-resources', externalResourcesRouter);
+
 
 // --- Error Handling Middleware ---
 

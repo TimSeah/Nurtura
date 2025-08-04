@@ -82,7 +82,6 @@ const Resources: React.FC = () => {
       description:
         "Connect with others and find resources to help you on your journey.",
     },
-    // Add more articles as needed
   ];
 
   return (
@@ -93,34 +92,6 @@ const Resources: React.FC = () => {
           Find caregiving articles, healthcare providers, support services, and
           community resources in Singapore.
         </p>
-      </div>
-
-      {/* Articles Section */}
-      <div className="articles-section">
-        <h2>Articles</h2>
-        <div className="articles-grid">
-          {articleList.map((article) => (
-            <div className="article-card" key={article.id}>
-              <img
-                src={article.image}
-                alt={article.title}
-                className="article-image"
-              />
-              <div className="article-content">
-                <h3>{article.title}</h3>
-                <p>{article.description}</p>
-                <a
-                  href={article.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary"
-                >
-                  Read Article
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* Search and Filter */}
@@ -230,6 +201,37 @@ const Resources: React.FC = () => {
           <p>Try adjusting your search terms or category filter.</p>
         </div>
       )}
+
+      {/* Divider */}
+      <hr className="section-divider" />
+
+      {/* Articles Section */}
+      <div className="section-label">Curated Caregiving Articles</div>
+      <div className="articles-section">
+        <div className="articles-grid">
+          {articleList.map((article) => (
+            <div className="article-card" key={article.id}>
+              <img
+                src={article.image}
+                alt={article.title}
+                className="article-image"
+              />
+              <div className="article-content">
+                <h3>{article.title}</h3>
+                <p>{article.description}</p>
+                <a
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                >
+                  Read Article
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
