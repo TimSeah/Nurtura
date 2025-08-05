@@ -1,6 +1,6 @@
 import "./App.css";
 import Login from "./pages/login/Login";
-import Register from "./pages/Register";
+import Register from "./pages/register/Register";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import { useContext } from "react";
@@ -9,10 +9,8 @@ import { Navigate } from "react-router-dom";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Calendar from "./pages/calendar/calendar";
 import HealthTracking from "./pages/healthMonitoring/HealthTracking";
-import CareCircle from "./pages/CareCircle";
-import Resources from "./pages/Resources";
-import Alerts from "./pages/Alerts";
-import Settings from "./pages/Settings";
+import Resources from "./pages/resources/Resources";
+import Settings from "./pages/settings/Settings";
 import Forum from "./pages/forum/Forum";
 import ForumTab from "./pages/forum/ForumTab";
 import ThreadDetail from "./pages/forum/ThreadDetail";
@@ -81,7 +79,6 @@ function App() {
         <Route path="/start" element={<Dashboard />} />
         <Route path="/" element={<Dashboard />} />
         <Route path="/calendar" element={<Calendar />} />
-        {/* <Route path="/journal" element={<Journal />} /> */}
         <Route path="/forum" element={<Forum />} />
         <Route path="/forumTab" element={<ForumTab />} />
         <Route path="/threads/:id" element={<ThreadDetail />} />

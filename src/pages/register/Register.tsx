@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { bannedWords } from "../utils/bannedWords";
+import { bannedWords } from "../../utils/bannedWords";
 import "./Register.css";
 import { set } from "date-fns";
 
@@ -73,7 +73,7 @@ export default function Register() {
   return (
     <div className="register-container">
       <div className="register-card">
-        <h1>Register</h1>
+        <h1>Register to Nurtura</h1>
         <form onSubmit={handleSubmit}>
           <input
             type="text"

@@ -8,13 +8,13 @@ import {
   Star,
   Filter,
 } from "lucide-react";
-import type { Resource } from "../types";
-import { dataService } from "../services/dataService";
+import type { Resource } from "../../types";
+import { dataService } from "../../services/dataService";
 import "./Resources.css";
 
-import caregiving1 from "../pages/dashboard/components/pics/koala.png";
-import caregiving2 from "../pages/dashboard/components/pics/koala.png";
-import caregiving3 from "../pages/dashboard/components/pics/koala.png";
+import caregiving1 from "../../pages/dashboard/components/pics/koala.png";
+import caregiving2 from "../../pages/dashboard/components/pics/koala.png";
+import caregiving3 from "../../pages/dashboard/components/pics/koala.png";
 
 const Resources: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -76,11 +76,10 @@ const Resources: React.FC = () => {
     },
     {
       id: 3,
-      title: "Building a Support Network",
+      title: "Building a Support System",
       image: caregiving3,
-      url: "https://www.aarp.org/caregiving/life-balance/info-2017/building-support-network.html",
-      description:
-        "Connect with others and find resources to help you on your journey.",
+      url: "https://mentalh2o.org/how-to-build-a-support-network-the-importance-of-strong-relationships/",
+      description: "Connect with others to accompany your journey.",
     },
   ];
 
@@ -92,6 +91,33 @@ const Resources: React.FC = () => {
           Find caregiving articles, healthcare providers, support services, and
           community resources in Singapore.
         </p>
+      </div>
+
+      {/* Articles Section */}
+      <div className="articles-section">
+        <div className="articles-grid">
+          {articleList.map((article) => (
+            <div className="article-card" key={article.id}>
+              <img
+                src={article.image}
+                alt={article.title}
+                className="article-image"
+              />
+              <div className="article-content">
+                <h3>{article.title}</h3>
+                <p>{article.description}</p>
+                <a
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                >
+                  Read Article
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Search and Filter */}
@@ -201,37 +227,6 @@ const Resources: React.FC = () => {
           <p>Try adjusting your search terms or category filter.</p>
         </div>
       )}
-
-      {/* Divider */}
-      <hr className="section-divider" />
-
-      {/* Articles Section */}
-      <div className="section-label">Curated Caregiving Articles</div>
-      <div className="articles-section">
-        <div className="articles-grid">
-          {articleList.map((article) => (
-            <div className="article-card" key={article.id}>
-              <img
-                src={article.image}
-                alt={article.title}
-                className="article-image"
-              />
-              <div className="article-content">
-                <h3>{article.title}</h3>
-                <p>{article.description}</p>
-                <a
-                  href={article.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary"
-                >
-                  Read Article
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };
