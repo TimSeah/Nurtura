@@ -1,5 +1,5 @@
 import "./App.css";
-import Login from "./pages/Login";
+import Login from "./pages/login/Login";
 import Register from "./pages/Register";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
@@ -78,6 +78,7 @@ function App() {
           </PrivateRoute>
         }
       >
+        <Route path="/start" element={<Dashboard />} />
         <Route path="/" element={<Dashboard />} />
         <Route path="/calendar" element={<Calendar />} />
         {/* <Route path="/journal" element={<Journal />} /> */}

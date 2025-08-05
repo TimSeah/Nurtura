@@ -9,7 +9,6 @@ html, body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: #fafafa;
   font-family: 'Inter', sans-serif;
 } 
 
@@ -29,7 +28,9 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #fafafa; /* updated background */
+  /* background: #fafafa; /* updated background */
+  background-position: center center;
+  background-image: url("./components/LoginScreen.png");
   padding: 0;
   margin: 0;
   width: 100%;
