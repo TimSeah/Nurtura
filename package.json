@@ -16,8 +16,8 @@
     "watch:jest": "jest --watch",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "cy:run:health": "cypress run --spec 'cypress/e2e/uc10_healthTrackingMonitoring.cy.ts'",
-    "cy:run:uc9": "cypress run --spec 'cypress/e2e/uc9_monitoringCareRecipients.cy.ts'",
+    "cy:run:uc9_2": "cypress run --spec 'cypress/e2e/uc9_monitoringCareRecipients_editReadingsAndMedications.cy.ts'",
+    "cy:run:uc9_1": "cypress run --spec 'cypress/e2e/uc9_monitoringCareRecipients_editJournals.cy.ts'",
     "cy:run:uc7": "cypress run --spec 'cypress/e2e/uc7_sendingNotifications.cy.ts'"
   },
   "dependencies": {
