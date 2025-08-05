@@ -10,13 +10,11 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
-import "./Forum.css";
+import "./forum.css";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
 import { parseISO, formatDistanceToNow } from 'date-fns';
-
-const currentUser = "A good grandkid";
 
 interface Thread {
   _id: string;
@@ -55,14 +53,14 @@ const Forum: React.FC = () => {
 
   const visibleThreads = showUserThreads
     ? sortedThreads.filter(
-        (t) => t.author === user?.email || t.author === user?.username
+        (t) => t.author === user?.username
       ) // for "My Threads" button to work
     : sortedThreads;
 
   const fetchThreads = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/threads", {
+      const res = await fetch("/api/threads", {
         credentials: "include",
       });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
@@ -86,11 +84,11 @@ const Forum: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  console.log("Creating thread with author:", user?.username, user?.email);
+  console.log("Creating thread with author:", user?.username);
   console.log("Request payload:", {
     title: form.title,
     content: form.content,
-    author: user?.username || user?.email || "Anonymous",
+    author: user?.username || "Anonymous",
     date: new Date().toISOString(),
     upvotes: 0,
   });
@@ -103,7 +101,7 @@ const Forum: React.FC = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/threads", {
+      const res = await fetch("/api/threads", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -112,7 +110,7 @@ const Forum: React.FC = () => {
         body: JSON.stringify({
           title: form.title,
           content: form.content,
-          author: user?.username || user?.email || "Anonymous",
+          author: user?.username || "Anonymous",
           date: new Date().toISOString(),
           upvotes: 0,
         }),
@@ -136,11 +134,11 @@ const Forum: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     const thread = threads.find((t) => t._id === id);
-    if (thread?.author !== user?.email && thread?.author !== user?.username) return;
+    if (thread?.author !== user?.username) return;
     if (!window.confirm("Are you sure you want to delete this thread?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/threads/${id}`, {
+      const res = await fetch(`/api/threads/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -377,8 +375,7 @@ const Forum: React.FC = () => {
                     </div>
                   )}
                   {/* Bin */}
-                  {(t.author === user?.email ||
-                    t.author === user?.username) && ( // updated logic to check if current user is author, fixes bug where delete button does not appear
+                  {t.author === user?.username && ( // updated logic to check if current user is author, fixes bug where delete button does not appear
                     <button
                       className="mt-2 -ml-3 text-red-500 hover:text-red-700 transition min-w-[48px] flex justify-center"
                       title="Delete Thread"

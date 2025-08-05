@@ -1,3 +1,4 @@
+import React from "react";
 import "./App.css";
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
@@ -11,14 +12,14 @@ import Calendar from "./pages/calendar/calendar";
 import HealthTracking from "./pages/healthMonitoring/HealthTracking";
 import Resources from "./pages/resources/Resources";
 import Settings from "./pages/settings/Settings";
-import Forum from "./pages/forum/Forum";
+import Forum from "./pages/forum/forum";
 import ForumTab from "./pages/forum/ForumTab";
-import ThreadDetail from "./pages/forum/ThreadDetail";
+import ThreadDetail from "./pages/forum/threadDetail";
 // import Journal from "./pages/healthMonitoring/components/journal/journal";
 import ResourcesAlt from "./pages/ResorucesAlt";
 import HealthMonitoring from "./pages/healthMonitoring/components/add new recipient/HealthMonitoring";
 
-function PrivateRoute({ children }: { children: JSX.Element }) {
+function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useContext(AuthContext);
 
   // Still loading auth check so we show loading spinner

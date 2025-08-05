@@ -1,0 +1,31 @@
+# Backend Development Dockerfile
+FROM node:20-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install ALL dependencies (including dev dependencies like nodemon)
+RUN npm ci
+
+# Install nodemon globally for development
+RUN npm install -g nodemon
+
+# Create non-root user (optional for development)
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+
+# Copy source code
+COPY . .
+
+# Change ownership to nodejs user
+RUN chown -R nextjs:nodejs /app
+USER nextjs
+
+# Expose port
+EXPOSE 5000
+
+# Default command for development (with nodemon)
+CMD ["npm", "run", "dev"]

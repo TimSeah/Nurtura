@@ -44,9 +44,12 @@ mongoose.connect(process.env.MONGO_URI, {
   startReminderService();
   
   const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log('You can test the server by navigating to http://localhost:5000 in your browser.');
+  const HOST = process.env.SERVER_HOST || '0.0.0.0';
+  
+  app.listen(PORT, HOST, () => {
+    console.log(`Server running on ${HOST}:${PORT}`);
+    const serverUrl = process.env.SERVER_URL || `http://localhost:${PORT}`;
+    console.log(`You can test the server by navigating to ${serverUrl} in your browser.`);
   });
 })
 .catch(err => {
@@ -58,8 +61,12 @@ mongoose.connect(process.env.MONGO_URI, {
 // Enable CORS for all origins.
 // IMPORTANT: In production, you should restrict this to your frontend's specific domain:
 // app.use(cors({ origin: 'http://localhost:3000' })); // Example for development
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',') 
+  : ['http://localhost:3000', 'http://localhost:80', 'http://localhost'];
+
 app.use(cors({
-  origin: true,        // reflect request.origin back in ACAO
+  origin: process.env.NODE_ENV === 'production' ? allowedOrigins : true,
   credentials: true,   // allow cookies/auth headers
 }));
 
@@ -98,6 +105,15 @@ app.use(
     getToken: req => req.cookies.token
   })
 );
+
+// Health check endpoint for Docker
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
 
 // Mount thread routes at auth
 app.use('/api/auth', authRoutes);

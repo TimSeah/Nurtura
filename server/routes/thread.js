@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router(); // Create a new Express router
-const Thread = require('../models/Thread'); // Import the Thread model
+const Thread = require('../models/thread'); // Import the Thread model
 const Comment = require('../models/Comment'); // Import the Comment model
 
 // --- GET All Threads ---

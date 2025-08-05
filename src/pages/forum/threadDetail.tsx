@@ -1,9 +1,8 @@
-import "./Forum.css";
-import "./Forum"
+import "./forum.css";
 import { useState, useEffect,useContext, type ChangeEvent } from "react";
 import { useParams } from "react-router-dom";
 import ThreadPost from "./threadPost";
-import Comment from "./Comment";
+import Comment from "./comment";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { AuthContext } from "../../contexts/AuthContext";
@@ -46,7 +45,7 @@ const ThreadDetail: React.FC = () => {
     const fetchThread = async (id: string) => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:5000/api/threads/${id}`, {
+            const res = await fetch(`/api/threads/${id}`, {
   credentials: 'include'
 })
             if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
@@ -67,7 +66,7 @@ const ThreadDetail: React.FC = () => {
     console.log('Frontend: fetchThread called for ID:', id);
     setLoading(true);
     try {
-        const res = await fetch(`http://localhost:5000/api/threads/${id}`, {
+        const res = await fetch(`/api/threads/${id}`, {
             credentials: 'include'
         });
         
@@ -113,7 +112,7 @@ const ThreadDetail: React.FC = () => {
     
     const fetchComments = async (threadId: string) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/threads/${threadId}/comments`, {
+            const res = await fetch(`/api/threads/${threadId}/comments`, {
                 credentials: 'include'
             })
             
@@ -164,7 +163,7 @@ const ThreadDetail: React.FC = () => {
     }
 
     try {
-    const res = await fetch(`http://localhost:5000/api/threads/${thread._id}/vote`, {
+    const res = await fetch(`/api/threads/${thread._id}/vote`, {
         method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -211,7 +210,7 @@ const ThreadDetail: React.FC = () => {
     console.log('Current upvotes:', thread.upvotes);
 
     try {
-        const res = await fetch(`http://localhost:5000/api/threads/${thread._id}/vote`, {
+        const res = await fetch(`/api/threads/${thread._id}/vote`, {
         method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -284,7 +283,7 @@ const ThreadDetail: React.FC = () => {
             return;
         }
         try {
-            const res = await fetch(`http://localhost:5000/api/threads/${id}/comments`, {
+            const res = await fetch(`/api/threads/${id}/comments`, {
                 method: "POST",
                 credentials: 'include',
                 headers: {
