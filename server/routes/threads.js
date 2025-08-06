@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router(); // Create a new Express router
 const Thread = require('../models/thread'); // Import the Thread model
 const Comment = require('../models/Comment');
+const moderator = require('../middleware/moderationMiddleware'); // Import moderation middleware
 console.log('threads.js route file loaded');
 
 // --- GET All Threads ---
@@ -87,10 +88,15 @@ router.get('/', async (req, res) => {
 
 
 // This route will create a new thread document in the database.
-router.post('/', async (req, res) => {
+router.post('/', moderator.moderationMiddleware(), async (req, res) => {
   // Extract thread data from the request body
   const { title, content, date, upvotes, author } = req.body;
   //const author = req.auth?.email || req.auth?.username; 
+
+  // Log moderation results if available
+  if (req.moderationResult) {
+    console.log('Thread moderation result:', req.moderationResult);
+  } 
 
   // Create a new Thread instance using the Mongoose model
   // Mongoose will automatically validate the data against the schema.
