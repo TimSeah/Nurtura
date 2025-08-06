@@ -199,8 +199,8 @@ router.patch('/:id/vote', async (req, res) => {
   const { direction } = req.body;
   const userId = req.auth?._id;
 
-  console.log('🔥 vote route hit');
-  console.log('🧠 req.auth:', req.auth);
+  console.log('vote route hit');
+  console.log('req.auth:', req.auth);
 
   if (!userId) return res.status(401).json({ message: 'Unauthorized' });
   if (!['up', 'down'].includes(direction)) {

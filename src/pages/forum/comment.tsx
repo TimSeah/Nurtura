@@ -20,7 +20,7 @@ interface CommentDetailProps {
 const Comment: React.FC<CommentDetailProps> = ({ comment, onDelete}) => {
   const { user } = useContext(AuthContext);
 
-  const handleDelete = async (id: number) => {
+  const handleDeleteComment = async (id: number) => {
     if (comment.author !== user?.username) return;
     if (!window.confirm("Are you sure you want to delete this Comment?")) return;
 
@@ -57,7 +57,7 @@ const Comment: React.FC<CommentDetailProps> = ({ comment, onDelete}) => {
                 className="mt-2 -ml-3 text-red-500 hover:text-red-700 transition min-w-[48px] flex justify-center"
                 title="Delete Thread"
                 onClick={() => {
-                    handleDelete(comment._id);
+                    handleDeleteComment(comment._id);
                 }}
                 >
                 <svg
