@@ -303,7 +303,7 @@ class DataService {
       description: 'Community center offering meals, activities, and social programs for seniors.',
       address: '890 Community Lane, Springfield, IL 62701',
       phone: '(217) 555-0300',
-      website: 'https://springfieldseniors.org',
+      website: 'https://springfieldvt.gov/springfield-senior',
       hours: 'Mon-Fri 8AM-5PM',
       rating: 4.7,
       distance: '3.1 miles',
@@ -330,7 +330,7 @@ class DataService {
       description: 'Government services including home care assistance, meal delivery, and benefits counseling.',
       address: '456 Government Plaza, Springfield, IL 62701',
       phone: '(217) 555-0500',
-      website: 'https://springfieldaaa.gov',
+      //website: 'https://springfieldaaa.gov', not used as broken
       hours: 'Mon-Fri 8AM-4:30PM',
       rating: 4.0,
       distance: '2.7 miles',
