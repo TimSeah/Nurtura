@@ -13,29 +13,65 @@
 .articles-section h2 {
   margin-bottom: 20px;
 }
+
+/* enabled horizontal scrolling */
 .articles-grid {
   display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  padding: 0 20px;
-  justify-content: center;
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden; /* Prevent vertical scrolling */
+  padding: 1rem 20px; /* Add horizontal padding */
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  /* Ensure the container doesn't wrap */
+  flex-wrap: nowrap;
+  /* Set a specific width to trigger overflow */
+  width: 100%;
 }
+
+/* Hide scrollbar but keep functionality */
+.articles-grid::-webkit-scrollbar {
+  height: 6px; /* Show a thin scrollbar for better UX */
+}
+
+.articles-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.articles-grid::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.articles-grid::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
 .article-card {
-  background: #fafafa;
-  border-radius: 1rem;
+  flex: 0 0 auto; /* Don't grow, don't shrink, use auto width */
+  width: 280px; /* Fixed width */
+  min-width: 280px; /* Ensure minimum width */
+  scroll-snap-align: start;
+  background: #fefefe;
+  border-radius: 12px;
   overflow: hidden;
-  width: 320px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
   display: flex;
   flex-direction: column;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  transition: all 0.15s ease-in-out;
 }
+
+.article-card:hover {
+  transform: translateY(-4px);
+}
+  
 .article-image {
   width: 100%;
   height: 160px;
   object-fit: cover;
 }
+
 .article-content {
   padding: 1rem;
   flex: 1;
@@ -43,21 +79,29 @@
   flex-direction: column;
   justify-content: space-between;
 }
+
 .article-content h3 {
   margin: 0 0 0.5rem 0;
   font-size: 20px;
 }
+
 .article-content p {
   flex: 1;
   margin-bottom: 1rem;
   font-size: 15px;
+  color: #666;
 }
+
 .article-content .btn {
   align-self: center;
 }
 
+/*  ADDED PADDING */
 .resources-grid {
-  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  padding: 0 20px; /* ADDED THIS LINE to move hospital cards away from edges */
 }
 
 .page-header {
@@ -140,12 +184,6 @@
   margin: 1.5rem 0 1rem 0;
   color: #64748b;
   font-size: 0.875rem;
-}
-
-.resources-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
 }
 
 .resource-card {
@@ -253,10 +291,11 @@
 
 .contact-item {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  align-items: flex-start; /* Changed from center to flex-start */
+  gap: 0.75rem; /* Increased gap slightly */
   font-size: 0.875rem;
   color: #4b5563;
+  line-height: 1.4; /* Add consistent line height */
 }
 
 .contact-item svg {
@@ -264,6 +303,7 @@
   height: 1rem;
   color: #9ca3af;
   flex-shrink: 0;
+  margin-top: 0.125rem; /* Add small top margin to align with first line of text */
 }
 
 .contact-item a {
@@ -323,6 +363,17 @@
   
   .resources-grid {
     grid-template-columns: 1fr;
+    padding: 0 10px; /* Reduce padding on mobile */
+  }
+  
+  .articles-grid {
+    padding: 1rem 10px;
+    gap: 0.75rem;
+  }
+  
+  .article-card {
+    width: 250px;
+    min-width: 250px;
   }
   
   .resource-header {
@@ -354,43 +405,3 @@
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
-
-.articles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-}
-
-.article-card {
-  background: #fefefe;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  transition: transform 0.2s ease;
-}
-
-.article-card:hover {
-  transform: translateY(-4px);
-}
-
-.article-image {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-}
-
-.article-content {
-  padding: 1rem;
-}
-
-.article-content h3 {
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-}
-
-.article-content p {
-  color: #666;
-  margin-bottom: 0.75rem;
-}
-
-

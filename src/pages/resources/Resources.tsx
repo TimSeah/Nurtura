@@ -81,6 +81,20 @@ const Resources: React.FC = () => {
       url: "https://mentalh2o.org/how-to-build-a-support-network-the-importance-of-strong-relationships/",
       description: "Connect with others to accompany your journey.",
     },
+    {
+      id: 4,
+      title: "Caring for Yourself",
+      image: caregiving1,
+      url: "https://www.caregiver.org/caregiver-resources/caring-for-yourself/",
+      description: "Self-care tips for caregivers.",
+    },
+    {
+      id: 5,
+      title: "Dementia Hub Singapore",
+      image: caregiving2,
+      url: "https://www.dementiahub.sg/",
+      description: "A simple guide to caregiving practices for seniors.",
+    },
   ];
 
   return (
@@ -93,8 +107,9 @@ const Resources: React.FC = () => {
         </p>
       </div>
 
-      {/* Articles Section */}
+      {/* Articles Section - FIXED STRUCTURE */}
       <div className="articles-section">
+        <h2>Featured Articles</h2>
         <div className="articles-grid">
           {articleList.map((article) => (
             <div className="article-card" key={article.id}>
@@ -119,6 +134,8 @@ const Resources: React.FC = () => {
           ))}
         </div>
       </div>
+
+      <h2>Locations</h2>
 
       {/* Search and Filter */}
       <div className="card">
@@ -152,12 +169,20 @@ const Resources: React.FC = () => {
         </div>
       </div>
 
+      {/* Results count */}
+      <div className="results-count">
+        {filteredResources.length} resource{filteredResources.length !== 1 ? 's' : ''} found
+      </div>
+
       {/* Resources List */}
       <div className="resources-grid">
         {filteredResources.map((resource) => (
           <div key={resource.id} className="resource-card">
             <div className="resource-header">
-              <h3>{resource.name}</h3>
+              <div className="resource-info">
+                <h3>{resource.name}</h3>
+                <span className="resource-category">{resource.category}</span>
+              </div>
               <div className="resource-rating">
                 <div className="stars">{renderStars(resource.rating)}</div>
                 <span className="rating-text">{resource.rating}</span>
@@ -166,18 +191,29 @@ const Resources: React.FC = () => {
 
             <p className="resource-description">{resource.description}</p>
 
-            <div className="resource-details">
-              <div className="detail-item">
-                <MapPin className="detail-icon" />
+            <div className="resource-services">
+              <h4>Services</h4>
+              <div className="services-list">
+                {resource.services.map((service) => (
+                  <span key={service} className="service-tag">
+                    {service}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="resource-contact">
+              <div className="contact-item">
+                <MapPin />
                 <span>{resource.address}</span>
               </div>
-              <div className="detail-item">
-                <Phone className="detail-icon" />
+              <div className="contact-item">
+                <Phone />
                 <span>{resource.phone}</span>
               </div>
               {resource.website && (
-                <div className="detail-item">
-                  <Globe className="detail-icon" />
+                <div className="contact-item">
+                  <Globe />
                   <a
                     href={resource.website}
                     target="_blank"
@@ -187,34 +223,11 @@ const Resources: React.FC = () => {
                   </a>
                 </div>
               )}
-              <div className="detail-item">
-                <Clock className="detail-icon" />
-                <span>{resource.hours}</span>
-              </div>
-            </div>
-
-            <div className="resource-services">
-              <h4>Services:</h4>
-              <div className="services-tags">
-                {resource.services.map((service) => (
-                  <span key={service} className="service-tag">
-                    {service}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="resource-footer">
-              <span className="distance">{resource.distance}</span>
-              <div className="resource-actions">
-                <button className="btn btn-primary btn-sm">
-                  <Phone className="btn-icon" />
-                  Call
-                </button>
-                <button className="btn btn-secondary btn-sm">
-                  <MapPin className="btn-icon" />
-                  Directions
-                </button>
+              <div className="contact-item">
+                <Clock />
+                <div className="resource-hours">
+                  <span className="hours-status open">{resource.hours}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -222,8 +235,8 @@ const Resources: React.FC = () => {
       </div>
 
       {filteredResources.length === 0 && (
-        <div className="no-results">
-          <p>No resources found matching your search criteria.</p>
+        <div className="empty-state">
+          <h3>No resources found</h3>
           <p>Try adjusting your search terms or category filter.</p>
         </div>
       )}
