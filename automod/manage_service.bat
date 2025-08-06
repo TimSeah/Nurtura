@@ -1,7 +1,13 @@
 @echo off
 REM Batch script to manage the persistent moderation service on Windows
 
-set PYTHON_PATH=C:\Users\user\anaconda3\python.exe
+REM Try to use virtual environment first, fallback to system python
+set VENV_PYTHON=%~dp0venv\Scripts\python.exe
+if exist "%VENV_PYTHON%" (
+    set PYTHON_PATH=%VENV_PYTHON%
+) else (
+    set PYTHON_PATH=python
+)
 set SCRIPT_DIR=%~dp0
 
 if "%1"=="start" goto start

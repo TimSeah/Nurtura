@@ -1,11 +1,13 @@
 # Auto-Moderation Service for Forum Content
 import os
 import sys
+import json
+import logging
+from pathlib import Path
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import torch.nn.functional as F
 from dotenv import load_dotenv
-import logging
 
 # Load environment variables
 load_dotenv()
@@ -18,9 +20,19 @@ class ContentModerator:
         self.tokenizer = None
         self.model = None
         self.logger = self._setup_logger()
+        self.model_loaded = False
 
     def _setup_logger(self):
-        logging.basicConfig(level=logging.INFO)
+        """Setup logging for production use"""
+        log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+        logging.basicConfig(
+            level=getattr(logging, log_level, logging.INFO),
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            handlers=[
+                logging.StreamHandler(sys.stdout),
+                logging.FileHandler("moderation.log", mode="a"),
+            ],
+        )
         return logging.getLogger(__name__)
 
     def load_model(self):
@@ -31,19 +43,54 @@ class ContentModerator:
             self.model = AutoModelForSequenceClassification.from_pretrained(
                 self.model_name
             )
+            self.model_loaded = True
             self.logger.info("Model loaded successfully")
             return True
         except Exception as e:
             self.logger.error(f"Failed to load model: {e}")
+            self.model_loaded = False
             return False
+
+    def is_ready(self):
+        """Check if the moderation service is ready"""
+        return (
+            self.model_loaded and self.model is not None and self.tokenizer is not None
+        )
 
     def predict_hate_speech(self, text):
         """
         Predict hate speech for given text
         Returns: dict with prediction results
         """
-        if not self.model or not self.tokenizer:
-            raise ValueError("Model not loaded. Call load_model() first.")
+        if not self.is_ready():
+            self.logger.warning("Model not ready. Call load_model() first.")
+            return {
+                "text": text,
+                "label": "ERROR",
+                "confidence": 0.0,
+                "is_hate": False,
+                "should_block": False,
+                "error": "Model not loaded",
+            }
+
+        # Input validation and sanitization
+        if not isinstance(text, str):
+            text = str(text)
+
+        text = text.strip()
+        if not text:
+            return {
+                "text": text,
+                "label": "NOT_HATE",
+                "confidence": 0.0,
+                "is_hate": False,
+                "should_block": False,
+            }
+
+        # Truncate very long text
+        max_length = 512
+        if len(text) > max_length * 4:  # Rough estimate for tokenization
+            text = text[: max_length * 4]
 
         try:
             # Tokenize input
@@ -64,7 +111,7 @@ class ContentModerator:
             label_map = {0: "NOT_HATE", 1: "HATE"}
             label = label_map.get(predicted_class, f"CLASS_{predicted_class}")
 
-            return {
+            result = {
                 "text": text,
                 "label": label,
                 "confidence": confidence,
@@ -72,6 +119,14 @@ class ContentModerator:
                 "should_block": label == "HATE"
                 and confidence >= self.confidence_threshold,
             }
+
+            # Log high-confidence detections
+            if result["should_block"]:
+                self.logger.warning(
+                    f"Blocking content - Label: {label}, Confidence: {confidence:.3f}"
+                )
+
+            return result
 
         except Exception as e:
             self.logger.error(f"Error during prediction: {e}")
@@ -92,43 +147,83 @@ class ContentModerator:
         Returns:
             dict with moderation results
         """
+        if not isinstance(content_data, dict):
+            self.logger.error("Invalid content_data: must be a dictionary")
+            return {
+                "allowed": True,  # Fail-safe: allow on error
+                "blocked_reason": None,
+                "predictions": {},
+                "overall_confidence": 0.0,
+                "error": "Invalid input format",
+            }
+
         results = {
             "allowed": True,
             "blocked_reason": None,
             "predictions": {},
             "overall_confidence": 0.0,
+            "timestamp": self._get_timestamp(),
         }
 
-        # Check title if present
-        if content_data.get("title"):
-            title_result = self.predict_hate_speech(content_data["title"])
-            results["predictions"]["title"] = title_result
+        try:
+            # Check title if present
+            if content_data.get("title"):
+                title_result = self.predict_hate_speech(content_data["title"])
+                results["predictions"]["title"] = title_result
 
-            if title_result["should_block"]:
-                results["allowed"] = False
-                results["blocked_reason"] = (
-                    f"Inappropriate title detected (confidence: {title_result['confidence']:.2f})"
-                )
-                return results
+                if title_result["should_block"]:
+                    results["allowed"] = False
+                    results["blocked_reason"] = (
+                        f"Inappropriate title detected (confidence: {title_result['confidence']:.2f})"
+                    )
+                    self.logger.info(f"Blocked content - Title moderation")
+                    return results
 
-        # Check content
-        if content_data.get("content"):
-            content_result = self.predict_hate_speech(content_data["content"])
-            results["predictions"]["content"] = content_result
+            # Check content
+            if content_data.get("content"):
+                content_result = self.predict_hate_speech(content_data["content"])
+                results["predictions"]["content"] = content_result
 
-            if content_result["should_block"]:
-                results["allowed"] = False
-                results["blocked_reason"] = (
-                    f"Inappropriate content detected (confidence: {content_result['confidence']:.2f})"
-                )
-                return results
+                if content_result["should_block"]:
+                    results["allowed"] = False
+                    results["blocked_reason"] = (
+                        f"Inappropriate content detected (confidence: {content_result['confidence']:.2f})"
+                    )
+                    self.logger.info(f"Blocked content - Content moderation")
+                    return results
 
-        # Calculate overall confidence
-        confidences = [pred["confidence"] for pred in results["predictions"].values()]
-        if confidences:
-            results["overall_confidence"] = max(confidences)
+            # Calculate overall confidence
+            confidences = [
+                pred.get("confidence", 0.0)
+                for pred in results["predictions"].values()
+                if isinstance(pred, dict)
+            ]
+            if confidences:
+                results["overall_confidence"] = max(confidences)
 
-        return results
+            # Log successful moderation
+            self.logger.debug(
+                f"Content allowed - Max confidence: {results['overall_confidence']:.3f}"
+            )
+            return results
+
+        except Exception as e:
+            self.logger.error(f"Error during content moderation: {e}")
+            # Fail-safe: allow content on error
+            return {
+                "allowed": True,
+                "blocked_reason": None,
+                "predictions": {},
+                "overall_confidence": 0.0,
+                "error": str(e),
+                "timestamp": self._get_timestamp(),
+            }
+
+    def _get_timestamp(self):
+        """Get current timestamp for logging"""
+        from datetime import datetime
+
+        return datetime.now().isoformat()
 
 
 # Initialize global moderator instance
