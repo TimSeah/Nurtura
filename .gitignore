@@ -83,3 +83,7 @@ public/uploads/
 # Local development
 .cache/
 server/.env
+
+# Python Packages
+.venv
+venv/

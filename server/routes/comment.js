@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router({ mergeParams: true }); // Enable mergeParams to access threadId from parent route
 const Thread = require('../models/thread');
 const Comment = require('../models/Comment');
+const moderator = require('../middleware/moderationMiddleware');
 
 router.get('/', async (req, res) => {
 const threadId = req.params.threadId;
@@ -14,8 +15,14 @@ const threadId = req.params.threadId;
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', moderator.moderationMiddleware(), async (req, res) => {
   const {threadId, content, author, date} = req.body;
+  
+  // Log moderation results if available
+  if (req.moderationResult) {
+    console.log('Comment moderation result:', req.moderationResult);
+  }
+  
   const newComment = new Comment({
     threadId,
     content,

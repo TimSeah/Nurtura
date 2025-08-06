@@ -6,7 +6,6 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
-const threadRoutes = require('./routes/threads');
 const { expressjwt: jwtMiddleware } = require('express-jwt');
 const authRoutes = require('./routes/auth');
 
@@ -115,15 +114,11 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Mount thread routes at auth
+// Mount auth routes
 app.use('/api/auth', authRoutes);
-// Mount thread routes at /api/threads
-app.use('/api/threads', threadRoutes)
 
 // --- Route Definitions ---
-// Import  route handlers.
-// create these files (e.g., './routes/index.js', './routes/events.js')
-// defineour API endpoints for different resources.
+// Import route handlers.
 const indexRouter = require('./routes/index');
 const eventsRouter = require('./routes/events');
 const journalsRouter = require('./routes/journal'); 
@@ -134,6 +129,7 @@ const vitalSignsRouter = require('./routes/vitalSigns');
 const careRecipientsRouter = require('./routes/careRecipients');
 const alertsRouter = require('./routes/alerts');
 const externalResourcesRouter = require('./routes/externalResources');
+const moderationRouter = require('./routes/moderation');
 
 // Import and start email reminder service
 const { startReminderService } = require('./services/emailReminderService');
@@ -159,8 +155,11 @@ app.use(
   })
 );
 app.use('/api/journal', journalsRouter); 
+
+// Mount threads router with JWT middleware
 app.use('/api/threads', threadsRouter); 
 console.log('threadsRouter mounted at /api/threads');
+
 app.use('/api/threads/:threadId/comments', commentRouter);
 app.use('/api/comments', commentRouter);
 
@@ -197,6 +196,9 @@ app.use(
 app.use('/api/care-recipients', careRecipientsRouter);
 app.use('/api/alerts', alertsRouter);
 app.use('/api/external-resources', externalResourcesRouter);
+console.log('🔧 Mounting moderation router at /api/moderation');
+app.use('/api/moderation', moderationRouter);
+console.log('✅ Moderation router mounted successfully');
 
 
 // --- Error Handling Middleware ---

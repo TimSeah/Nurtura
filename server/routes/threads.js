@@ -2,7 +2,21 @@ const express = require('express');
 const router = express.Router(); // Create a new Express router
 const Thread = require('../models/thread'); // Import the Thread model
 const Comment = require('../models/Comment');
+const moderator = require('../middleware/moderationMiddleware');
 console.log('threads.js route file loaded');
+
+// Add a test route to verify routing is working
+router.get('/test', (req, res) => {
+  console.log('🧪 TEST ROUTE HIT - routing is working!');
+  res.json({ message: 'Test route working', auth: req.auth });
+});
+
+// Add a middleware to log all requests to this router
+router.use((req, res, next) => {
+  console.log(`📍 ${req.method} ${req.path} - Threads router accessed`);
+  console.log('🔑 Auth info:', req.auth);
+  next();
+});
 
 // --- GET All Threads ---
 // Route: GET /api/threads
@@ -87,20 +101,36 @@ router.get('/', async (req, res) => {
 
 
 // This route will create a new thread document in the database.
-router.post('/', async (req, res) => {
+router.post('/', moderator.moderationMiddleware(), async (req, res) => {
+  console.log('🚀 POST /api/threads called');
+  console.log('🔍 Request body:', JSON.stringify(req.body));
+  console.log('🔑 Auth user:', req.auth);
+  
   // Extract thread data from the request body
-  const { title, content, date, upvotes, author } = req.body;
-  //const author = req.auth?.email || req.auth?.username; 
+  const { title, content, upvotes } = req.body;
+  const author = req.auth?.username; // Get username from JWT
+
+  console.log('📝 Processing thread:', { title, content, author });
+
+  // Log moderation results if available
+  if (req.moderationResult) {
+    console.log('🛡️ Thread moderation result:', req.moderationResult);
+  } else {
+    console.log('⚠️ No moderation result found');
+  }
 
   // Create a new Thread instance using the Mongoose model
   // Mongoose will automatically validate the data against the schema.
-  const newThread = new Thread({
+  const threadData = {
     title,
     content,
     author,
-    date: new Date(date), // Convert the date string from frontend to a Date object
-    upvotes,
-  });
+    upvotes: upvotes || 0
+  };
+
+  console.log('💾 Thread data to save:', threadData);
+
+  const newThread = new Thread(threadData);
 
   try {
     // Save the new thread document to the database
