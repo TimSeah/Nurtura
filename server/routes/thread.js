@@ -198,9 +198,9 @@ router.patch('/:id/vote', async (req, res) => {
   const { direction } = req.body;
   const userId = req.auth?._id;
 
-  console.log('🔥 Vote route hit');
-  console.log('📊 Direction:', direction);
-  console.log('👤 User ID:', userId);
+  console.log('Vote route hit');
+  console.log('Direction:', direction);
+  console.log('User ID:', userId);
 
   if (!userId) return res.status(401).json({ message: 'Unauthorized' });
   if (!['up', 'down'].includes(direction)) {
@@ -211,9 +211,9 @@ router.patch('/:id/vote', async (req, res) => {
     const thread = await Thread.findById(req.params.id);
     if (!thread) return res.status(404).json({ message: 'Thread not found' });
 
-    console.log('🧵 Thread found:', thread.title);
-    console.log('📈 Current upvotes:', thread.upvotes);
-    console.log('🗳️ Current votes:', thread.votes);
+    console.log('Thread found:', thread.title);
+    console.log('Current upvotes:', thread.upvotes);
+    console.log('Current votes:', thread.votes);
 
     // Initialize votes array if it doesn't exist
     if (!Array.isArray(thread.votes)) {
@@ -229,35 +229,35 @@ router.patch('/:id/vote', async (req, res) => {
 
     if (existingVoteIndex !== -1) {
       previousVoteDirection = thread.votes[existingVoteIndex].direction;
-      console.log('📋 Found existing vote:', previousVoteDirection);
+      console.log('Found existing vote:', previousVoteDirection);
 
       if (previousVoteDirection === direction) {
         // User clicked same direction - remove vote (toggle off)
-        console.log('🔄 Toggling off vote');
+        console.log('Toggling off vote');
         thread.votes.splice(existingVoteIndex, 1);
         thread.upvotes += (direction === 'up') ? -1 : 1;
         userVote = null;
       } else {
         // User switched vote direction
-        console.log('🔀 Switching vote direction');
+        console.log('Switching vote direction');
         thread.votes[existingVoteIndex].direction = direction;
         thread.upvotes += (direction === 'up') ? 2 : -2;
         userVote = direction;
       }
     } else {
       // First-time vote
-      console.log('🆕 First time vote');
+      console.log('First time vote');
       thread.votes.push({ userId, direction });
       thread.upvotes += (direction === 'up') ? 1 : -1;
       userVote = direction;
     }
 
-    console.log('📊 Final upvotes:', thread.upvotes);
-    console.log('👤 Final userVote:', userVote);
-    console.log('📝 Final votes array:', thread.votes);
+    console.log('Final upvotes:', thread.upvotes);
+    console.log('Final userVote:', userVote);
+    console.log('Final votes array:', thread.votes);
 
     await thread.save();
-    console.log('💾 Thread saved successfully');
+    console.log('Thread saved successfully');
 
     res.json({ 
       upvotes: thread.upvotes, 
@@ -265,7 +265,7 @@ router.patch('/:id/vote', async (req, res) => {
       success: true 
     });
   } catch (err) {
-    console.error('❌ Error voting:', err);
+    console.error('Error voting:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
