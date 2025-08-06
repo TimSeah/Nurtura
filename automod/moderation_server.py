@@ -7,6 +7,7 @@ import sys
 import os
 import json
 import time
+import signal
 import threading
 from datetime import datetime, timedelta
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -16,6 +17,10 @@ import urllib.parse
 sys.path.append(os.path.dirname(__file__))
 
 from moderationService import ContentModerator, initialize_moderation_service
+
+# Global variables for graceful shutdown
+server_instance = None
+shutdown_requested = False
 
 
 class ModerationHandler(BaseHTTPRequestHandler):
@@ -144,7 +149,21 @@ def create_handler(moderator):
     return handler
 
 
+def signal_handler(signum, frame):
+    """Handle shutdown signals gracefully"""
+    global server_instance, shutdown_requested
+    print(f"\nReceived signal {signum}, shutting down moderation service...")
+    shutdown_requested = True
+    if server_instance:
+        server_instance.shutdown()
+
 def main():
+    global server_instance
+    
+    # Setup signal handlers for graceful shutdown
+    signal.signal(signal.SIGTERM, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)
+    
     # Configuration
     PORT = int(os.getenv("MODERATION_SERVICE_PORT", 8001))
     IDLE_TIMEOUT = int(os.getenv("MODERATION_IDLE_TIMEOUT", 30))  # minutes
@@ -165,7 +184,7 @@ def main():
 
     # Start HTTP server
     handler = create_handler(moderator)
-    server = HTTPServer(("localhost", PORT), handler)
+    server_instance = HTTPServer(("localhost", PORT), handler)
 
     print(f"Moderation service running on http://localhost:{PORT}")
     print("Health check: http://localhost:8001/health")
@@ -173,10 +192,17 @@ def main():
     print("-" * 50)
 
     try:
-        server.serve_forever()
+        server_instance.serve_forever()
     except KeyboardInterrupt:
-        print("\nShutting down moderation service...")
-        server.server_close()
+        print("\nKeyboard interrupt received...")
+    except Exception as e:
+        print(f"Server error: {e}")
+    finally:
+        print("Shutting down moderation service...")
+        if server_instance:
+            server_instance.server_close()
+        print("Moderation service stopped.")
+        sys.exit(0)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-// Moderation middleware for Express.js routes
+// Moderation middleware       console.log('� Starting persistent moderation service...');or Express.js routes
 const { spawn } = require('child_process');
 const path = require('path');
 
@@ -12,22 +12,60 @@ class ForumModerator {
     this.scriptPath = path.join(__dirname, '../../automod/moderate_cli.py');
     this.serviceProcess = null;
     
-    console.log('🔧 ForumModerator initialized');
-    console.log('🛡️ Moderation enabled:', this.moderationEnabled);
-    console.log('🚀 Use persistent service:', this.usePersistentService);
-    
-    if (this.usePersistentService) {
-      console.log('🌐 Service URL:', this.serviceUrl);
-      this.startPersistentService();
-    } else {
-      console.log('🐍 Python path:', this.pythonPath);
-      console.log('📄 Script path:', this.scriptPath);
+    // Only log moderation status in production
+    if (this.moderationEnabled) {
+      console.log('🛡️ Content moderation enabled');
+      if (this.usePersistentService) {
+        this.startPersistentService();
+      }
+    }
+
+    // Setup cleanup handlers for graceful shutdown
+    this.setupCleanupHandlers();
+  }
+
+  setupCleanupHandlers() {
+    // Handle different shutdown signals
+    const cleanup = () => {
+      this.cleanup();
+    };
+
+    process.on('SIGINT', cleanup);  // Ctrl+C
+    process.on('SIGTERM', cleanup); // Termination signal
+    process.on('exit', cleanup);    // Normal exit
+    process.on('uncaughtException', (error) => {
+      console.error('Uncaught exception:', error);
+      this.cleanup();
+      process.exit(1);
+    });
+  }
+
+  cleanup() {
+    if (this.serviceProcess) {
+      console.log('🔄 Shutting down moderation service...');
+      try {
+        // First try graceful shutdown
+        this.serviceProcess.kill('SIGTERM');
+        
+        // If process doesn't exit in 5 seconds, force kill
+        setTimeout(() => {
+          if (this.serviceProcess && !this.serviceProcess.killed) {
+            console.log('⚡ Force killing moderation service...');
+            this.serviceProcess.kill('SIGKILL');
+          }
+        }, 5000);
+        
+        this.serviceProcess = null;
+        console.log('✅ Moderation service shutdown complete');
+      } catch (error) {
+        console.error('❌ Error during cleanup:', error.message);
+      }
     }
   }
 
   async startPersistentService() {
     try {
-      console.log('� Starting persistent moderation service...');
+      console.log('🏁 Starting persistent moderation service...');
       const serverPath = path.join(__dirname, '../../automod/moderation_server.py');
       
       this.serviceProcess = spawn(this.pythonPath, [serverPath], {
@@ -47,18 +85,19 @@ class ForumModerator {
       });
 
       this.serviceProcess.on('close', (code) => {
-        console.log(`🔚 Moderation service exited with code ${code}`);
+        if (code !== 0) {
+          console.log(`⚠️ Moderation service exited with code ${code}`);
+        }
         this.serviceProcess = null;
       });
 
-      // Wait a moment for service to start and test health with retries
-      console.log('⏳ Waiting for service to start...');
-      const isHealthy = await this.waitForServiceHealth(30000); // 30 second timeout
+      // Wait for service to start
+      const isHealthy = await this.waitForServiceHealth(30000);
       
       if (isHealthy) {
-        console.log('✅ Persistent moderation service is ready');
+        console.log('✅ Content moderation service ready');
       } else {
-        console.log('⚠️ Persistent service may not be ready, falling back to CLI mode');
+        console.log('⚠️ Content moderation service failed to start, falling back to CLI');
         this.usePersistentService = false;
       }
     } catch (error) {
@@ -93,7 +132,7 @@ class ForumModerator {
         return true;
       }
       
-      console.log('⏳ Service not ready yet, retrying...');
+      // Silently wait and retry
       await new Promise(resolve => setTimeout(resolve, checkInterval));
     }
     
@@ -102,8 +141,6 @@ class ForumModerator {
 
   async moderateContentViaPersistentService(contentData) {
     try {
-      console.log('🌐 Using persistent moderation service...');
-      
       // Create AbortController for timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
@@ -124,19 +161,14 @@ class ForumModerator {
       }
 
       const result = await response.json();
-      console.log('✅ Persistent service result:', result);
       return result;
     } catch (error) {
-      console.error('❌ Persistent service error:', error);
-      // Fallback to CLI method
-      console.log('🔄 Falling back to CLI moderation...');
+      // Fallback to CLI method silently
       return this.moderateContentViaCLI(contentData);
     }
   }
 
   async moderateContentViaCLI(contentData) {
-    console.log('🐍 Using CLI moderation (loading model each time)...');
-    
     return new Promise((resolve, reject) => {
       const python = spawn(this.pythonPath, [this.scriptPath]);
       let result = '';
@@ -156,15 +188,12 @@ class ForumModerator {
 
       python.on('close', (code) => {
         if (code !== 0) {
-          console.error('❌ Python moderation script error:', error);
           resolve({ allowed: true, reason: 'Moderation service unavailable' });
         } else {
           try {
             const moderationResult = JSON.parse(result);
-            console.log('✅ CLI moderation result:', moderationResult);
             resolve(moderationResult);
           } catch (e) {
-            console.error('❌ Failed to parse moderation result:', e);
             resolve({ allowed: true, reason: 'Moderation parsing error' });
           }
         }
@@ -173,10 +202,7 @@ class ForumModerator {
   }
 
   async moderateContent(contentData) {
-    console.log('🔍 moderateContent called with:', contentData);
-    
     if (!this.moderationEnabled) {
-      console.log('⏭️ Moderation disabled, allowing content');
       return { allowed: true, reason: 'Moderation disabled' };
     }
 
@@ -211,9 +237,6 @@ class ForumModerator {
   // Middleware function for Express routes
   moderationMiddleware() {
     return async (req, res, next) => {
-      console.log('🛡️ Moderation middleware called');
-      console.log('📥 Request body:', JSON.stringify(req.body));
-      
       try {
         const contentData = {
           title: req.body.title,
@@ -221,15 +244,9 @@ class ForumModerator {
           author: req.body.author
         };
 
-        console.log('🔍 Content to moderate:', contentData);
-
         const moderationResult = await this.moderateContent(contentData);
-        
-        console.log('✅ Moderation completed:', moderationResult);
 
         if (!moderationResult.allowed) {
-          console.log('🚫 Content blocked:', moderationResult.blocked_reason);
-          
           // Create user-friendly error message
           const userMessage = this.createUserFriendlyMessage(moderationResult);
           
@@ -237,22 +254,16 @@ class ForumModerator {
             success: false,
             message: userMessage,
             code: 'CONTENT_MODERATED',
-            timestamp: new Date().toISOString(),
-            // Include technical details for debugging (can be hidden from UI)
-            debug: {
-              reason: moderationResult.blocked_reason,
-              predictions: moderationResult.predictions
-            }
+            timestamp: new Date().toISOString()
           });
         }
 
         // Add moderation results to request for logging
         req.moderationResult = moderationResult;
-        console.log('✅ Content allowed, proceeding');
         next();
       } catch (error) {
-        console.error('❌ Moderation middleware error:', error);
         // In case of error, allow content but log the issue
+        console.error('Moderation error:', error.message);
         next();
       }
     };

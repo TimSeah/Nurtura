@@ -61,16 +61,67 @@ def start_service(port=8001):
 
 def stop_service(port=8001):
     """Stop the persistent moderation service"""
-    try:
-        # For Windows, use taskkill to stop the process
-        if os.name == "nt":
-            subprocess.run(["taskkill", "/f", "/im", "python.exe"], capture_output=True)
-        else:
-            # For Unix-like systems, you might need to implement PID tracking
-            subprocess.run(["pkill", "-f", "moderation_server.py"], capture_output=True)
-        print("🛑 Moderation service stopped")
-    except Exception as e:
-        print(f"❌ Error stopping service: {e}")
+    import psutil
+    
+    print("🛑 Stopping moderation service...")
+    
+    # Find processes listening on the specified port
+    stopped = False
+    for proc in psutil.process_iter(['pid', 'name', 'connections']):
+        try:
+            connections = proc.info['connections']
+            if connections:
+                for conn in connections:
+                    if hasattr(conn, 'laddr') and conn.laddr and conn.laddr.port == port:
+                        print(f"🔍 Found process {proc.info['pid']} ({proc.info['name']}) using port {port}")
+                        proc.terminate()
+                        
+                        # Wait for graceful termination
+                        try:
+                            proc.wait(timeout=5)
+                            print(f"✅ Process {proc.info['pid']} terminated gracefully")
+                        except psutil.TimeoutExpired:
+                            print(f"⚡ Force killing process {proc.info['pid']}")
+                            proc.kill()
+                        
+                        stopped = True
+                        break
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    
+    if not stopped:
+        # Fallback: look for python processes running moderation_server.py
+        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+            try:
+                if proc.info['name'] == 'python.exe' or proc.info['name'] == 'python':
+                    cmdline = proc.info['cmdline']
+                    if cmdline and any('moderation_server.py' in arg for arg in cmdline):
+                        print(f"🔍 Found moderation process {proc.info['pid']}")
+                        proc.terminate()
+                        
+                        try:
+                            proc.wait(timeout=5)
+                            print(f"✅ Moderation process {proc.info['pid']} terminated gracefully")
+                        except psutil.TimeoutExpired:
+                            print(f"⚡ Force killing moderation process {proc.info['pid']}")
+                            proc.kill()
+                        
+                        stopped = True
+                        break
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                pass
+    
+    if stopped:
+        print("✅ Moderation service stopped")
+    else:
+        print("⚠️ No moderation service found running")
+    
+    # Verify the service is actually stopped
+    time.sleep(1)
+    if not check_service_health(port):
+        print(f"✅ Confirmed: Service on port {port} is stopped")
+    else:
+        print(f"⚠️ Service may still be running on port {port}")
 
 
 def main():

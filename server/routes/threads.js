@@ -3,7 +3,6 @@ const router = express.Router(); // Create a new Express router
 const Thread = require('../models/thread'); // Import the Thread model
 const Comment = require('../models/Comment');
 const moderator = require('../middleware/moderationMiddleware'); // Import moderation middleware
-console.log('threads.js route file loaded');
 
 // --- GET All Threads ---
 // Route: GET /api/threads
@@ -37,12 +36,8 @@ router.get('/', async (req, res) => {
 
 // Current Implementation Suggestion
 router.get('/', async (req, res) => {
-  console.log('GET /api/threads route hit');
-  console.log('req.auth:', req.auth);
-  
   try {
     const threads = await Thread.find().sort({ date: -1 });
-    console.log(`Found ${threads.length} threads`);
     
     // Get comment counts
     const counts = await Comment.aggregate([
@@ -62,8 +57,6 @@ router.get('/', async (req, res) => {
         userVote = existingVote ? existingVote.direction : null;
       }
 
-      console.log(`Thread ${t.title}: User ${req.auth?._id} vote = ${userVote}`);
-
       return {
         _id: t._id,
         title: t.title,
@@ -71,12 +64,11 @@ router.get('/', async (req, res) => {
         author: t.author,
         date: t.date,
         upvotes: t.upvotes,
-        userVote: userVote, // This should be different for each user
+        userVote: userVote,
         replies: countMap.get(t._id.toString()) || 0
       };
     });
     
-    console.log('Sending payload to client');
     res.json(payload);
   } catch (error) {
     console.error('Error in GET /api/threads:', error);

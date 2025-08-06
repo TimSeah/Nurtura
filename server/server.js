@@ -19,6 +19,10 @@ process.on('SIGTERM', cleanup);
 async function cleanup() {
   console.log('Server shutting down...');
   try {
+    // Import and cleanup moderation service
+    const moderator = require('./middleware/moderationMiddleware');
+    moderator.cleanup();
+    
     if (mongoose.connection.readyState === 1) {
       await mongoose.disconnect();
       console.log('MongoDB disconnected due to app termination');
@@ -157,8 +161,7 @@ app.use(
 app.use('/api/journal', journalsRouter); 
 
 // Mount threads router with JWT middleware
-app.use('/api/threads', threadsRouter); 
-console.log('threadsRouter mounted at /api/threads');
+app.use('/api/threads', threadsRouter);
 
 app.use('/api/threads/:threadId/comments', commentRouter);
 app.use('/api/comments', commentRouter);
@@ -196,9 +199,7 @@ app.use(
 app.use('/api/care-recipients', careRecipientsRouter);
 app.use('/api/alerts', alertsRouter);
 app.use('/api/external-resources', externalResourcesRouter);
-console.log('🔧 Mounting moderation router at /api/moderation');
 app.use('/api/moderation', moderationRouter);
-console.log('✅ Moderation router mounted successfully');
 
 
 // --- Error Handling Middleware ---

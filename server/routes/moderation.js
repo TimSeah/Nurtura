@@ -2,13 +2,9 @@ const express = require('express');
 const router = express.Router();
 const moderator = require('../middleware/moderationMiddleware');
 
-console.log('🔧 Moderation router loaded');
-
 // Test endpoint for moderation
 router.post('/test-moderation', async (req, res) => {
   try {
-    console.log('🧪 Testing moderation with:', req.body);
-    
     const contentData = {
       title: req.body.title || '',
       content: req.body.content || '',
@@ -24,7 +20,6 @@ router.post('/test-moderation', async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('❌ Moderation test error:', error);
     res.status(500).json({
       success: false,
       error: error.message,
@@ -35,7 +30,6 @@ router.post('/test-moderation', async (req, res) => {
 
 // Get moderation status
 router.get('/moderation-status', (req, res) => {
-  console.log('📊 Moderation status requested');
   res.json({
     enabled: process.env.ENABLE_MODERATION === 'true',
     model: process.env.MODEL || 'irlab-udc/MetaHateBERT',
@@ -44,5 +38,4 @@ router.get('/moderation-status', (req, res) => {
   });
 });
 
-console.log('✅ Moderation router exported');
 module.exports = router;

@@ -87,8 +87,6 @@ router.post('/login', async (req, res) => {
 
 // GET /api/auth/me - This route will have req.auth populated by JWT middleware
 router.get('/me', async (req, res) => {
-  console.log('Auth check - req.auth:', req.auth);
-  
   try {
     // req.auth is populated by the JWT middleware applied in server.js
     const user = await User.findById(req.auth._id).select('-passwordHash');
