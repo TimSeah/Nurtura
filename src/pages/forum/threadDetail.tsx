@@ -35,32 +35,9 @@ const ThreadDetail: React.FC = () => {
     const [comments, setComments] = useState<CommentDetail[]>([]);
     const [form, setForm] = useState({ content: "" });
     const [formError, setFormError] = useState<string | null>(null);
-    //const [upvotes, setUpvotes] = useState<number>(0); //useState, dont need it?(thread?.upvotes ?? 0); THIS WAS WORKING
     const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
     const { user } = useContext(AuthContext);
 
-    //Original
-    /*
-    const fetchThread = async (id: string) => {
-        setLoading(true);
-        try {
-            const res = await fetch(`/api/threads/${id}`, {
-  credentials: 'include'
-})
-            if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-            const data: ThreadDetail = await res.json();
-            setThread(data);
-            setUserVote(data.userVote);
-            //setUpvotes(data.upvotes);
-        } catch (e: any) {
-            setError(e.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-    */
-
-    //Current Implementation Suggestion
     const fetchThread = async (id: string) => {
     console.log('Frontend: fetchThread called for ID:', id);
     setLoading(true);
@@ -134,73 +111,6 @@ const ThreadDetail: React.FC = () => {
             }
         }, [id]);
 
-    // THIS WAS THE WORKING REDDIT HANDLEVOTE !!!!!!!
-    /*
-    const handleVote = async (direction: 'up' | 'down') => {
-    if (!thread || !user) return;
-
-    let actualDirection: 'up' | 'down' | 'cancel' = direction;
-    let voteDelta = 0;
-
-    if (userVote === direction) {
-        // Cancelling the same vote
-        actualDirection = 'cancel';
-        voteDelta = direction === 'up' ? -1 : +1;
-        setUserVote(null);
-    } else if (userVote === 'up' && direction === 'down') {
-        // Switching from up to down
-        voteDelta = -2;
-        setUserVote('down');
-    } else if (userVote === 'down' && direction === 'up') {
-        // Switching from down to up
-        voteDelta = +2;
-        setUserVote('up');
-    } else if (userVote === null) {
-        // First time voting
-        voteDelta = direction === 'up' ? +1 : -1;
-        setUserVote(direction);
-    }
-
-    try {
-    const res = await fetch(`/api/threads/${thread._id}/vote`, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ direction: actualDirection }),
-    });
-
-    if (!res.ok) throw new Error(await res.text());
-
-    const updated = await res.json();
-
-    // Apply local optimistic update (optional)
-    let voteDelta = 0;
-    if (actualDirection === 'cancel') {
-        voteDelta = userVote === 'up' ? -1 : 1;
-    } else {
-        if (userVote === null) {
-        voteDelta = direction === 'up' ? 1 : -1;
-        } else if (userVote === 'up' && direction === 'down') {
-        voteDelta = -2;
-        } else if (userVote === 'down' && direction === 'up') {
-        voteDelta = 2;
-        }
-    }
-
-    setThread(prev =>
-        prev
-        ? { ...prev, upvotes: updated.upvotes, userVote: updated.userVote }
-        : null
-    );
-    } catch (err) {
-    console.error("Vote failed:", err);
-    alert("Vote failed");
-    }
-    };
-    */
-
-
-    //Current Implementation Suggestion
     const handleVote = async (direction: 'up' | 'down') => {
     if (!thread || !user) return;
 
@@ -240,32 +150,6 @@ const ThreadDetail: React.FC = () => {
         console.error(" Vote failed:", err);
         alert(`Vote failed: ${err.message}`);
     }};
-
-
-
-      
-    /*
-    const updated = await res.json();
-    setUpvotes(updated.upvotes);
-    setUserVote(updated.userVote); // This will now be null if vote was retracted
-  } catch (err) {
-    console.error("Vote failed:", err);
-    alert("Vote failed");
-  }
-};
-
-
-   /* was working before
-    useEffect(() => {
-        if (thread) {
-            setUpvotes(thread.upvotes);
-            //if (thread?.userVote) {
-                 //setUserVote(thread.userVote);
-               // }
-        }
-    }, [thread]);
-    */
-
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });

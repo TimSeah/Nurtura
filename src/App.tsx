@@ -67,7 +67,7 @@ function App() {
       {/* Public routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-
+      <Route path="/threads/:id" element={<ThreadDetail />} />
       {/* Protected routes - requires login + shows Layout */}
       <Route
         element={
@@ -81,7 +81,7 @@ function App() {
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/forum" element={<Forum />} />
         <Route path="/forumTab" element={<ForumTab />} />
-        <Route path="/threads/:id" element={<ThreadDetail />} />
+        
         <Route path="/health" element={<HealthTracking />} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/resourcesAlt" element={<ResourcesAlt />} />

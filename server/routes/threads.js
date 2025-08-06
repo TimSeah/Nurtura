@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router(); // Create a new Express router
 const Thread = require('../models/thread'); // Import the Thread model
 const Comment = require('../models/comment');
+const { expressjwt: jwt } = require('express-jwt');
+const getToken = req => req.cookies.token;
+
 console.log('threads.js route file loaded');
 
 // Current Implementation Suggestion
@@ -57,7 +60,9 @@ router.get('/', async (req, res) => {
 
 
 // This route will create a new thread document in the database.
-router.post('/', async (req, res) => {
+router.post('/',
+  jwt({ secret: process.env.JWT_SECRET, algorithms: ['HS256'], getToken }),
+  async (req, res) => {
   // Extract thread data from the request body
   const { title, content, date, upvotes, author } = req.body;
   //const author = req.auth?.email || req.auth?.username; 
@@ -135,7 +140,9 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.patch('/:id/vote', async (req, res) => {
+router.patch('/:id/vote', 
+  jwt({ secret: process.env.JWT_SECRET, algorithms: ['HS256'], getToken }),
+  async (req, res) => {
   const { direction } = req.body;
   const userId = req.auth?._id;
 
@@ -213,7 +220,9 @@ router.patch('/:id/vote', async (req, res) => {
 
 
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', 
+  jwt({ secret: process.env.JWT_SECRET, algorithms: ['HS256'], getToken }),
+  async (req, res) => {
   try {
     const deleted = await Thread.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ message: 'Thread not found' });

@@ -90,6 +90,7 @@ app.use('/api/auth/me', jwtMiddleware({
 }));
 
 // any route under /api that needs logi, this is MIDDLEWARE
+/*
 app.use(
   '/api/threads',
   jwtMiddleware({
@@ -98,6 +99,7 @@ app.use(
     getToken: req => req.cookies.token
   })
 );
+*/
 
 // Mount thread routes at auth
 app.use('/api/auth', authRoutes);
