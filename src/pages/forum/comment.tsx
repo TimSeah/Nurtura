@@ -25,7 +25,7 @@ const Comment: React.FC<CommentDetailProps> = ({ comment, onDelete}) => {
     if (!window.confirm("Are you sure you want to delete this Comment?")) return;
 
     try {
-      const res = await fetch(`/api/comments/${id}`, {
+      const res = await fetch(`/api/threads/${comment.threadId}/comments/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -33,8 +33,8 @@ const Comment: React.FC<CommentDetailProps> = ({ comment, onDelete}) => {
 
       onDelete(comment._id);
     } catch (err: any) {
-      console.error("Failed to delete thread:", err);
-      alert(`Failed to delete thread: ${err.message}`);
+      console.error("Failed to delete comment:", err);
+      alert(`Failed to delete comment: ${err.message}`);
     }
   };
 
