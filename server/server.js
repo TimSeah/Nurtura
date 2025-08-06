@@ -6,7 +6,6 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
-const threadRoutes = require('./routes/threads');
 const { expressjwt: jwtMiddleware } = require('express-jwt');
 const authRoutes = require('./routes/auth');
 
@@ -20,6 +19,10 @@ process.on('SIGTERM', cleanup);
 async function cleanup() {
   console.log('Server shutting down...');
   try {
+    // Import and cleanup moderation service
+    const moderator = require('./middleware/moderationMiddleware');
+    moderator.cleanup();
+    
     if (mongoose.connection.readyState === 1) {
       await mongoose.disconnect();
       console.log('MongoDB disconnected due to app termination');
@@ -44,9 +47,12 @@ mongoose.connect(process.env.MONGO_URI, {
   startReminderService();
   
   const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log('You can test the server by navigating to http://localhost:5000 in your browser.');
+  const HOST = process.env.SERVER_HOST || '0.0.0.0';
+  
+  app.listen(PORT, HOST, () => {
+    console.log(`Server running on ${HOST}:${PORT}`);
+    const serverUrl = process.env.SERVER_URL || `http://localhost:${PORT}`;
+    console.log(`You can test the server by navigating to ${serverUrl} in your browser.`);
   });
 })
 .catch(err => {
@@ -58,8 +64,12 @@ mongoose.connect(process.env.MONGO_URI, {
 // Enable CORS for all origins.
 // IMPORTANT: In production, you should restrict this to your frontend's specific domain:
 // app.use(cors({ origin: 'http://localhost:3000' })); // Example for development
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',') 
+  : ['http://localhost:3000', 'http://localhost:80', 'http://localhost'];
+
 app.use(cors({
-  origin: true,        // reflect request.origin back in ACAO
+  origin: process.env.NODE_ENV === 'production' ? allowedOrigins : true,
   credentials: true,   // allow cookies/auth headers
 }));
 
@@ -101,15 +111,20 @@ app.use(
 );
 */
 
-// Mount thread routes at auth
+// Health check endpoint for Docker
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
+// Mount auth routes
 app.use('/api/auth', authRoutes);
-// Mount thread routes at /api/threads
-app.use('/api/threads', threadRoutes)
 
 // --- Route Definitions ---
-// Import  route handlers.
-// create these files (e.g., './routes/index.js', './routes/events.js')
-// defineour API endpoints for different resources.
+// Import route handlers.
 const indexRouter = require('./routes/index');
 const eventsRouter = require('./routes/events');
 const journalsRouter = require('./routes/journal'); 
@@ -120,6 +135,7 @@ const vitalSignsRouter = require('./routes/vitalSigns');
 const careRecipientsRouter = require('./routes/careRecipients');
 const alertsRouter = require('./routes/alerts');
 const externalResourcesRouter = require('./routes/externalResources');
+const moderationRouter = require('./routes/moderation');
 
 // Import and start email reminder service
 const { startReminderService } = require('./services/emailReminderService');
@@ -145,9 +161,12 @@ app.use(
   })
 );
 app.use('/api/journal', journalsRouter); 
-app.use('/api/threads', threadsRouter); 
-console.log('threadsRouter mounted at /api/threads');
+
+// Mount threads router with JWT middleware
+app.use('/api/threads', threadsRouter);
+
 app.use('/api/threads/:threadId/comments', commentRouter);
+app.use('/api/comments', commentRouter);
 
 
 app.use(
@@ -182,6 +201,7 @@ app.use(
 app.use('/api/care-recipients', careRecipientsRouter);
 app.use('/api/alerts', alertsRouter);
 app.use('/api/external-resources', externalResourcesRouter);
+app.use('/api/moderation', moderationRouter);
 
 
 // --- Error Handling Middleware ---

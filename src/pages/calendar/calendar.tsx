@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
-import "./Calendar.css";
+import "./calendar.css";
 
 interface Event {
   _id?: string;

@@ -4,17 +4,14 @@ const Thread = require('../models/thread'); // Import the Thread model
 const Comment = require('../models/comment');
 const { expressjwt: jwt } = require('express-jwt');
 const getToken = req => req.cookies.token;
+const moderator = require('../middleware/moderationMiddleware'); // Import moderation middleware
 
 console.log('threads.js route file loaded');
 
 // Current Implementation Suggestion
 router.get('/', async (req, res) => {
-  console.log('GET /api/threads route hit');
-  console.log('req.auth:', req.auth);
-  
   try {
     const threads = await Thread.find().sort({ date: -1 });
-    console.log(`Found ${threads.length} threads`);
     
     // Get comment counts
     const counts = await Comment.aggregate([
@@ -34,8 +31,6 @@ router.get('/', async (req, res) => {
         userVote = existingVote ? existingVote.direction : null;
       }
 
-      console.log(`Thread ${t.title}: User ${req.auth?._id} vote = ${userVote}`);
-
       return {
         _id: t._id,
         title: t.title,
@@ -43,12 +38,11 @@ router.get('/', async (req, res) => {
         author: t.author,
         date: t.date,
         upvotes: t.upvotes,
-        userVote: userVote, // This should be different for each user
+        userVote: userVote,
         replies: countMap.get(t._id.toString()) || 0
       };
     });
     
-    console.log('Sending payload to client');
     res.json(payload);
   } catch (error) {
     console.error('Error in GET /api/threads:', error);
@@ -62,10 +56,16 @@ router.get('/', async (req, res) => {
 // This route will create a new thread document in the database.
 router.post('/',
   jwt({ secret: process.env.JWT_SECRET, algorithms: ['HS256'], getToken }),
+  moderator.moderationMiddleware(),
   async (req, res) => {
   // Extract thread data from the request body
   const { title, content, date, upvotes, author } = req.body;
   //const author = req.auth?.email || req.auth?.username; 
+
+  // Log moderation results if available
+  if (req.moderationResult) {
+    console.log('Thread moderation result:', req.moderationResult);
+  } 
 
   // Create a new Thread instance using the Mongoose model
   // Mongoose will automatically validate the data against the schema.
@@ -92,21 +92,13 @@ router.post('/',
 });
 
 router.get('/:id', async (req, res) => {
-  console.log('GET /api/threads/:id route hit');
-  console.log('Thread ID:', req.params.id);
-  console.log('req.auth:', req.auth);
-  
   const threadId = req.params.id;
   try {
     const thread = await Thread.findById(threadId);
     
     if (!thread) {
-      console.log('Thread not found');
       return res.status(404).json({ message: 'Thread not found' });
     }
-
-    console.log('Found thread:', thread.title);
-    console.log('Thread votes:', thread.votes);
 
     // Get current user's vote state
     let userVote = null;
@@ -115,10 +107,7 @@ router.get('/:id', async (req, res) => {
         v.userId && v.userId.toString() === req.auth._id.toString()
       );
       userVote = existingVote ? existingVote.direction : null;
-      console.log('Found existing vote for user:', existingVote);
     }
-
-    console.log(`Final userVote for user ${req.auth?._id}: ${userVote}`);
 
     // Return thread with user's vote state
     const response = {
@@ -132,7 +121,6 @@ router.get('/:id', async (req, res) => {
       replies: 0 // You can calculate this if needed
     };
 
-    console.log('Sending response:', response);
     res.json(response);
   } catch (err) {
     console.error('Error fetching thread:', err);

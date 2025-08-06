@@ -1,5 +1,19 @@
 // API configuration and base functions
-const API_BASE_URL = 'http://localhost:5000/api';
+
+// For Jest/test environments, we'll use process.env
+// For Vite builds, the bundler will replace import.meta.env references at build time
+const getApiBaseUrl = (): string => {
+  // Check if we have process.env (Node.js/Jest environment)
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env.VITE_API_URL || 'http://localhost:5000/api';
+  }
+  
+  // For browser environments, we'll fallback to the default
+  // In actual production, Vite will have replaced import.meta.env references during build
+  return 'http://localhost:5000/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 class ApiService {
   private async request(endpoint: string, options: RequestInit = {}) {

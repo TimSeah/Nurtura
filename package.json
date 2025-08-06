@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:docker": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "npm run test:vitest && npm run test:jest",
@@ -35,6 +36,7 @@
     "lucide-react": "^0.523.0",
     "mongodb": "^6.17.0",
     "mongoose": "^8.16.4",
+    "node-fetch": "^2.7.0",
     "nodemailer": "^7.0.5",
     "ogl": "^1.0.11",
     "react": "^19.1.0",

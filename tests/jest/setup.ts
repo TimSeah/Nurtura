@@ -1,6 +1,9 @@
 import '@testing-library/jest-dom';
 import { TextEncoder, TextDecoder } from 'util';
 
+// Set up environment variables for Jest testing
+process.env.VITE_API_URL = 'http://localhost:5000/api';
+
 // Polyfill for TextEncoder/TextDecoder (JSDOM doesn't include these)
 global.TextEncoder = TextEncoder;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

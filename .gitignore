@@ -83,3 +83,22 @@ public/uploads/
 # Local development
 .cache/
 server/.env
+
+# Python Packages
+.venv
+*/venv/
+automod/venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+pyvenv.cfg
+
+# Actual environment files
+.env
+automod/.env
+
+# Log files
+*.log
+automod/*.log
+moderation.log
