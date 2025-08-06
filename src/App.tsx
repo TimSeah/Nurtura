@@ -15,7 +15,7 @@ import Settings from "./pages/settings/Settings";
 import Forum from "./pages/forum/forum";
 import ForumTab from "./pages/forum/ForumTab";
 import ThreadDetail from "./pages/forum/threadDetail";
-// import Journal from "./pages/healthMonitoring/components/journal/journal";
+import Landing from "./pages/landing/Landing";
 import ResourcesAlt from "./pages/ResorucesAlt";
 import HealthMonitoring from "./pages/healthMonitoring/components/add new recipient/HealthMonitoring";
 
@@ -68,6 +68,7 @@ function App() {
       {/* Public routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/landing" element={<Landing />} />
 
       {/* Protected routes - requires login + shows Layout */}
       <Route
