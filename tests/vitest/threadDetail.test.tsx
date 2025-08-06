@@ -2,7 +2,7 @@ import { screen, fireEvent, waitFor } from '@testing-library/react';
 import ThreadDetail from '../../src/pages/forum/threadDetail';
 import { renderWithRouter } from './utils';
 import { mockFetchOnce } from './mockFetch';
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import { act, renderHook } from '@testing-library/react';
 import { useState } from 'react';
@@ -96,7 +96,7 @@ describe('ThreadDetail: UI test cases', () => {
     mockFetchOnce(sampleComments, true);
     renderWithRouter(<ThreadDetail />, { route: '/threads/1', path: '/threads/:id' });
     await screen.findByText('Test Thread');
-    fireEvent.click(screen.getByRole('button', { name: /comment/i }));
+    fireEvent.click(screen.getByRole('button', { name: /add comment/i }));
     expect(screen.getByPlaceholderText(/Write a comment/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Cancel/i }));
     expect(screen.queryByPlaceholderText(/Write a comment/i)).not.toBeInTheDocument();
@@ -108,7 +108,7 @@ describe('ThreadDetail: UI test cases', () => {
     mockFetchOnce(sampleComments, true);
     renderWithRouter(<ThreadDetail />, { route: '/threads/1', path: '/threads/:id' });
     await screen.findByText('Test Thread');
-    fireEvent.click(screen.getByRole('button', { name: /comment/i }));
+    fireEvent.click(screen.getByRole('button', { name: /add comment/i }));
     fireEvent.click(screen.getByRole('button', { name: /Post comment/i }));
     expect(screen.getByText(/Please write a comment before posting/i)).toBeInTheDocument();
   });
@@ -160,7 +160,7 @@ describe('ThreadDetail: UI test cases', () => {
         <ThreadDetail />
       </AuthContext.Provider>, { route: '/threads/1', path: '/threads/:id' });
     await screen.findByText('Test Thread');
-    fireEvent.click(screen.getByRole('button', { name: /comment/i }));
+    fireEvent.click(screen.getByRole('button', { name: /add comment/i }));
     const maxContent = 'X'.repeat(1000);
     fireEvent.change(screen.getByPlaceholderText(/Write a comment/i), { target: { value: maxContent } });
     const newComment = { _id: 4, threadId: '1', content: maxContent, author: 'Good Commenter', date: new Date().toISOString() };
@@ -182,7 +182,7 @@ describe('ThreadDetail: Integration test cases', () => {
         <ThreadDetail />
       </AuthContext.Provider>, { route: '/threads/1', path: '/threads/:id' });
     await screen.findByText('Test Thread');
-    fireEvent.click(screen.getByRole('button', { name: /comment/i }));
+    fireEvent.click(screen.getByRole('button', { name: /add comment/i }));
     fireEvent.change(screen.getByPlaceholderText(/Write a comment/i), { target: { value: 'A new comment' } });
     const newComment = { _id: 3, threadId: '1', content: 'A new comment', author: 'Good Commenter', date: new Date().toISOString() };
     mockFetchOnce(newComment, true); // POST
@@ -319,7 +319,7 @@ describe('ThreadDetail: Auth/Back button test cases (UI/Integration)', () => {
         <ThreadDetail />
       </AuthContext.Provider>, { route: '/threads/1', path: '/threads/:id' });
     await screen.findByText('Test Thread');
-    fireEvent.click(screen.getByRole('button', { name: /comment/i }));
+    fireEvent.click(screen.getByRole('button', { name: /add comment/i }));
     fireEvent.change(screen.getByPlaceholderText(/Write a comment/i), { target: { value: 'Should not work' } });
     fireEvent.click(screen.getByRole('button', { name: /Post comment/i }));
     expect(await screen.findByText('You must be logged in to comment.')).toBeInTheDocument();
