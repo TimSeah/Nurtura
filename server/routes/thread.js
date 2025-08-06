@@ -194,57 +194,6 @@ router.patch('/:id/vote', async (req, res) => {
 });
 */
 
-
-/* THIS WAS THE WORKING REDDIT ONE SORT OF
-router.patch('/:id/vote', async (req, res) => {
-  const { direction } = req.body;
-  const userId = req.auth?._id;
-  console.log('🔥 vote route hit');
-  console.log('🧠 req.auth:', req.auth); // this should show your JWT payload
-
-  if (!req.auth || !req.auth._id) {
-    return res.status(401).json({ message: 'Unauthorized - no user ID in token' });
-  }
-
-  
-
-  if (!userId) {
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
-
-  if (!['up', 'down'].includes(direction)) {
-    return res.status(400).json({ message: 'Invalid vote direction' });
-  }
-
-  const thread = await Thread.findById(req.params.id);
-  if (!thread) return res.status(404).json({ message: 'Thread not found' });
-
-  const existingVote = thread.votes.find(v => v.userId.toString() === userId.toString());
-
-  if (existingVote) {
-    if (existingVote.direction === direction) {
-      // Same vote again → no change
-      return res.status(200).json({ upvotes: thread.upvotes, userVote: direction });
-    }
-
-    // Switch vote: update upvote count and direction
-    if (direction === 'up') thread.upvotes += 2;   // down -> up
-    else thread.upvotes -= 2;                      // up -> down
-
-    existingVote.VoteType = direction;
-  } else {
-    // First vote
-    thread.votes.push({ userId, direction });
-    if (direction === 'up') thread.upvotes += 1;
-    else thread.upvotes -= 1;
-  }
-
-  await thread.save();
-  res.json({ upvotes: thread.upvotes, userVote: direction });
-});
-
-*/
-
 router.patch('/:id/vote', async (req, res) => {
   const { direction } = req.body;
   const userId = req.auth?._id;
