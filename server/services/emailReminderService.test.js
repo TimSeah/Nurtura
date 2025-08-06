@@ -116,28 +116,31 @@ describe('Email Reminder Service', () => {
 
     test('handles missing transporter configuration', async () => {
       // Temporarily remove the transporter
-      const originalCreateTransporter = nodemailer.createTransporter;
-      nodemailer.createTransporter = jest.fn().mockReturnValue(null);
+      const originalCreateTransport = nodemailer.createTransport;
+      nodemailer.createTransport = jest.fn().mockReturnValue(null);
 
       const result = await sendReminderEmail(mockEvent, mockUserEmail, mockUserName);
 
       expect(result).toBe(false);
       
       // Restore original transporter
-      nodemailer.createTransporter = originalCreateTransporter;
+      nodemailer.createTransport = originalCreateTransport;
     });
   });
 
   describe('checkAndSendReminders', () => {
-    test('sends reminders for events within reminder window', async () => {
-      // Create events that are ALREADY within the reminder window
-      // Mock event with date/time exactly 58 minutes from a fixed "now"
+    test('correctly identifies events within reminder window', async () => {
+      // Create events that are actually within the reminder window (55-60 minutes from now)
+      const now = moment();
+      const eventInWindow = now.clone().add(58, 'minutes');
+      const eventOutsideWindow = now.clone().add(90, 'minutes');
+      
       const mockEvents = [
         {
           _id: '1',
           title: 'Doctor Appointment',
-          date: new Date('2023-07-25T10:58:00.000Z'), // In proper reminder window
-          startTime: '10:58',
+          date: eventInWindow.format('YYYY-MM-DD'),
+          startTime: eventInWindow.format('HH:mm'),
           userId: 'user1',
           reminderSent: false,
           enableReminder: true,
@@ -146,8 +149,8 @@ describe('Email Reminder Service', () => {
         {
           _id: '2', 
           title: 'Dentist Appointment',
-          date: new Date('2023-07-25T12:00:00.000Z'), // Too far in future
-          startTime: '12:00',
+          date: eventOutsideWindow.format('YYYY-MM-DD'),
+          startTime: eventOutsideWindow.format('HH:mm'),
           userId: 'user1',
           reminderSent: false,
           enableReminder: true,
@@ -173,10 +176,11 @@ describe('Email Reminder Service', () => {
         enableReminder: true
       });
       
-      // Since our test events are not within the 55-60 minute window,
-      // UserSettings should not be queried (correct behavior)
-      expect(UserSettings.findOne).not.toHaveBeenCalled();
-      expect(mockSendMail).not.toHaveBeenCalled();
+      // UserSettings should be queried for the event within the window
+      expect(UserSettings.findOne).toHaveBeenCalledWith({ userId: 'user1' });
+      expect(mockSendMail).toHaveBeenCalledTimes(1);
+      expect(mockEvents[0].save).toHaveBeenCalled();
+      expect(mockEvents[1].save).not.toHaveBeenCalled();
     });
 
     test('skips events with notifications disabled', async () => {
