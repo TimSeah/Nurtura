@@ -28,7 +28,7 @@ describe('Comment: UI test cases', () => {
     render(<Comment comment={comment} />);
     const article = screen.getByRole('article');
     expect(article).toHaveClass('p-6', 'text-base', 'bg-white', 'rounded-lg');
-    expect(screen.getByText('This is a comment.')).toHaveClass('text-gray-500', 'text-left');
+    expect(screen.getByText('This is a comment.')).toHaveClass('text-gray-500', 'mt-1');
   });
 
   test('renders author and content as plain text', () => {
