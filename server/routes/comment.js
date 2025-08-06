@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true }); // Enable mergeParams to access threadId from parent route
-const Thread = require('../models/thread');
+const Thread = require('../models/Thread');
 const Comment = require('../models/Comment');
 const moderator = require('../middleware/moderationMiddleware'); // Import moderation middleware
 
