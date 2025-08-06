@@ -24,14 +24,20 @@ class ContentModerator:
 
     def _setup_logger(self):
         """Setup logging for production use"""
-        log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+        log_level = os.getenv("LOG_LEVEL", "WARNING").upper()  # Changed default to WARNING
+        
+        # Only log to file in production, reduce console noise
+        handlers = []
+        if os.getenv("NODE_ENV") == "development":
+            handlers.append(logging.StreamHandler(sys.stdout))
+        
+        # Always log errors to file
+        handlers.append(logging.FileHandler("moderation.log", mode="a"))
+        
         logging.basicConfig(
-            level=getattr(logging, log_level, logging.INFO),
+            level=getattr(logging, log_level, logging.WARNING),
             format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-            handlers=[
-                logging.StreamHandler(sys.stdout),
-                logging.FileHandler("moderation.log", mode="a"),
-            ],
+            handlers=handlers,
         )
         return logging.getLogger(__name__)
 
@@ -120,9 +126,9 @@ class ContentModerator:
                 and confidence >= self.confidence_threshold,
             }
 
-            # Log high-confidence detections
+            # Log high-confidence detections (only in debug mode)
             if result["should_block"]:
-                self.logger.warning(
+                self.logger.debug(
                     f"Blocking content - Label: {label}, Confidence: {confidence:.3f}"
                 )
 
@@ -176,7 +182,7 @@ class ContentModerator:
                     results["blocked_reason"] = (
                         f"Inappropriate title detected (confidence: {title_result['confidence']:.2f})"
                     )
-                    self.logger.info(f"Blocked content - Title moderation")
+                    self.logger.debug(f"Blocked content - Title moderation")
                     return results
 
             # Check content
@@ -189,7 +195,7 @@ class ContentModerator:
                     results["blocked_reason"] = (
                         f"Inappropriate content detected (confidence: {content_result['confidence']:.2f})"
                     )
-                    self.logger.info(f"Blocked content - Content moderation")
+                    self.logger.debug(f"Blocked content - Content moderation")
                     return results
 
             # Calculate overall confidence

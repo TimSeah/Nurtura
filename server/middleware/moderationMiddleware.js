@@ -65,7 +65,6 @@ class ForumModerator {
 
   async startPersistentService() {
     try {
-      console.log('🏁 Starting persistent moderation service...');
       const serverPath = path.join(__dirname, '../../automod/moderation_server.py');
       
       this.serviceProcess = spawn(this.pythonPath, [serverPath], {
@@ -76,12 +75,13 @@ class ForumModerator {
         }
       });
 
-      this.serviceProcess.stdout.on('data', (data) => {
-        console.log(`[ModerationService] ${data.toString().trim()}`);
-      });
-
+      // Only log errors and completion status
       this.serviceProcess.stderr.on('data', (data) => {
-        console.error(`[ModerationService Error] ${data.toString().trim()}`);
+        const output = data.toString().trim();
+        // Only log actual errors, not warnings
+        if (output.includes('ERROR') || output.includes('CRITICAL')) {
+          console.error(`[ModerationService] ${output}`);
+        }
       });
 
       this.serviceProcess.on('close', (code) => {

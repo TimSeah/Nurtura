@@ -138,21 +138,13 @@ router.get('/:id', async (req, res) => {
 */
 //Current Implementation Suggestion
 router.get('/:id', async (req, res) => {
-  console.log('GET /api/threads/:id route hit');
-  console.log('Thread ID:', req.params.id);
-  console.log('req.auth:', req.auth);
-  
   const threadId = req.params.id;
   try {
     const thread = await Thread.findById(threadId);
     
     if (!thread) {
-      console.log('Thread not found');
       return res.status(404).json({ message: 'Thread not found' });
     }
-
-    console.log('Found thread:', thread.title);
-    console.log('Thread votes:', thread.votes);
 
     // Get current user's vote state
     let userVote = null;
@@ -161,10 +153,7 @@ router.get('/:id', async (req, res) => {
         v.userId && v.userId.toString() === req.auth._id.toString()
       );
       userVote = existingVote ? existingVote.direction : null;
-      console.log('Found existing vote for user:', existingVote);
     }
-
-    console.log(`Final userVote for user ${req.auth?._id}: ${userVote}`);
 
     // Return thread with user's vote state
     const response = {
@@ -178,7 +167,6 @@ router.get('/:id', async (req, res) => {
       replies: 0 // You can calculate this if needed
     };
 
-    console.log('Sending response:', response);
     res.json(response);
   } catch (err) {
     console.error('Error fetching thread:', err);
