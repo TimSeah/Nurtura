@@ -83,13 +83,6 @@ const Resources: React.FC = () => {
     },
     {
       id: 4,
-      title: "Caring for Yourself",
-      image: caregiving1,
-      url: "https://www.caregiver.org/caregiver-resources/caring-for-yourself/",
-      description: "Self-care tips for caregivers.",
-    },
-    {
-      id: 5,
       title: "Dementia Hub Singapore",
       image: caregiving2,
       url: "https://www.dementiahub.sg/",
