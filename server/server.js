@@ -162,6 +162,7 @@ app.use('/api/journal', journalsRouter);
 app.use('/api/threads', threadsRouter); 
 console.log('threadsRouter mounted at /api/threads');
 app.use('/api/threads/:threadId/comments', commentRouter);
+app.use('/api/comments', commentRouter);
 
 
 app.use(

@@ -324,9 +324,9 @@ const ThreadDetail: React.FC = () => {
         <div className="min-h-screen bg-gray-50 antialiased">
             <div className="max-w-3xl mx-auto px-4 py-8">
                 {/* Back Button */}
-                <div className="mb-4 flex items-center space-x-2 text-blue-600 hover:text-blue-800 cursor-pointer" onClick={() => navigate(-1)}>
-                <ArrowLeftIcon className="w-5 h-5" />
-                <span className="text-sm font-medium">Back to Forum</span>
+                <div className="mb-4 flex items-center space-x-2 text-teal-600 hover:text-teal-800 cursor-pointer" onClick={() => navigate(-1)}>
+                {/* <ArrowLeftIcon className="w-5 h-5" /> */}
+                <span className="text-[20px] font-large"> &lt; Back to Forum</span>
                 </div>
                 {/* --- Thread Header --- */}
                 <ThreadPost 
@@ -374,7 +374,13 @@ const ThreadDetail: React.FC = () => {
                     <div className="mt-6 space-y-4">
                         {comments.length > 0 ? (
                             comments.map((c) => (
-                                <Comment key={c._id} comment={c} />
+                                <Comment 
+                                key={c._id} 
+                                comment={c}
+                                onDelete={handlecommentDelete => {
+                                    setComments(prev => prev.filter(comment => comment._id !== handlecommentDelete));
+                                }}
+                                 />
                             ))
                         ) : (
                             <p className="text-gray-500">No comments yet. Be the first to comment!</p>
