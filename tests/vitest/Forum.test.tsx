@@ -1,5 +1,5 @@
 import { screen, fireEvent, waitFor, within } from '@testing-library/react';
-import Forum from '../../src/pages/forum/Forum';
+import Forum from '../../src/pages/forum/forum';
 import { renderWithRouter } from './utils';
 import { mockFetchOnce } from './mockFetch';
 import { afterEach, describe, expect, test, vi } from 'vitest';
