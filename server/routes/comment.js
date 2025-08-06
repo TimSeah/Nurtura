@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true }); // Enable mergeParams to access threadId from parent route
-const Thread = require('../models/Thread');
+const Thread = require('../models/thread');
 const Comment = require('../models/Comment');
 
 router.get('/', async (req, res) => {
@@ -29,6 +29,17 @@ router.post('/', async (req, res) => {
   } catch (err) {
     console.error('Error creating comment:', err);
     res.status(400).json({ message: err.message });
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try {
+    const deleted = await Comment.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Comment not found' });
+    res.json({ message: 'Comment deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting Comment:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

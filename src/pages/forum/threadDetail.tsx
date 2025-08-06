@@ -1,9 +1,8 @@
-import "./Forum.css";
-import "./Forum"
+import "./forum.css";
 import { useState, useEffect,useContext, type ChangeEvent } from "react";
 import { useParams } from "react-router-dom";
 import ThreadPost from "./threadPost";
-import Comment from "./Comment";
+import Comment from "./comment";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { AuthContext } from "../../contexts/AuthContext";
@@ -46,7 +45,7 @@ const ThreadDetail: React.FC = () => {
     const fetchThread = async (id: string) => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:5000/api/threads/${id}`, {
+            const res = await fetch(`/api/threads/${id}`, {
   credentials: 'include'
 })
             if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
@@ -67,7 +66,7 @@ const ThreadDetail: React.FC = () => {
     console.log('Frontend: fetchThread called for ID:', id);
     setLoading(true);
     try {
-        const res = await fetch(`http://localhost:5000/api/threads/${id}`, {
+        const res = await fetch(`/api/threads/${id}`, {
             credentials: 'include'
         });
         
@@ -113,7 +112,7 @@ const ThreadDetail: React.FC = () => {
     
     const fetchComments = async (threadId: string) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/threads/${threadId}/comments`, {
+            const res = await fetch(`/api/threads/${threadId}/comments`, {
                 credentials: 'include'
             })
             
@@ -164,7 +163,7 @@ const ThreadDetail: React.FC = () => {
     }
 
     try {
-    const res = await fetch(`http://localhost:5000/api/threads/${thread._id}/vote`, {
+    const res = await fetch(`/api/threads/${thread._id}/vote`, {
         method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -211,7 +210,7 @@ const ThreadDetail: React.FC = () => {
     console.log('Current upvotes:', thread.upvotes);
 
     try {
-        const res = await fetch(`http://localhost:5000/api/threads/${thread._id}/vote`, {
+        const res = await fetch(`/api/threads/${thread._id}/vote`, {
         method: 'PATCH',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -284,7 +283,7 @@ const ThreadDetail: React.FC = () => {
             return;
         }
         try {
-            const res = await fetch(`http://localhost:5000/api/threads/${id}/comments`, {
+            const res = await fetch(`/api/threads/${id}/comments`, {
                 method: "POST",
                 credentials: 'include',
                 headers: {
@@ -325,9 +324,9 @@ const ThreadDetail: React.FC = () => {
         <div className="min-h-screen bg-gray-50 antialiased">
             <div className="max-w-3xl mx-auto px-4 py-8">
                 {/* Back Button */}
-                <div className="mb-4 flex items-center space-x-2 text-blue-600 hover:text-blue-800 cursor-pointer" onClick={() => navigate(-1)}>
-                <ArrowLeftIcon className="w-5 h-5" />
-                <span className="text-sm font-medium">Back to Forum</span>
+                <div className="mb-4 flex items-center space-x-2 text-teal-600 hover:text-teal-800 cursor-pointer" onClick={() => navigate(-1)}>
+                {/* <ArrowLeftIcon className="w-5 h-5" /> */}
+                <span className="text-[20px] font-large"> &lt; Back to Forum</span>
                 </div>
                 {/* --- Thread Header --- */}
                 <ThreadPost 
@@ -375,7 +374,13 @@ const ThreadDetail: React.FC = () => {
                     <div className="mt-6 space-y-4">
                         {comments.length > 0 ? (
                             comments.map((c) => (
-                                <Comment key={c._id} comment={c} />
+                                <Comment 
+                                key={c._id} 
+                                comment={c}
+                                onDelete={handlecommentDelete => {
+                                    setComments(prev => prev.filter(comment => comment._id !== handlecommentDelete));
+                                }}
+                                 />
                             ))
                         ) : (
                             <p className="text-gray-500">No comments yet. Be the first to comment!</p>
