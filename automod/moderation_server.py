@@ -184,11 +184,12 @@ def main():
 
     # Start HTTP server
     handler = create_handler(moderator)
-    server_instance = HTTPServer(("localhost", PORT), handler)
+    host = os.getenv("API_HOST", "0.0.0.0")  # Bind to all interfaces for Docker
+    server_instance = HTTPServer((host, PORT), handler)
 
-    print(f"Moderation service running on http://localhost:{PORT}")
-    print("Health check: http://localhost:8001/health")
-    print("POST moderation requests to http://localhost:8001/")
+    print(f"Moderation service running on http://{host}:{PORT}")
+    print(f"Health check: http://{host}:{PORT}/health")
+    print(f"POST moderation requests to http://{host}:{PORT}/")
     print("-" * 50)
 
     try:

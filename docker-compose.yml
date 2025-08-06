@@ -1,20 +1,50 @@
 services:
-  # Backend Service
-  backend:
+  # Web Application Service
+  webapp:
     build:
-      context: ./server
-      dockerfile: Dockerfile
-    container_name: nurtura-backend
+      context: .
+      dockerfile: server/Dockerfile.webapp
+    container_name: nurtura-webapp
     restart: unless-stopped
     env_file:
       - ./server/.env
     environment:
       NODE_ENV: production
+      # Point to AI moderation service
+      MODERATION_SERVICE_URL: http://ai-moderation:8001
     ports:
       - "5000:5000"
     networks:
       - nurtura-network
-  # Frontend Service
+    depends_on:
+      - ai-moderation
+
+  # AI Moderation Service
+  ai-moderation:
+    build:
+      context: automod/
+      dockerfile: Dockerfile
+    container_name: nurtura-ai-moderation
+    restart: unless-stopped
+    environment:
+      API_HOST: 0.0.0.0
+      API_PORT: 8001
+      LOG_LEVEL: INFO
+      MODEL_CACHE_DIR: /app/models
+      MODERATION_IDLE_TIMEOUT: 30
+    ports:
+      - "8001:8001"  # External access for testing
+    networks:
+      - nurtura-network
+    # Optional: Add resource limits for AI service
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+
+  # Frontend Service (unchanged)
   frontend:
     build:
       context: .
@@ -23,11 +53,15 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
-    depends_on:
-      - backend
     networks:
       - nurtura-network
+    depends_on:
+      - webapp
 
 networks:
   nurtura-network:
     driver: bridge
+
+volumes:
+  ai-models:
+    driver: local

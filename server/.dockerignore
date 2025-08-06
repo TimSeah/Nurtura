@@ -39,3 +39,10 @@ logs
 
 # Misc
 .eslintcache
+
+# Auto-moderation cache and development files
+automod/venv
+automod/__pycache__
+automod/*.log
+automod/.env
+automod/*.bat

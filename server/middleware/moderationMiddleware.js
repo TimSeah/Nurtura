@@ -7,7 +7,9 @@ class ForumModerator {
     this.moderationEnabled = process.env.ENABLE_MODERATION === 'true';
     this.usePersistentService = process.env.USE_PERSISTENT_MODERATION === 'true';
     this.servicePort = process.env.MODERATION_SERVICE_PORT || 8001;
-    this.serviceUrl = `http://localhost:${this.servicePort}`;
+    
+    // Support both local and external AI service
+    this.serviceUrl = process.env.MODERATION_SERVICE_URL || `http://localhost:${this.servicePort}`;
     this.pythonPath = process.env.PYTHON_PATH || 'python';
     this.scriptPath = path.join(__dirname, '../../automod/moderate_cli.py');
     this.serviceProcess = null;
@@ -15,7 +17,10 @@ class ForumModerator {
     // Only log moderation status in production
     if (this.moderationEnabled) {
       console.log('🛡️ Content moderation enabled');
-      if (this.usePersistentService) {
+      console.log(`📡 Moderation service: ${this.serviceUrl}`);
+      
+      // Only start local service if not using external service
+      if (this.usePersistentService && !process.env.MODERATION_SERVICE_URL) {
         this.startPersistentService();
       }
     }
