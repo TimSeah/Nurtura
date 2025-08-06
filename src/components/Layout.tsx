@@ -75,8 +75,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
             {navigationItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-
+              let isActive;
+              if (item.path === "/forum") {
+                isActive = location.pathname.startsWith("/forum") || location.pathname.startsWith("/threads/");
+              } else {
+                isActive = location.pathname === item.path;
+              }
               return (
                 <Link
                   key={item.path}
