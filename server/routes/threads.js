@@ -6,8 +6,6 @@ const { expressjwt: jwt } = require('express-jwt');
 const getToken = req => req.cookies.token;
 const moderator = require('../middleware/moderationMiddleware'); // Import moderation middleware
 
-console.log('threads.js route file loaded');
-
 // Current Implementation Suggestion
 router.get('/', async (req, res) => {
   try {
