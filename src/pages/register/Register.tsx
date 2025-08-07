@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { FiEye, FiEyeOff } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiInfo } from "react-icons/fi";
 import { bannedWords } from "../../utils/bannedWords";
 import logoBlack from "../login/components/koala-removebg-preview.png";
 
@@ -127,6 +127,26 @@ export default function Register() {
             >
               {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
             </button>
+            
+            {/* Password Requirements Info Icon */}
+            <div className="absolute right-12 top-1/2 transform -translate-y-1/2 group">
+              <FiInfo 
+                size={16} 
+                className="text-slate-400 hover:text-slate-600 cursor-help transition-colors"
+              />
+              <div className="absolute left-6 top-1/2 transform -translate-y-1/2 w-64 p-3 bg-white border border-slate-200 text-slate-700 text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                <div>
+                  <p className="font-medium" style={{ marginBottom: '8px' }}>Password requirements:</p>
+                  <div style={{ lineHeight: '1.3' }}>
+                    <p style={{ margin: '0', padding: '0', marginBottom: '2px' }}>• At least 8 characters long</p>
+                    <p style={{ margin: '0', padding: '0', marginBottom: '2px' }}>• Contains at least one letter</p>
+                    <p style={{ margin: '0', padding: '0', marginBottom: '0' }}>• Contains at least one number</p>
+                  </div>
+                </div>
+                {/* Arrow pointing left */}
+                <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-full w-0 h-0 border-t-4 border-b-4 border-r-4 border-t-transparent border-b-transparent border-r-white"></div>
+              </div>
+            </div>
           </div>
           
           {errorMessage && (
@@ -134,15 +154,6 @@ export default function Register() {
               {errorMessage}
             </div>
           )}
-
-          <div className="text-xs text-slate-500 space-y-1">
-            <p>Password requirements:</p>
-            <ul className="list-disc list-inside space-y-1 ml-2">
-              <li>At least 8 characters long</li>
-              <li>Contains at least one letter</li>
-              <li>Contains at least one number</li>
-            </ul>
-          </div>
 
           <button
             className={`w-full bg-gradient-to-r from-teal-400 to-cyan-500 text-white font-semibold py-3 rounded-lg hover:from-teal-500 hover:to-cyan-600 transition-all duration-300 ${
