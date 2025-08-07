@@ -1,16 +1,12 @@
 import React from "react";
 import AnimatedBackground from "./components/AnimatedBackground";
+import { useNavigate, Link } from "react-router-dom";
 import "./Landing.css";
 
-// Main App component for the landing page
 const App: React.FC = () => {
-  // Function to handle sign-in button click
+  const navigate = useNavigate();
   const handleSignInClick = () => {
-    // In a real application, you would navigate to the sign-in page here.
-    // For this example, we'll just log a message.
-    console.log("Navigating to sign-in page...");
-    // Example: window.location.href = '/signin';
-    // Or if using a router: navigate('/signin');
+    navigate("/login");
   };
 
   return (
