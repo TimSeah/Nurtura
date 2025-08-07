@@ -23,7 +23,7 @@ export default function Register() {
       // check if username contains only alphanumeric characters and underscores
       if (!isValidUsername) {
         setErrorMessage(
-          "Username can only contain letters, numbers, and underscores."
+          "Username can only contain letters, numbers, and underscores"
         );
         return;
       }
@@ -38,7 +38,7 @@ export default function Register() {
       const containsOffensiveWord = pattern.test(normalizedUsername);
 
       if (containsOffensiveWord) {
-        setErrorMessage("Username is inappropriate.");
+        setErrorMessage("Username is inappropriate");
         return;
       }
 
@@ -67,8 +67,8 @@ export default function Register() {
         alert("Registration successful! Please log in.");
         navigate("/login");
       } else {
-        const err = await res.json();
-        setErrorMessage(`Registration failed: ${err.message}`);
+        await res.json(); // Read the error response
+        setErrorMessage("Registration failed");
       }
     } catch (error) {
       setErrorMessage("Registration failed. Please try again.");
@@ -150,7 +150,7 @@ export default function Register() {
           </div>
           
           {errorMessage && (
-            <div className="text-red-500 text-sm text-center bg-red-50 border border-red-200 rounded-lg p-3">
+            <div className="error-message text-red-500 text-sm text-center bg-red-50 border border-red-200 rounded-lg p-3">
               {errorMessage}
             </div>
           )}
