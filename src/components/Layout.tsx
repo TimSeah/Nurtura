@@ -33,7 +33,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { path: "/health", label: "Health Tracking", icon: Activity },
     // { path: "/care-circle", label: "Care Circle", icon: Heart },
     { path: "/forum", label: "Forum", icon: Users },
-    { path: "/resourcesAlt", label: "Resources", icon: MapPin },
+    //{ path: "/resourcesAlt", label: "Resources", icon: MapPin }, commented out cause no longer in use
     { path: "/resources", label: "Locations", icon: X },
     // { path: "/alerts", label: "Alerts", icon: Bell },
     { path: "/settings", label: "Settings", icon: Settings },
@@ -75,8 +75,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
             {navigationItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-
+              let isActive;
+              if (item.path === "/forum") {
+                isActive = location.pathname.startsWith("/forum") || location.pathname.startsWith("/threads/");
+              } else {
+                isActive = location.pathname === item.path;
+              }
               return (
                 <Link
                   key={item.path}

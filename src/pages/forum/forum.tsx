@@ -32,6 +32,7 @@ const Forum: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", content: "" });
   const [showUserThreads, setShowUserThreads] = useState(false);
@@ -82,6 +83,10 @@ const Forum: React.FC = () => {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    // Clear form error when user starts typing
+    if (formError) {
+      setFormError(null);
+    }
   };
 
   console.log("Creating thread with author:", user?.username);
@@ -95,8 +100,12 @@ const Forum: React.FC = () => {
   console.log("user =", user);
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!form.title || !form.content) {
-      setFormError("Title and content are required.");
+    setFormError(null);
+    setIsSubmitting(true);
+
+    if (!form.title.trim() || !form.content.trim()) {
+      setFormError("Please fill in all fields.");
+      setIsSubmitting(false);
       return;
     }
 
@@ -117,18 +126,39 @@ const Forum: React.FC = () => {
       });
 
       if (!res.ok) {
-        throw new Error(await res.text());
+        const errorText = await res.text();
+        let errorMessage = "Failed to create thread";
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          if (errorData.code === 'CONTENT_MODERATED') {
+            // Handle moderation error with user-friendly message
+            setFormError(errorData.message);
+          } else {
+            setFormError(errorData.message || errorMessage);
+          }
+        } catch {
+          // Fallback for non-JSON errors
+          setFormError(errorText || errorMessage);
+        }
+        
+        setIsSubmitting(false);
+        return;
       }
+      
       const newThread: Thread = await res.json();
 
       setShowForm(false);
       setThreads((prev) => [...prev, newThread]);
       setForm({ title: "", content: "" });
+      setFormError(null);
 
       await fetchThreads();
     } catch (err: any) {
       console.error("Failed to create thread:", err);
-      alert(`Failed to create thread: ${err}`);
+      setFormError("Network error. Please check your connection and try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -173,7 +203,7 @@ const Forum: React.FC = () => {
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              className="appearance-none ml-1 text-sm bg-green-100 h-13 px-2 pt-1 border border-gray-400 shadow-sm focus:border-green-800 rounded hover:shadow-md"
+              className="w-43 appearance-none ml-1 text-sm bg-green-100 h-13 px-2 pt-1 border border-gray-400 shadow-sm focus:border-green-800 rounded hover:shadow-md"
             >
               <option value="recent">Most Recent</option>
               <option value="oldest">Oldest</option>
@@ -205,8 +235,11 @@ const Forum: React.FC = () => {
               {showUserThreads ? "Show All Threads" : "My Threads"}
             </button>
             <button
-              onClick={() => setShowForm(true)}
-              // style={{ backgroundColor: "#0d7377" }}
+              onClick={() => {
+                setShowForm(true);
+                setFormError(null);
+                setForm({ title: "", content: "" });
+              }}
               className="text-white bg-teal-700 text-sm px-4 py-2 rounded-md shadow-sm hover:bg-teal-800 transition hover:shadow-md"
             >
               + New Thread
@@ -266,20 +299,45 @@ const Forum: React.FC = () => {
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2"
                     />
                   </div>
-                  {formError && <p className="text-red-600">{formError}</p>}
+                  {formError && (
+                    <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                      <div className="flex">
+                        <div className="flex-shrink-0">
+                          <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-sm text-red-800">{formError}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <div className="flex justify-end space-x-2">
                     <button
                       type="button"
-                      onClick={() => setShowForm(false)}
-                      className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition"
+                      onClick={() => {
+                        setShowForm(false);
+                        setFormError(null);
+                        setForm({ title: "", content: "" });
+                      }}
+                      disabled={isSubmitting}
+                      className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="bg-teal-700 text-white px-4 py-2 rounded-md hover:bg-teal-800 transition"
+                      disabled={isSubmitting}
+                      className="bg-teal-700 text-white px-4 py-2 rounded-md hover:bg-teal-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                     >
-                      Create Thread
+                      {isSubmitting && (
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      )}
+                      <span>{isSubmitting ? 'Creating...' : 'Create Thread'}</span>
                     </button>
                   </div>
                 </form>

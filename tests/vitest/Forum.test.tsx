@@ -1,5 +1,5 @@
 import { screen, fireEvent, waitFor, within } from '@testing-library/react';
-import Forum from '../../src/pages/forum/Forum';
+import Forum from '../../src/pages/forum/forum';
 import { renderWithRouter } from './utils';
 import { mockFetchOnce } from './mockFetch';
 import { afterEach, describe, expect, test, vi } from 'vitest';
@@ -76,7 +76,7 @@ describe('Forum: UI test cases', () => {
     await screen.findByText('Hello');
     fireEvent.click(screen.getByRole('button', { name: /\+ New Thread/i }));
     fireEvent.click(screen.getByRole('button', { name: /Create Thread/i }));
-    expect(screen.getByText(/Title and content are required/i)).toBeInTheDocument();
+    expect(screen.getByText(/Please fill in all fields/i)).toBeInTheDocument();
   });
 
   test('validates form with only title', async () => {
@@ -86,7 +86,7 @@ describe('Forum: UI test cases', () => {
     fireEvent.click(screen.getByRole('button', { name: /\+ New Thread/i }));
     fireEvent.change(screen.getByLabelText(/Title/i), { target: { value: 'Only Title' } });
     fireEvent.click(screen.getByRole('button', { name: /Create Thread/i }));
-    expect(screen.getByText(/Title and content are required/i)).toBeInTheDocument();
+    expect(screen.getByText(/Please fill in all fields/i)).toBeInTheDocument();
   });
 
   test('validates form with only content', async () => {
@@ -96,7 +96,7 @@ describe('Forum: UI test cases', () => {
     fireEvent.click(screen.getByRole('button', { name: /\+ New Thread/i }));
     fireEvent.change(screen.getByLabelText(/Content/i), { target: { value: 'Only Content' } });
     fireEvent.click(screen.getByRole('button', { name: /Create Thread/i }));
-    expect(screen.getByText(/Title and content are required/i)).toBeInTheDocument();
+    expect(screen.getByText(/Please fill in all fields/i)).toBeInTheDocument();
   });
 
   test('posts new thread & refreshes', async () => {

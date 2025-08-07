@@ -6,7 +6,6 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
-const threadRoutes = require('./routes/threads');
 const { expressjwt: jwtMiddleware } = require('express-jwt');
 const authRoutes = require('./routes/auth');
 
@@ -20,6 +19,10 @@ process.on('SIGTERM', cleanup);
 async function cleanup() {
   console.log('Server shutting down...');
   try {
+    // Import and cleanup moderation service
+    const moderator = require('./middleware/moderationMiddleware');
+    moderator.cleanup();
+    
     if (mongoose.connection.readyState === 1) {
       await mongoose.disconnect();
       console.log('MongoDB disconnected due to app termination');
@@ -97,6 +100,7 @@ app.use('/api/auth/me', jwtMiddleware({
 }));
 
 // any route under /api that needs logi, this is MIDDLEWARE
+/*
 app.use(
   '/api/threads',
   jwtMiddleware({
@@ -105,6 +109,7 @@ app.use(
     getToken: req => req.cookies.token
   })
 );
+*/
 
 // Health check endpoint for Docker
 app.get('/health', (req, res) => {
@@ -115,15 +120,11 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Mount thread routes at auth
+// Mount auth routes
 app.use('/api/auth', authRoutes);
-// Mount thread routes at /api/threads
-app.use('/api/threads', threadRoutes)
 
 // --- Route Definitions ---
-// Import  route handlers.
-// create these files (e.g., './routes/index.js', './routes/events.js')
-// defineour API endpoints for different resources.
+// Import route handlers.
 const indexRouter = require('./routes/index');
 const eventsRouter = require('./routes/events');
 const journalsRouter = require('./routes/journal'); 
@@ -134,6 +135,7 @@ const vitalSignsRouter = require('./routes/vitalSigns');
 const careRecipientsRouter = require('./routes/careRecipients');
 const alertsRouter = require('./routes/alerts');
 const externalResourcesRouter = require('./routes/externalResources');
+const moderationRouter = require('./routes/moderation');
 
 // Import and start email reminder service
 const { startReminderService } = require('./services/emailReminderService');
@@ -159,8 +161,10 @@ app.use(
   })
 );
 app.use('/api/journal', journalsRouter); 
-app.use('/api/threads', threadsRouter); 
-console.log('threadsRouter mounted at /api/threads');
+
+// Mount threads router with JWT middleware
+app.use('/api/threads', threadsRouter);
+
 app.use('/api/threads/:threadId/comments', commentRouter);
 app.use('/api/comments', commentRouter);
 
@@ -197,6 +201,7 @@ app.use(
 app.use('/api/care-recipients', careRecipientsRouter);
 app.use('/api/alerts', alertsRouter);
 app.use('/api/external-resources', externalResourcesRouter);
+app.use('/api/moderation', moderationRouter);
 
 
 // --- Error Handling Middleware ---

@@ -45,3 +45,26 @@ logs
 # Misc
 .eslintcache
 *.tsbuildinfo
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Python virtual environments
+venv/
+automod/venv/
+.venv/
+pyvenv.cfg
+
+# Documentation directories
+misc/
+
+# Documentation files (keep README.md)
+*.md
+!README.md
+
+# Scripts (unless needed in container)
+*.bat
+*.sh

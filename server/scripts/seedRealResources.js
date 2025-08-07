@@ -43,10 +43,10 @@ mongoose.connect(process.env.MONGO_URI)
     ];
 
     await ExternalResource.insertMany(resources);
-    console.log("✅ Real resources inserted.");
+    console.log("Real resources inserted.");
     process.exit();
   })
   .catch(err => {
-    console.error("❌ Seeding failed:", err);
+    console.error("Seeding failed:", err);
     process.exit(1);
   });
