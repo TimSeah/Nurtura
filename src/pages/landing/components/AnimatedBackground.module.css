@@ -1,0 +1,50 @@
+/* src/components/VibrantAnimatedBackground.module.css */
+.container {
+  position: fixed;
+  inset: 0;
+  z-index: -50;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.base {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Higher contrast gradient */
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+.bubbleContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px); /* Increased blur for more diffusion */
+  transform: translate3d(0, 0, 0);
+  animation: pulse 15s infinite ease-in-out;
+  mix-blend-mode: screen; /* Creates vibrant color mixing */
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    transform: scale(1) translate3d(0, 0, 0) rotate(0deg); 
+  }
+  25% { 
+    transform: scale(1.8) translate3d(15%, -10%, 0) rotate(45deg); 
+  }
+  50% { 
+    transform: scale(1.2) translate3d(-15%, 15%, 0) rotate(90deg); 
+  }
+  75% { 
+    transform: scale(1.6) translate3d(10%, 20%, 0) rotate(135deg); 
+  }
+}

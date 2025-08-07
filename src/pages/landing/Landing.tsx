@@ -1,4 +1,6 @@
 import React from "react";
+import AnimatedBackground from "./components/AnimatedBackground";
+import "./Landing.css";
 
 // Main App component for the landing page
 const App: React.FC = () => {
@@ -12,26 +14,18 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] font-sans text-[#555555]">
+    <div className="landing-container">
       {/* Hero Section */}
       <header className="relative flex items-center justify-center h-screen overflow-hidden">
         {/* Background image/overlay (optional, can be replaced with a solid color or pattern) */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-70"
-          style={{
-            backgroundImage:
-              "url('https://placehold.co/1920x1080/E0F2F7/000000?text=Caring+Hands')",
-          }}
-        ></div>
-        <div className="absolute inset-0 bg-[#1e293b] opacity-70"></div>{" "}
+        {/* <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-70"></div> */}
+        <AnimatedBackground />
         {/* Darker overlay */}
         <div className="relative z-10 text-center p-8 max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-extrabold text-[#fafafa] leading-tight mb-6 animate-fade-in-down">
+          <h1 className="landing-header-h1">
             Compassionate Care, Right at Your Fingertips.
           </h1>
-          <p className="text-xl md:text-2xl text-[#ffbcb5] mb-10 animate-fade-in-up">
-            {" "}
-            {/* Using light coral for accent text */}
+          <p className="landing-header-p">
             Connecting families with trusted and dedicated caregivers for every
             need.
           </p>
@@ -45,14 +39,14 @@ const App: React.FC = () => {
       </header>
 
       {/* Features Section */}
-      <section className="py-20 bg-[#eaeaea]">
+      <section className="py-20 bg-[#eaeaea] px-20">
         {" "}
         {/* Light gray background for this section */}
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-[#1e293b] mb-12">
-            Why Choose CareConnect?
+          <h2 className="text-4xl font-bold text-[#1e293b] mb-30">
+            Why Nurtura?
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
             {/* Feature 1 */}
             <div className="p-8 bg-[#fafafa] rounded-lg shadow-lg transform transition duration-500 hover:scale-105">
               <div className="text-5xl text-[#0c9891] mb-4">
@@ -71,12 +65,12 @@ const App: React.FC = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-2xl font-semibold text-[#1e293b] mb-4">
-                Verified Professionals
+              <h3 className="text-2xl font-semibold text-[#1e293b] mb-4 justify-center flex">
+                Monitor Care Recipients' Health
               </h3>
               <p className="text-[#555555]">
-                All caregivers undergo rigorous background checks and interviews
-                to ensure your peace of mind.
+                All in one page to monitor your care recipients' data. Write
+                journals to ease your health tracking journey.
               </p>
             </div>
             {/* Feature 2 */}
@@ -97,12 +91,12 @@ const App: React.FC = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-2xl font-semibold text-[#1e293b] mb-4">
-                Flexible Scheduling
+              <h3 className="text-2xl font-semibold text-[#1e293b] mb-4 justify-center flex">
+                Manage and Schedule Tasks
               </h3>
               <p className="text-[#555555]">
-                Book care by the hour, day, or week. We adapt to your family's
-                unique schedule and needs.
+                Note your to-do lists on our calendar. We can help to remind you
+                of your care giving duties.
               </p>
             </div>
             {/* Feature 3 */}
@@ -123,12 +117,12 @@ const App: React.FC = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-2xl font-semibold text-[#1e293b] mb-4">
-                Personalized Matching
+              <h3 className="text-2xl font-semibold text-[#1e293b] mb-4 justify-center flex">
+                Caregiver Forum
               </h3>
               <p className="text-[#555555]">
-                Our smart matching system connects you with caregivers who best
-                fit your family's specific requirements.
+                Reach out for help anytime you need. In Nurtura, we connect the
+                caregiver community together.
               </p>
             </div>
           </div>
@@ -136,19 +130,19 @@ const App: React.FC = () => {
       </section>
 
       {/* Call to Action Section */}
-      <section className="py-20 bg-[#0c9891] text-[#fafafa] text-center">
+      <section className="py-20 text-[#fafafa] text-center landing-ready">
         {" "}
         {/* Primary accent color */}
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold mb-6">
+          <h2 className="text-4xl font-bold mb-6 text-[#fafafa]">
             Ready to Find the Perfect Care?
           </h2>
-          <p className="text-xl mb-8">
+          <p className="text-xl mb-8 text-[#fafafa]">
             Join our community and experience peace of mind.
           </p>
           <button
             onClick={handleSignInClick}
-            className="px-10 py-4 bg-[#5fe8d8] text-[#1e293b] font-bold rounded-full text-lg shadow-xl hover:bg-[#ffbcb5] hover:text-[#1e293b] transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#5fe8d8] focus:ring-opacity-50"
+            className="px-10 py-4 bg-[#fafafa] text-[#059669] font-bold rounded-full text-lg shadow-xl hover:bg-[#ffbcb5] hover:text-[#1e293b] transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#5fe8d8] focus:ring-opacity-50"
           >
             Sign In Now
           </button>
@@ -156,11 +150,11 @@ const App: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 bg-[#1e293b] text-[#fafafa] text-center">
+      <footer className="py-10 bg-[#1e293b] text-[#fafafa] text-center">
         {" "}
         {/* Dark blue/gray */}
         <div className="container mx-auto px-4">
-          <p>&copy; 2025 CareConnect. All rights reserved.</p>
+          <p>&copy; 2025 Nurtura. All rights reserved.</p>
           <div className="mt-4 flex justify-center space-x-6">
             <a
               href="#"

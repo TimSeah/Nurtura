@@ -1,0 +1,32 @@
+.landing-container {
+  overflow: auto; /* Enables scrolling */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+
+}
+
+.landing-header-h1 {
+    color: #fafafa;
+    font-size: xx-large;
+}
+
+.landing-header-p {
+    color: #fafafa;
+    font-size: larger;
+}
+
+.landing-features {
+  padding: 20px;
+}
+
+.landing-ready {
+  background: linear-gradient(135deg, #2dd4bf, #059669);
+}
+
+.landing-ready p {
+  color: #fafafa;
+}
+
+.landing-ready h2 {
+  color: #fafafa;
+}
