@@ -19,7 +19,13 @@
     "cy:run": "cypress run",
     "cy:run:uc9_2": "cypress run --spec 'cypress/e2e/uc9_monitoringCareRecipients_editReadingsAndMedications.cy.ts'",
     "cy:run:uc9_1": "cypress run --spec 'cypress/e2e/uc9_monitoringCareRecipients_editJournals.cy.ts'",
-    "cy:run:uc7": "cypress run --spec 'cypress/e2e/uc7_sendingNotifications.cy.ts'"
+    "cy:run:uc7": "cypress run --spec 'cypress/e2e/uc7_sendingNotifications.cy.ts'",
+    "fuzz": "node tests/fuzz/run-fuzz-tests.js",
+    "fuzz:api": "jest tests/fuzz/api-fuzz.test.js --detectOpenHandles",
+    "fuzz:db": "jest tests/fuzz/database-fuzz.test.js --detectOpenHandles",
+    "fuzz:moderation": "jest tests/fuzz/moderation-fuzz.test.js --detectOpenHandles",
+    "fuzz:validation": "jest tests/fuzz/input-validation-fuzz.test.js --detectOpenHandles",
+    "security:scan": "npm run fuzz && npm audit"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
