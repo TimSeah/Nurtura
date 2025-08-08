@@ -214,7 +214,7 @@ describe("Calendar Component", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         title: "New Event",
-        date: "2023-07-21T00:00:00.000Z",
+        date: "2023-07-02T00:00:00.000Z",
         startTime: "09:00",
         remark: "Test remark",
         month: "July",

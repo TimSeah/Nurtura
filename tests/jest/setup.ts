@@ -46,5 +46,5 @@ Object.defineProperty(window, 'localStorage', {
 });
 
 // Mock Date
-const mockDate = new Date('2023-07-21T00:00:00Z');
-jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+// const mockDate = new Date('2023-07-21T00:00:00Z');
+// jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
