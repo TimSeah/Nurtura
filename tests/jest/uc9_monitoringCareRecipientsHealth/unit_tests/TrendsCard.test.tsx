@@ -1,6 +1,5 @@
-// import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import TrendsCard from "../../src/pages/healthMonitoring/components/trendsCard/TrendsCard";
+import TrendsCard from "../../../../src/pages/healthMonitoring/components/trendsCard/TrendsCard";
 import "@testing-library/jest-dom";
 
 // Mock ResizeObserver

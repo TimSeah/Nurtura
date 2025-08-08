@@ -1,11 +1,14 @@
-// ReadingsCard.test.tsx
-
-import React from "react";
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import ReadingsCard from "../../src/pages/healthMonitoring/components/readingsCard/ReadingsCard";
-import { CareRecipient } from "../../src/types";
+import ReadingsCard from "../../../../src/pages/healthMonitoring/components/readingsCard/ReadingsCard";
+import { CareRecipient } from "../../../../src/types";
 
 // Mock global fetch
 global.fetch = jest.fn() as jest.Mock;
@@ -235,14 +238,18 @@ describe("ReadingsCard", () => {
     );
 
     // Click on a reading card
-    const heartRateCard = screen.getByText("75 bpm").closest('.reading-card');
+    const heartRateCard = screen.getByText("75 bpm").closest(".reading-card");
     fireEvent.click(heartRateCard!);
 
     // Check if modal opened
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /Edit/i })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Delete/i })).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /Close/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /Delete/i })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /Close/i })
+      ).toBeInTheDocument();
     });
   });
 
@@ -262,7 +269,7 @@ describe("ReadingsCard", () => {
     );
 
     // Click on a reading card to open modal
-    const heartRateCard = screen.getByText("75 bpm").closest('.reading-card');
+    const heartRateCard = screen.getByText("75 bpm").closest(".reading-card");
     fireEvent.click(heartRateCard!);
 
     // Wait for modal to open and click edit button
@@ -298,8 +305,8 @@ describe("ReadingsCard", () => {
             value: "80",
             unit: "bpm",
             dateTime: "2023-07-01T08:00",
-            notes: "Updated notes"
-          })
+            notes: "Updated notes",
+          }),
         })
       );
     });
@@ -321,7 +328,7 @@ describe("ReadingsCard", () => {
     );
 
     // Click on a reading card and edit
-    const heartRateCard = screen.getByText("75 bpm").closest('.reading-card');
+    const heartRateCard = screen.getByText("75 bpm").closest(".reading-card");
     fireEvent.click(heartRateCard!);
 
     await waitFor(() => {
@@ -356,7 +363,7 @@ describe("ReadingsCard", () => {
     );
 
     // Click on a reading card to open modal
-    const heartRateCard = screen.getByText("75 bpm").closest('.reading-card');
+    const heartRateCard = screen.getByText("75 bpm").closest(".reading-card");
     fireEvent.click(heartRateCard!);
 
     // Wait for modal and click delete button
@@ -371,7 +378,7 @@ describe("ReadingsCard", () => {
         "http://localhost:5000/api/vital-signs/r1",
         expect.objectContaining({
           method: "DELETE",
-          credentials: "include"
+          credentials: "include",
         })
       );
     });
@@ -393,7 +400,7 @@ describe("ReadingsCard", () => {
     );
 
     // Click on a reading card and delete
-    const heartRateCard = screen.getByText("75 bpm").closest('.reading-card');
+    const heartRateCard = screen.getByText("75 bpm").closest(".reading-card");
     fireEvent.click(heartRateCard!);
 
     await waitFor(() => {
@@ -420,7 +427,7 @@ describe("ReadingsCard", () => {
     );
 
     // Click on a reading card and edit
-    const heartRateCard = screen.getByText("75 bpm").closest('.reading-card');
+    const heartRateCard = screen.getByText("75 bpm").closest(".reading-card");
     fireEvent.click(heartRateCard!);
 
     await waitFor(() => {
@@ -435,7 +442,9 @@ describe("ReadingsCard", () => {
     // Should be back to view mode
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /Edit/i })).toBeInTheDocument();
-      expect(screen.queryByRole("button", { name: /Save Changes/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /Save Changes/i })
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -450,7 +459,7 @@ describe("ReadingsCard", () => {
     );
 
     // Click on a reading card
-    const heartRateCard = screen.getByText("75 bpm").closest('.reading-card');
+    const heartRateCard = screen.getByText("75 bpm").closest(".reading-card");
     fireEvent.click(heartRateCard!);
 
     await waitFor(() => {
@@ -460,7 +469,9 @@ describe("ReadingsCard", () => {
 
     // Modal should be closed
     await waitFor(() => {
-      expect(screen.queryByRole("button", { name: /Edit/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /Edit/i })
+      ).not.toBeInTheDocument();
     });
   });
 });

@@ -1,13 +1,12 @@
-import React from "react";
-import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import Dashboard from "../../src/pages/dashboard/Dashboard";
-import { AuthContext } from "../../src/contexts/AuthContext";
-import { apiService } from "../../src/services/apiService";
+import Dashboard from "../../../src/pages/dashboard/Dashboard";
+import { AuthContext } from "../../../src/contexts/AuthContext";
+import { apiService } from "../../../src/services/apiService";
 import "@testing-library/jest-dom";
 
 // Mock API service
-jest.mock("../../src/services/apiService", () => ({
+jest.mock("../../../src/services/apiService", () => ({
   apiService: {
     getTodaysEvents: jest.fn(),
     addVitalSigns: jest.fn(),
@@ -71,7 +70,7 @@ describe("Dashboard Component", () => {
     },
     {
       id: "2",
-      _id: "2", 
+      _id: "2",
       recipientName: "John",
       vitalType: "blood_glucose",
       value: "125",
@@ -84,7 +83,7 @@ describe("Dashboard Component", () => {
     {
       id: "3",
       _id: "3",
-      recipientName: "John", 
+      recipientName: "John",
       vitalType: "appointment",
       value: "Cardiology appointment",
       unit: "",
@@ -116,7 +115,7 @@ describe("Dashboard Component", () => {
     (apiService.getTodaysEvents as jest.Mock).mockReset();
     (apiService.addVitalSigns as jest.Mock).mockReset();
     (apiService.getRecentVitalSigns as jest.Mock).mockReset();
-    
+
     // Default mocks to prevent errors
     (apiService.getTodaysEvents as jest.Mock).mockResolvedValue([]);
     (apiService.getRecentVitalSigns as jest.Mock).mockResolvedValue([]);
@@ -169,7 +168,9 @@ describe("Dashboard Component", () => {
 
   test("displays recent activities", async () => {
     (apiService.getTodaysEvents as jest.Mock).mockResolvedValue([]);
-    (apiService.getRecentVitalSigns as jest.Mock).mockResolvedValue(mockRecentActivities);
+    (apiService.getRecentVitalSigns as jest.Mock).mockResolvedValue(
+      mockRecentActivities
+    );
 
     await renderDashboard();
 
@@ -220,7 +221,9 @@ describe("Dashboard Component", () => {
 
   test("displays priority indicators for activities", async () => {
     (apiService.getTodaysEvents as jest.Mock).mockResolvedValue([]);
-    (apiService.getRecentVitalSigns as jest.Mock).mockResolvedValue(mockRecentActivities);
+    (apiService.getRecentVitalSigns as jest.Mock).mockResolvedValue(
+      mockRecentActivities
+    );
 
     await renderDashboard();
 

@@ -1,8 +1,6 @@
-// JournalEntryForm.test.tsx
-import React from "react";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import JournalEntryForm from "../../src/pages/healthMonitoring/components/journal/JournalEntryForm";
+import JournalEntryForm from "../../../../src/pages/healthMonitoring/components/journal/JournalEntryForm";
 
 // Mock global fetch
 global.fetch = jest.fn() as jest.Mock;
@@ -200,8 +198,6 @@ describe("JournalEntryForm", () => {
   });
 
   test("shows validation alert for empty fields", async () => {
-    const alertMock = jest.spyOn(window, "alert").mockImplementation(() => {});
-
     render(
       <JournalEntryForm
         recipientId={mockRecipientId}

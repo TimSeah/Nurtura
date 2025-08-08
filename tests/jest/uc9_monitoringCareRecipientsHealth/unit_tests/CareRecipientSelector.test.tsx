@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import CareRecipientSelector from "../../src/pages/healthMonitoring/components/careRecipientSelector/CareRecipientSelector";
-import { CareRecipient } from "../../src/types";
+import CareRecipientSelector from "../../../../src/pages/healthMonitoring/components/careRecipientSelector/CareRecipientSelector";
+import { CareRecipient } from "../../../../src/types";
 
 // Mock global fetch
 global.fetch = jest.fn() as jest.Mock;
@@ -98,7 +98,9 @@ describe("CareRecipientSelector", () => {
   test("shows error state", () => {
     render(<CareRecipientSelector {...defaultProps} error="Failed to load" />);
 
-    expect(screen.getByText(/Error loading care recipients/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Error loading care recipients/)
+    ).toBeInTheDocument();
     expect(screen.getByText(/Failed to load/)).toBeInTheDocument();
     expect(screen.getByText("Retry")).toBeInTheDocument();
   });
@@ -134,7 +136,7 @@ describe("CareRecipientSelector", () => {
 
     // Should first show the modal with recipient details (be more specific)
     expect(screen.getByText("Edit")).toBeInTheDocument(); // The Edit button in modal
-    
+
     // Click the Edit button in the modal
     const modalEditButton = screen.getByText("Edit");
     fireEvent.click(modalEditButton);
@@ -147,7 +149,7 @@ describe("CareRecipientSelector", () => {
 
   test("updates care recipient successfully", async () => {
     const user = userEvent.setup();
-    
+
     // Mock successful update
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
@@ -207,17 +209,20 @@ describe("CareRecipientSelector", () => {
     fireEvent.click(deleteButton);
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith(expect.stringContaining("/api/care-recipients/1"), {
-        method: "DELETE",
-        credentials: "include",
-      });
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining("/api/care-recipients/1"),
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
       expect(mockOnRecipientUpdated).toHaveBeenCalled();
     });
   });
 
   test("handles edit API error", async () => {
     const user = userEvent.setup();
-    
+
     // Mock API error
     (fetch as jest.Mock).mockRejectedValueOnce(new Error("API Error"));
 
@@ -240,7 +245,10 @@ describe("CareRecipientSelector", () => {
     fireEvent.click(screen.getByText("Save Changes"));
 
     await waitFor(() => {
-      expect(console.error).toHaveBeenCalledWith("Error updating care recipient:", expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith(
+        "Error updating care recipient:",
+        expect.any(Error)
+      );
     });
   });
 
@@ -255,7 +263,10 @@ describe("CareRecipientSelector", () => {
     fireEvent.click(deleteButton);
 
     await waitFor(() => {
-      expect(console.error).toHaveBeenCalledWith("Error deleting care recipient:", expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith(
+        "Error deleting care recipient:",
+        expect.any(Error)
+      );
     });
   });
 
@@ -300,7 +311,9 @@ describe("CareRecipientSelector", () => {
     fireEvent.click(screen.getByText("Save Changes"));
 
     await waitFor(() => {
-      expect(window.alert).toHaveBeenCalledWith("Error updating care recipient. Please try again.");
+      expect(window.alert).toHaveBeenCalledWith(
+        "Error updating care recipient. Please try again."
+      );
     });
   });
 
@@ -321,7 +334,7 @@ describe("CareRecipientSelector", () => {
 
     // Add a new condition
     fireEvent.click(screen.getByText("Add Medical Condition"));
-    
+
     const conditionInputs = screen.getAllByPlaceholderText("Medical condition");
     expect(conditionInputs.length).toBe(3); // 2 existing + 1 new
 

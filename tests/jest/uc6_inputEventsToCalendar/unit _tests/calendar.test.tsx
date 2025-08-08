@@ -5,7 +5,7 @@ import {
   waitFor,
   act,
 } from "@testing-library/react";
-import { AuthContext } from "../../src/contexts/AuthContext";
+import { AuthContext } from "../../../../src/contexts/AuthContext";
 
 const fakeCtx = {
   user: { username: "test‑user" },
@@ -17,7 +17,7 @@ const fakeCtx = {
 // src/setupTests.ts
 import "@testing-library/jest-dom"; // Only this import is needed
 import userEvent from "@testing-library/user-event";
-import Calendar from "../../src/pages/calendar/calendar";
+import Calendar from "../../../../src/pages/calendar/calendar";
 
 // Mock API calls
 global.fetch = jest.fn() as jest.Mock;

@@ -1,17 +1,16 @@
-import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import HealthTracking from "../../src/pages/healthMonitoring/HealthTracking";
-import { apiService } from "../../src/services/apiService";
+import HealthTracking from "../../../../src/pages/healthMonitoring/HealthTracking";
+import { apiService } from "../../../../src/services/apiService";
 
 // Mock Modal to prevent full DOM rendering
-jest.mock("../../src/components/Modal", () => ({
+jest.mock("../../../../src/components/Modal", () => ({
   __esModule: true,
   default: ({ isOpen, children }: any) =>
     isOpen ? <div>{children}</div> : null,
 }));
 
 // Mock API service
-jest.mock("../../src/services/apiService");
+jest.mock("../../../../src/services/apiService");
 
 const mockCareRecipients = [
   { _id: "1", name: "John Doe" },
