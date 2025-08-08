@@ -351,6 +351,7 @@ const Calendar: React.FC = () => {
               onChange={
                 editingEvent ? handleEditInputChange : handleInputChange
               }
+              maxLength={30}
             />
             <input
               id="time-input"
@@ -375,6 +376,7 @@ const Calendar: React.FC = () => {
               onChange={
                 editingEvent ? handleEditInputChange : handleInputChange
               }
+              maxLength={60}
             ></textarea>
             <div className="modal-buttons">
               <button onClick={editingEvent ? updateEvent : saveEvent}>
