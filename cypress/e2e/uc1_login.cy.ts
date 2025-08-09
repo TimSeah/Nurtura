@@ -2,20 +2,28 @@
 
 describe('Login Page', () => {
   beforeEach(() => {
-    // Visit login page before each test
+    // Clear cookies and visit login page before each test
+    cy.clearCookies();
+    // Ensure test user exists before attempting login
+    cy.ensureTestUser('Bob', '1234');
     cy.visit('/login');
+    // Wait for page to fully load
+    cy.get('input[placeholder="Username"]').should('be.visible');
   });
 
   it('logs in successfully with correct credentials', () => {
     // Fill in login form with new placeholder text
-    cy.get('input[placeholder="Username"]').type('Bob');
-    cy.get('input[name="password"]').type('1234'); // Use name attribute since placeholder is "••••••••"
+    cy.get('input[placeholder="Username"]').clear().type('Bob');
+    cy.get('input[name="password"]').clear().type('1234');
 
     // Click submit button
     cy.get('button[type="submit"]').click();
 
-    // Check redirection to dashboard after successful login
-    cy.url().should('eq', 'http://localhost:5173/');
+    // Wait for and verify successful redirect to dashboard
+    cy.url().should('eq', 'http://localhost:5173/', { timeout: 10000 });
+    
+    // Verify we're actually logged in by checking for authenticated content
+    cy.get('body').should('not.contain', 'Log In');
   });
 
   it('shows error for invalid credentials', () => {
