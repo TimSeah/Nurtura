@@ -1,6 +1,6 @@
 import React from "react";
 import AnimatedBackground from "./components/AnimatedBackground";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Activity, Calendar, Users } from "lucide-react";
 import "./Landing.css";
 
@@ -8,10 +8,6 @@ const App: React.FC = () => {
   const navigate = useNavigate();
   const handleSignInClick = () => {
     navigate("/login");
-  };
-
-  const handleSignUpClick = () => {
-    navigate("/register");
   };
 
   return (
@@ -34,7 +30,7 @@ const App: React.FC = () => {
             onClick={handleSignInClick}
             className="px-10 py-4 bg-[#5fe8d8] text-[#1e293b] font-bold rounded-full text-lg shadow-xl hover:bg-[#0c9891] hover:text-[#fafafa] transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#5fe8d8] focus:ring-opacity-50 animate-bounce-in"
           >
-            Get Started
+            Get Started - Sign In
           </button>
         </div>
       </header>
@@ -101,10 +97,10 @@ const App: React.FC = () => {
             Join our community and experience peace of mind.
           </p>
           <button
-            onClick={handleSignUpClick}
+            onClick={handleSignInClick}
             className="px-10 py-4 bg-[#fafafa] text-[#059669] font-bold rounded-full text-lg shadow-xl hover:bg-[#ffbcb5] hover:text-[#1e293b] transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#5fe8d8] focus:ring-opacity-50"
           >
-            Sign Up Now
+            Sign In Now
           </button>
         </div>
       </section>
