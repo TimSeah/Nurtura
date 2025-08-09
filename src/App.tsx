@@ -36,7 +36,7 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
   // Auth check complete - not logged in
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/landing" replace />;
   }
 
   // Authenticated user
@@ -83,7 +83,7 @@ function App() {
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/forum" element={<Forum />} />
         <Route path="/forumTab" element={<ForumTab />} />
-        
+
         <Route path="/health" element={<HealthTracking />} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/resourcesAlt" element={<ResourcesAlt />} />

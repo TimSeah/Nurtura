@@ -22,7 +22,13 @@
     "cy:run:uc7": "cypress run --spec 'cypress/e2e/uc7_sendingNotifications.cy.ts'",
     "server:start": "cd server && npm run dev",
     "test:e2e": "npm-run-all --parallel server:start dev --race",
-    "test:e2e:run": "start-test \"npm run server:start\" http://localhost:5000/health \"npm run dev\" http://localhost:5173 \"npm run cy:run\""
+    "test:e2e:run": "start-test \"npm run server:start\" http://localhost:5000/health \"npm run dev\" http://localhost:5173 \"npm run cy:run\"",
+    "fuzz": "node tests/fuzz/run-fuzz-tests.js",
+    "fuzz:api": "jest tests/fuzz/api-fuzz.test.js --detectOpenHandles",
+    "fuzz:db": "jest tests/fuzz/database-fuzz.test.js --detectOpenHandles",
+    "fuzz:moderation": "jest tests/fuzz/moderation-fuzz.test.js --detectOpenHandles",
+    "fuzz:validation": "jest tests/fuzz/input-validation-fuzz.test.js --detectOpenHandles",
+    "security:scan": "npm run fuzz && npm audit"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
