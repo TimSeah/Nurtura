@@ -10,7 +10,7 @@ describe('Registration Page', () => {
     let alertCalled = false;
     // Fill in registration form
     cy.get('input[placeholder="Username"]').type(randomUsername);
-    cy.get('input[placeholder="Password"]').type("Testpass123");
+    cy.get('input[placeholder="Password (min. 8 characters)"]').type("Testpass123");
 
     // Click submit
     cy.get('button[type="submit"]').click();
@@ -34,7 +34,7 @@ describe('Registration Page', () => {
     it("rejects usernames with spaces", () => {
         cy.visit("http://localhost:5173/register");
         cy.get('input[placeholder="Username"]').type("john doe");
-        cy.get('input[placeholder="Password"]').type("Validpass123");
+        cy.get('input[placeholder="Password (min. 8 characters)"]').type("Validpass123");
         cy.get('button[type="submit"]').click();
         cy.get(".error-message").should(
         "contain",
@@ -45,7 +45,7 @@ describe('Registration Page', () => {
     it("rejects usernames with special characters", () => {
         cy.visit("http://localhost:5173/register");
         cy.get('input[placeholder="Username"]').type("user@name!");
-        cy.get('input[placeholder="Password"]').type("Validpass123");
+        cy.get('input[placeholder="Password (min. 8 characters)"]').type("Validpass123");
         cy.get('button[type="submit"]').click();
         cy.get(".error-message").should(
         "contain",
@@ -62,7 +62,7 @@ describe('Registration Page', () => {
         testCases.forEach((offensiveUsername) => {
         cy.visit("http://localhost:5173/register");
         cy.get('input[placeholder="Username"]').type(offensiveUsername);
-        cy.get('input[placeholder="Password"]').type("Validpass123");
+        cy.get('input[placeholder="Password (min. 8 characters)"]').type("Validpass123");
         cy.get('button[type="submit"]').click();
         cy.get(".error-message").should("contain", "Username is inappropriate");
         });
@@ -70,7 +70,7 @@ describe('Registration Page', () => {
 
     it("prevents submission if username is empty", () => {
         cy.visit("http://localhost:5173/register");
-        cy.get('input[placeholder="Password"]').type("Validpass123");
+        cy.get('input[placeholder="Password (min. 8 characters)"]').type("Validpass123");
         cy.get('button[type="submit"]').click();
 
         // The browser will stop form submission, so we can assert URL stays
@@ -79,7 +79,7 @@ describe('Registration Page', () => {
 
     it('shows error for existing username', () => {
         cy.get('input[placeholder="Username"]').type('Bob'); // assuming 'Bob' already exists
-        cy.get('input[placeholder="Password"]').type('Testpass123');
+        cy.get('input[placeholder="Password (min. 8 characters)"]').type('Testpass123');
         // Click submit
         cy.get('button[type="submit"]').click();
         // Check error message
@@ -104,7 +104,7 @@ describe('Registration Page', () => {
     it('shows error for weak password', () => {
         // Fill in registration form with weak password
         cy.get('input[placeholder="Username"]').type('NewUser');
-        cy.get('input[placeholder="Password"]').type('123'); // too short password
+        cy.get('input[placeholder="Password (min. 8 characters)"]').type('123'); // too short password
 
         // Click submit
         cy.get('button[type="submit"]').click();
@@ -115,7 +115,7 @@ describe('Registration Page', () => {
     it('shows error for password without numbers', () => {
         // Fill in registration form with invalid password
         cy.get('input[placeholder="Username"]').type('NewUser');
-        cy.get('input[placeholder="Password"]').type('password'); // no number
+        cy.get('input[placeholder="Password (min. 8 characters)"]').type('password'); // no number
 
         // Click submit
         cy.get('button[type="submit"]').click();
@@ -126,7 +126,7 @@ describe('Registration Page', () => {
     it('shows error for password without letters', () => {
         // Fill in registration form with invalid password
         cy.get('input[placeholder="Username"]').type('NewUser');
-        cy.get('input[placeholder="Password"]').type('12345678'); // no letter
+        cy.get('input[placeholder="Password (min. 8 characters)"]').type('12345678'); // no letter
 
         // Click submit
         cy.get('button[type="submit"]').click();

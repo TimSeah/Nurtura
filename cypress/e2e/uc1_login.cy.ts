@@ -1,31 +1,60 @@
 /// <reference types="cypress" />
 
 describe('Login Page', () => {
+  beforeEach(() => {
+    // Clear cookies and visit login page before each test
+    cy.clearCookies();
+    // Ensure test user exists before attempting login
+    cy.ensureTestUser('Bob', '1234');
+    cy.visit('/login');
+    // Wait for page to fully load
+    cy.get('input[placeholder="Username"]').should('be.visible');
+  });
+
   it('logs in successfully with correct credentials', () => {
-    cy.visit('/');
+    // Fill in login form with new placeholder text
+    cy.get('input[placeholder="Username"]').clear().type('Bob');
+    cy.get('input[name="password"]').clear().type('1234');
 
-    // Fill in login form
-    cy.get('input[placeholder="Username"]').type('Bob');
-    cy.get('input[placeholder="Password"]').type('1234');
-
-    // Click submit
+    // Click submit button
     cy.get('button[type="submit"]').click();
 
-    // Check redirection or success message
-    cy.url().should('eq', 'http://localhost:5173/login'); // redirected to homepage
+    // Wait for and verify successful redirect to dashboard
+    cy.url().should('eq', 'http://localhost:5173/', { timeout: 10000 });
+    
+    // Verify we're actually logged in by checking for authenticated content
+    cy.get('body').should('not.contain', 'Log In');
   });
 
   it('shows error for invalid credentials', () => {
-    cy.visit('/login');
+    // Set up alert handler before triggering the action
+    cy.window().then((win) => {
+      cy.stub(win, 'alert').as('windowAlert');
+    });
 
     cy.get('input[placeholder="Username"]').type('Bob');
-    cy.get('input[placeholder="Password"]').type('wrongpass');
+    cy.get('input[name="password"]').type('wrongpass');
 
     cy.get('button[type="submit"]').click();
 
-    // Since it uses alert(), Cypress can catch it like this
-    cy.on('window:alert', (str) => {
-      expect(str).to.equal('Invalid credentials');
-    });
+    // The alert should be called with the error message
+    cy.get('@windowAlert').should('have.been.calledWith', 'Invalid credentials');
+  });
+
+  it('prevents submission with empty fields', () => {
+    // Try to submit without filling anything
+    cy.get('button[type="submit"]').click();
+    
+    // Should stay on login page due to HTML5 validation
+    cy.url().should('include', '/login');
+  });
+
+  it('shows loading state during login attempt', () => {
+    cy.get('input[placeholder="Username"]').type('Bob');
+    cy.get('input[name="password"]').type('1234');
+
+    // Check that button shows loading state when clicked
+    cy.get('button[type="submit"]').click();
+    cy.get('button[type="submit"]').should('contain', 'Logging in...');
   });
 });

@@ -66,10 +66,10 @@ mongoose.connect(process.env.MONGO_URI, {
 // app.use(cors({ origin: 'http://localhost:3000' })); // Example for development
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',') 
-  : ['http://localhost:3000', 'http://localhost:80', 'http://localhost'];
+  : ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:80', 'http://localhost'];
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? allowedOrigins : true,
+  origin: allowedOrigins,  // Always use specific origins when credentials are needed
   credentials: true,   // allow cookies/auth headers
 }));
 

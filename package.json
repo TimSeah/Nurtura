@@ -19,7 +19,10 @@
     "cy:run": "cypress run",
     "cy:run:uc9_2": "cypress run --spec 'cypress/e2e/uc9_monitoringCareRecipients_editReadingsAndMedications.cy.ts'",
     "cy:run:uc9_1": "cypress run --spec 'cypress/e2e/uc9_monitoringCareRecipients_editJournals.cy.ts'",
-    "cy:run:uc7": "cypress run --spec 'cypress/e2e/uc7_sendingNotifications.cy.ts'"
+    "cy:run:uc7": "cypress run --spec 'cypress/e2e/uc7_sendingNotifications.cy.ts'",
+    "server:start": "cd server && npm run dev",
+    "test:e2e": "npm-run-all --parallel server:start dev --race",
+    "test:e2e:run": "start-test \"npm run server:start\" http://localhost:5000/health \"npm run dev\" http://localhost:5173 \"npm run cy:run\""
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

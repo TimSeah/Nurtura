@@ -1,11 +1,11 @@
 describe('UC 4&5: Leaving A Comment', () => {
   
   it('Logging in, navigating to forum, selecting a thread, leaving a comment', () => {
-    cy.visit('/');
+    cy.visit('/login');
     cy.get('[placeholder="Username"]').type('Ryan');
-    cy.get('[placeholder="Password"]').type('Password1234');
+    cy.get('input[name="password"]').type('Password1234');
     cy.wait(2000);
-    cy.get('.login-button').click();
+    cy.get('button[type="submit"]').click();
     cy.wait(2000);
     cy.url().should('eq', 'http://localhost:5173/');
     cy.get('[href="/forum"] > .nav-label').click();
@@ -28,10 +28,10 @@ describe('UC 4&5: Leaving A Comment', () => {
   })
   
   it('Display error message when posting empty comment', () => {
-    cy.visit('/');
+    cy.visit('/login');
     cy.get('[placeholder="Username"]').type('Ryan');
-    cy.get('[placeholder="Password"]').type('Password1234');
-    cy.get('.login-button').click();
+    cy.get('input[name="password"]').type('Password1234');
+    cy.get('button[type="submit"]').click();
     cy.url().should('eq', 'http://localhost:5173/');
     cy.get('[href="/forum"] > .nav-label').click();
     cy.url().should('eq', 'http://localhost:5173/forum');
@@ -40,15 +40,15 @@ describe('UC 4&5: Leaving A Comment', () => {
     cy.get('.ml-6 > span').click();
     cy.get('#content').click();
     cy.get('button[type="submit"]').contains('Post comment').click();
-    cy.get('[role="alert"]').should('be.visible').and('have.text', 'Content is required.')
+    cy.get('.text-sm.text-red-800').should('be.visible').and('contain.text', 'Please write a comment before posting.');
     cy.wait(2000);
   })
 
   it('Upvoting a thread', () => {
-    cy.visit('/');
+    cy.visit('/login');
     cy.get('[placeholder="Username"]').type('Ryan');
-    cy.get('[placeholder="Password"]').type('Password1234');
-    cy.get('.login-button').click();
+    cy.get('input[name="password"]').type('Password1234');
+    cy.get('button[type="submit"]').click();
     cy.url().should('eq', 'http://localhost:5173/');
     cy.get('[href="/forum"] > .nav-label').click();
     cy.url().should('eq', 'http://localhost:5173/forum');
@@ -61,10 +61,10 @@ describe('UC 4&5: Leaving A Comment', () => {
   })
 
   it('Undo upvote', () => {
-    cy.visit('/');
+    cy.visit('/login');
     cy.get('[placeholder="Username"]').type('Ryan');
-    cy.get('[placeholder="Password"]').type('Password1234');
-    cy.get('.login-button').click();
+    cy.get('input[name="password"]').type('Password1234');
+    cy.get('button[type="submit"]').click();
     cy.url().should('eq', 'http://localhost:5173/');
     cy.get('[href="/forum"] > .nav-label').click();
     cy.url().should('eq', 'http://localhost:5173/forum');
@@ -77,10 +77,10 @@ describe('UC 4&5: Leaving A Comment', () => {
   })
 
   it('Downvoting a thread', () => {
-    cy.visit('/');
+    cy.visit('/login');
     cy.get('[placeholder="Username"]').type('Ryan');
-    cy.get('[placeholder="Password"]').type('Password1234');
-    cy.get('.login-button').click();
+    cy.get('input[name="password"]').type('Password1234');
+    cy.get('button[type="submit"]').click();
     cy.url().should('eq', 'http://localhost:5173/');
     cy.get('[href="/forum"] > .nav-label').click();
     cy.url().should('eq', 'http://localhost:5173/forum');
@@ -93,10 +93,10 @@ describe('UC 4&5: Leaving A Comment', () => {
   })
 
   it('Undo downvote', () => {
-    cy.visit('/');
+    cy.visit('/login');
     cy.get('[placeholder="Username"]').type('Ryan');
-    cy.get('[placeholder="Password"]').type('Password1234');
-    cy.get('.login-button').click();
+    cy.get('input[name="password"]').type('Password1234');
+    cy.get('button[type="submit"]').click();
     cy.url().should('eq', 'http://localhost:5173/');
     cy.get('[href="/forum"] > .nav-label').click();
     cy.url().should('eq', 'http://localhost:5173/forum');
