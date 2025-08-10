@@ -20,7 +20,7 @@ describe('UC 7: Sending Notifications for Events', () => {
     cy.contains('My Calendar').should('be.visible');
 
     // Step 2: Verify seeded events are present (we have 5 seeded events)
-    cy.wait(3000); // Allow calendar to load
+    cy.wait(1500); // reduced from 3000ms - Allow calendar to load
     
     cy.get('body').then(($body) => {
       if ($body.text().includes('Annual Checkup') || 
@@ -82,7 +82,7 @@ describe('UC 7: Sending Notifications for Events', () => {
   it('validates seeded event notification features', () => {
     // Test notification features using seeded events
     cy.contains('Calendar').click();
-    cy.wait(3000);
+    cy.wait(1500); // reduced from 3000ms
     
     // Check if we can access seeded events for notification testing
     cy.request({
@@ -117,7 +117,7 @@ describe('UC 7: Sending Notifications for Events', () => {
   it('validates email service error handling', () => {
     // Test that the system handles email service errors gracefully
     cy.contains('Calendar').click();
-    cy.wait(2000);
+    cy.wait(1000); // reduced from 2000ms
     
     cy.log('📧 Testing email service error handling');
     cy.log('✅ Expected behavior: System should handle email service failures gracefully');
@@ -146,7 +146,7 @@ describe('UC 7: Sending Notifications for Events', () => {
   it('simulates automated notification system behavior', () => {
     // Test simulated cron job behavior
     cy.contains('Calendar').click();
-    cy.wait(2000);
+    cy.wait(1000); // reduced from 2000ms
     
     cy.request({
       method: 'GET',

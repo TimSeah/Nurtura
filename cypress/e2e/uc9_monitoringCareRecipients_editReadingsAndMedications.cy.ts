@@ -41,9 +41,9 @@ describe('UC 10: Health Tracking & Monitoring E2E Tests', () => {
       // Handle the case where there might be loading errors
       cy.get('body').then(($body) => {
         if ($body.text().includes('Error loading care recipients')) {
-          // If there's an error, try the Retry button
+          // If there's an error, try the Retry button - reduced from 2000ms
           cy.contains('Retry').click();
-          cy.wait(2000);
+          cy.wait(1000);
         }
         
         // Check if we now have seeded recipients (Emma Thompson, Robert Johnson)
@@ -71,7 +71,7 @@ describe('UC 10: Health Tracking & Monitoring E2E Tests', () => {
       cy.get('body').then(($body) => {
         if ($body.text().includes('Error loading care recipients')) {
           cy.contains('Retry').click();
-          cy.wait(3000);
+          cy.wait(1500); // reduced from 3000ms
         }
       });
       
@@ -102,17 +102,17 @@ describe('UC 10: Health Tracking & Monitoring E2E Tests', () => {
       cy.get('body').then(($body) => {
         if ($body.text().includes('Error loading care recipients')) {
           cy.contains('Retry').click();
-          cy.wait(3000);
+          cy.wait(1500); // reduced from 3000ms
         }
       });
       
       cy.get('body', { timeout: 10000 }).then(($body) => {
         if ($body.find('[data-testid="care-recipient-card"]').length > 0) {
           cy.get('[data-testid="care-recipient-card"]').first().click();
-          cy.wait(2000); // Allow UI to update
+          cy.wait(1000); // reduced from 2000ms - Allow UI to update
         } else if ($body.text().includes('Emma Thompson')) {
           cy.contains('Emma Thompson').click();
-          cy.wait(2000);
+          cy.wait(1000); // reduced from 2000ms
         }
       });
     });
@@ -224,17 +224,17 @@ describe('UC 10: Health Tracking & Monitoring E2E Tests', () => {
       cy.get('body').then(($body) => {
         if ($body.text().includes('Error loading care recipients')) {
           cy.contains('Retry').click();
-          cy.wait(3000);
+          cy.wait(1500); // reduced from 3000ms
         }
       });
       
       cy.get('body', { timeout: 10000 }).then(($body) => {
         if ($body.find('[data-testid="care-recipient-card"]').length > 0) {
           cy.get('[data-testid="care-recipient-card"]').first().click();
-          cy.wait(2000);
+          cy.wait(1000); // reduced from 2000ms
         } else if ($body.text().includes('Emma Thompson')) {
           cy.contains('Emma Thompson').click();
-          cy.wait(2000);
+          cy.wait(1000); // reduced from 2000ms
         }
       });
     });

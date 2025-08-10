@@ -21,8 +21,8 @@ describe('UC 2&3: Making A New Thread', () => {
     cy.get('[href="/forum"] > .nav-label').click();
     cy.url().should('include', '/forum');
     
-    // Wait for forum page to load completely
-    cy.wait(2000);
+    // Wait for forum page to load completely - reduced from 2000ms
+    cy.wait(1000);
     
     // Click on "Create New Thread" button
     cy.get('.mb-6 > :nth-child(1) > .flex > :nth-child(2)').click();
@@ -35,14 +35,14 @@ describe('UC 2&3: Making A New Thread', () => {
     // Submit the thread
     cy.get('.space-y-4 > .flex > .bg-teal-700').click();
     
-    // Wait for thread creation and modal to close
-    cy.wait(3000);
+    // Wait for thread creation and modal to close - reduced from 3000ms
+    cy.wait(1500);
     
     // Ensure any modal/overlay is closed before proceeding
     cy.get('body').then(($body) => {
       // Check if there's a modal backdrop and wait for it to disappear
       if ($body.find('.modal-backdrop, .fixed.inset-0, [role="dialog"]').length > 0) {
-        cy.wait(2000);
+        cy.wait(1000); // reduced from 2000ms
       }
     });
     
@@ -54,8 +54,8 @@ describe('UC 2&3: Making A New Thread', () => {
       .should('be.visible')
       .click({ force: true });
     
-    // Wait for thread page to load
-    cy.wait(4000);
+    // Wait for thread page to load - reduced from 4000ms
+    cy.wait(2000);
     
     // Verify we're on the thread page and can see our content
     cy.get('body').should('contain', uniqueContent);
@@ -63,8 +63,8 @@ describe('UC 2&3: Making A New Thread', () => {
     // Go back to forum
     cy.contains("Back to Forum").should('be.visible').click();
     
-    // Wait for forum page to reload
-    cy.wait(5000);
+    // Wait for forum page to reload - reduced from 5000ms
+    cy.wait(2000);
     
     // Ensure the thread list is loaded
     cy.get('body').should('not.contain', 'Loading threads...');
@@ -78,15 +78,15 @@ describe('UC 2&3: Making A New Thread', () => {
           .should('be.visible')
           .click({ force: true });
         
-        // Wait for deletion and confirm
-        cy.wait(3000);
+        // Wait for deletion and confirm - reduced from 3000ms
+        cy.wait(1500);
         
         // Check if confirmation modal appears and confirm deletion
         cy.get('body').then(($confirmBody) => {
           if ($confirmBody.text().includes('confirm') || $confirmBody.text().includes('delete')) {
             // If there's a confirmation modal, confirm the deletion
             cy.get('button').contains(/confirm|delete|yes/i).click({ force: true });
-            cy.wait(2000);
+            cy.wait(1000); // reduced from 2000ms
           }
         });
       }

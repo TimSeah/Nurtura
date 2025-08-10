@@ -46,8 +46,8 @@ describe('UC 9: Monitoring Care Recipients\' Health', () => {
         // Handle either success or failure case - just ensure modal closes
         cy.get('@windowAlert').should('have.been.called');
         
-        // Wait a moment then close modal if it's still open
-        cy.wait(1000);
+        // Wait a moment then close modal if it's still open - reduced from 1000ms
+        cy.wait(500);
         cy.get('body').then(($body) => {
           if ($body.find('.modal').length > 0) {
             // Modal is still open, close it manually

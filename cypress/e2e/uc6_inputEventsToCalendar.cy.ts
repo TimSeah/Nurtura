@@ -54,16 +54,16 @@ describe('UC 6: Input Events To Calendar', () => {
     // Wait for form to close - this confirms the event was saved
     cy.get('[data-testid="title-input"]').should('not.exist');
     
-    // Step 10: Verify the calendar still works properly
-    cy.wait(3000);
+    // Step 10: Verify the calendar still works properly - reduced wait time
+    cy.wait(1500); // reduced from 3000ms
     cy.url().should('include', '/calendar');
     cy.contains('My Calendar').should('be.visible');
     cy.log('✅ New event added successfully to calendar with existing seeded events');
   });
 
   it('validates seeded event data integration', () => {
-    // Test that seeded events are properly integrated
-    cy.wait(5000); // Allow calendar to fully load
+    // Test that seeded events are properly integrated - reduced wait time
+    cy.wait(2000); // reduced from 5000ms
     
     cy.get('body').then(($body) => {
       // Check for various seeded event titles
