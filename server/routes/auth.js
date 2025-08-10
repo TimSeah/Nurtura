@@ -102,6 +102,11 @@ router.post('/login', async (req, res) => {
 // GET /api/auth/me - This route will have req.auth populated by JWT middleware
 router.get('/me', async (req, res) => {
   try {
+    // Check if JWT middleware populated req.auth
+    if (!req.auth || !req.auth._id) {
+      return res.status(401).json({ message: 'Invalid or missing token' });
+    }
+
     // req.auth is populated by the JWT middleware applied in server.js
     const user = await User.findById(req.auth._id).select('-passwordHash');
     

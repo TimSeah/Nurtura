@@ -4,13 +4,13 @@ describe('UC 7: Sending Notifications for Events', () => {
   
   beforeEach(() => {
     // Step 1: Visit login page and authenticate
-    cy.visit('http://localhost:5173/login');
-    cy.get('input[placeholder="Username"]').type('Bob');
-    cy.get('input[placeholder="Password"]').type('1234');
+    cy.visit('/login');
+    cy.get('input[placeholder="Username"]').type('Cypress');
+    cy.get('input[name="password"]').type('Testing1234!');
     cy.get('button[type="submit"]').click();
     
     // Verify successful login
-    cy.url().should('eq', 'http://localhost:5173/');
+    cy.url().should('eq', 'http://[::1]:5173/');
   });
 
   it('creates an event with reminder enabled and tests notification sending', () => {
@@ -60,7 +60,7 @@ describe('UC 7: Sending Notifications for Events', () => {
     // First, we need to get the event ID - this simulates what the cron job would do
     cy.request({
       method: 'GET',
-      url: 'http://localhost:5000/api/events',
+      url: 'http://[::1]:5000/api/events',
       headers: {
         'Content-Type': 'application/json'
       }
@@ -74,7 +74,7 @@ describe('UC 7: Sending Notifications for Events', () => {
         // Step 5: Test the reminder sending functionality
         cy.request({
           method: 'POST',
-          url: `http://localhost:5000/api/events/${createdEvent._id}/send-reminder`,
+          url: `http://[::1]:5000/api/events/${createdEvent._id}/send-reminder`,
           headers: {
             'Content-Type': 'application/json'
           },
@@ -190,7 +190,7 @@ describe('UC 7: Sending Notifications for Events', () => {
     // Get the event and test error handling
     cy.request({
       method: 'GET',
-      url: 'http://localhost:5000/api/events'
+      url: 'http://[::1]:5000/api/events'
     }).then((response) => {
       const event = response.body.find(e => e.title === 'Medication Review');
       
@@ -198,7 +198,7 @@ describe('UC 7: Sending Notifications for Events', () => {
         // Attempt to send reminder - this may fail due to email service not configured
         cy.request({
           method: 'POST',
-          url: `http://localhost:5000/api/events/${event._id}/send-reminder`,
+          url: `http://[::1]:5000/api/events/${event._id}/send-reminder`,
           failOnStatusCode: false
         }).then((reminderResponse) => {
           // Expected behavior: should handle errors gracefully
@@ -275,7 +275,7 @@ describe('UC 7: Sending Notifications for Events', () => {
     // Simulate cron job behavior by checking events
     cy.request({
       method: 'GET',
-      url: 'http://localhost:5000/api/events'
+      url: 'http://[::1]:5000/api/events'
     }).then((response) => {
       const events = response.body;
       
@@ -313,7 +313,7 @@ describe('UC 7: Sending Notifications for Events', () => {
     // Test the reminder status tracking
     cy.request({
       method: 'GET',
-      url: 'http://localhost:5000/api/events'
+      url: 'http://[::1]:5000/api/events'
     }).then((response) => {
       const event = response.body.find(e => e.title === 'Status Test Event');
       
@@ -324,14 +324,14 @@ describe('UC 7: Sending Notifications for Events', () => {
         // Send test reminder
         cy.request({
           method: 'POST',
-          url: `http://localhost:5000/api/events/${event._id}/send-reminder`,
+          url: `http://[::1]:5000/api/events/${event._id}/send-reminder`,
           failOnStatusCode: false
         }).then((reminderResponse) => {
           if (reminderResponse.status === 200) {
             // Verify event is marked as reminder sent
             cy.request({
               method: 'GET',
-              url: `http://localhost:5000/api/events`
+              url: `http://[::1]:5000/api/events`
             }).then((updatedResponse) => {
               const updatedEvent = updatedResponse.body.find(e => e._id === event._id);
               

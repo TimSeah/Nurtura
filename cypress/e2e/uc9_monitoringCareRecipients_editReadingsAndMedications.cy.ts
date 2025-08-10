@@ -3,11 +3,11 @@
 describe('UC 10: Health Tracking & Monitoring E2E Tests', () => {
   beforeEach(() => {
     // Set up common prerequisites for all tests
-    cy.visit('http://localhost:5173/login');
+    cy.visit('/login');
     
     // Login with test credentials
-    cy.get('input[placeholder="Username"]').type('Bob');
-    cy.get('input[placeholder="Password"]').type('1234');
+    cy.get('input[placeholder="Username"]').type('Cypress');
+    cy.get('input[name="password"]').type('Testing1234!');
     cy.get('button[type="submit"]').click();
     
     // Navigate to health tracking page

@@ -3,15 +3,15 @@
 describe('UC 9: Monitoring Care Recipients\' Health', () => {
   it('logs in, navigates to health monitoring, and manages care recipient data', () => {
     // Step 1: Visit login page
-    cy.visit('http://localhost:5173/login');
+    cy.visit('/login');
 
     // Step 2: Fill login form
-    cy.get('input[placeholder="Username"]').type('Bob'); // replace with valid test user
-    cy.get('input[name="password"]').type('1234'); // use name attribute
+    cy.get('input[placeholder="Username"]').type('Cypress'); // replace with valid test user
+    cy.get('input[name="password"]').type('Testing1234!'); // use name attribute
     cy.get('button[type="submit"]').click();
 
     // Step 3: Should redirect to dashboard
-    cy.url().should('eq', 'http://localhost:5173/');
+    cy.url().should('eq', 'http://[::1]:5173/');
 
     // Step 4: Click "Health Tracking" from navbar
     cy.contains('Health Tracking').click();
@@ -93,9 +93,9 @@ describe('UC 9: Monitoring Care Recipients\' Health', () => {
 
   it('handles error scenarios and validation', () => {
     // Visit login page and login
-    cy.visit('http://localhost:5173/login');
-    cy.get('input[placeholder="Username"]').type('Bob');
-    cy.get('input[name="password"]').type('1234');
+    cy.visit('/login');
+    cy.get('input[placeholder="Username"]').type('Cypress');
+    cy.get('input[name="password"]').type('Testing1234!');
     cy.get('button[type="submit"]').click();
 
     // Navigate to health tracking
@@ -122,9 +122,9 @@ describe('UC 9: Monitoring Care Recipients\' Health', () => {
 
   it('handles missing recipient selection gracefully', () => {
     // Visit login page and login
-    cy.visit('http://localhost:5173/login');
-    cy.get('input[placeholder="Username"]').type('Bob');
-    cy.get('input[name="password"]').type('1234');
+    cy.visit('/login');
+    cy.get('input[placeholder="Username"]').type('Cypress');
+    cy.get('input[name="password"]').type('Testing1234!');
     cy.get('button[type="submit"]').click();
 
     // Navigate to health tracking
