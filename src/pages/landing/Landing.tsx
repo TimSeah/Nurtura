@@ -40,49 +40,49 @@ const App: React.FC = () => {
       </header>
 
       {/* Features Section */}
-      <section className="py-20 bg-[#eaeaea] px-20">
+      <section className="py-20 bg-[#eaeaea]">
         {" "}
         {/* Light gray background for this section */}
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-[#1e293b] mb-30">
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-bold text-[#1e293b] mb-16">
             Why Nurtura?
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 mt-10">
             {/* Feature 1 */}
-            <div className="p-8 bg-[#fafafa] rounded-lg shadow-lg transform transition duration-500 hover:scale-105">
-              <div className="text-5xl text-[#0c9891] mb-4">
-                <Activity className="h-16 w-16 mx-auto" />
+            <div className="p-6 lg:p-8 bg-[#fafafa] rounded-lg shadow-lg transform transition duration-500 hover:scale-105 mx-auto max-w-sm">
+              <div className="text-5xl text-[#0c9891] mb-4 flex justify-center">
+                <Activity className="h-16 w-16" />
               </div>
-              <h3 className="text-2xl font-semibold text-[#1e293b] mb-4 justify-center flex">
+              <h3 className="text-2xl font-semibold text-[#1e293b] mb-4 text-center">
                 Monitor Care Recipients' Health
               </h3>
-              <p className="text-[#555555]">
+              <p className="text-[#555555] text-center">
                 All in one page to monitor your care recipients' data. Write
                 journals to ease your health tracking journey.
               </p>
             </div>
             {/* Feature 2 */}
-            <div className="p-8 bg-[#fafafa] rounded-lg shadow-lg transform transition duration-500 hover:scale-105">
-              <div className="text-5xl text-[#0c9891] mb-4">
-                <Calendar className="h-16 w-16 mx-auto" />
+            <div className="p-6 lg:p-8 bg-[#fafafa] rounded-lg shadow-lg transform transition duration-500 hover:scale-105 mx-auto max-w-sm">
+              <div className="text-5xl text-[#0c9891] mb-4 flex justify-center">
+                <Calendar className="h-16 w-16" />
               </div>
-              <h3 className="text-2xl font-semibold text-[#1e293b] mb-4 justify-center flex">
+              <h3 className="text-2xl font-semibold text-[#1e293b] mb-4 text-center">
                 Manage and Schedule Tasks
               </h3>
-              <p className="text-[#555555]">
+              <p className="text-[#555555] text-center">
                 Note your to-do lists on our calendar. We can help to remind you
                 of your care giving duties.
               </p>
             </div>
             {/* Feature 3 */}
-            <div className="p-8 bg-[#fafafa] rounded-lg shadow-lg transform transition duration-500 hover:scale-105">
-              <div className="text-5xl text-[#0c9891] mb-4">
-                <Users className="h-16 w-16 mx-auto" />
+            <div className="p-6 lg:p-8 bg-[#fafafa] rounded-lg shadow-lg transform transition duration-500 hover:scale-105 mx-auto max-w-sm">
+              <div className="text-5xl text-[#0c9891] mb-4 flex justify-center">
+                <Users className="h-16 w-16" />
               </div>
-              <h3 className="text-2xl font-semibold text-[#1e293b] mb-4 justify-center flex">
+              <h3 className="text-2xl font-semibold text-[#1e293b] mb-4 text-center">
                 Caregiver Forum
               </h3>
-              <p className="text-[#555555]">
+              <p className="text-[#555555] text-center">
                 Reach out for help anytime you need. In Nurtura, we connect the
                 caregiver community together.
               </p>
@@ -93,7 +93,7 @@ const App: React.FC = () => {
 
       {/* Call to Action Section */}
       <section className="landing-ready">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6 text-[#fafafa]">
             Ready to Find the Perfect Care?
           </h2>
@@ -111,7 +111,7 @@ const App: React.FC = () => {
 
       {/* Footer */}
       <footer className="py-10 bg-[#1e293b] text-[#fafafa] landing-footer">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
           <p>&copy; 2025 Nurtura. All rights reserved.</p>
           <div className="mt-4 flex justify-center space-x-6">
             <a
