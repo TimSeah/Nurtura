@@ -213,7 +213,8 @@ html, body {
 /* Mobile Styles - Mayo Clinic Theme */
 @media (max-width: 768px) {
   .layout-header {
-    display: inline;
+    display: flex;
+    height: var(--header-height);
   }
 
   .header-content {
@@ -240,16 +241,16 @@ html, body {
   }
 
   .nav-item {
-    color:#0078d4;
+    color: #0c9891;
   }
 
   .sidebar {
     position: fixed;
-    top: var(--header-height);
-    left: -280px;
-    width: 280px;
-    height: calc(100vh - var(--header-height));
-    z-index: 999;
+    top: 0;
+    left: -288px;
+    width: 80%;
+    height: 100vh;
+    z-index: 1000;
     transition: left 0.3s ease;
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
     overflow-y: auto;
@@ -258,17 +259,6 @@ html, body {
 
   .sidebar.mobile-open {
     left: 0;
-  }
-
-  .sidebar.mobile-open::before {
-    content: '';
-    position: fixed;
-    top: var(--header-height);
-    left: 280px;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 998;
   }
 
   .main-content {

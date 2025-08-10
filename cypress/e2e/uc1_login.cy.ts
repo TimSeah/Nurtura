@@ -5,25 +5,27 @@ describe('Login Page', () => {
     // Clear cookies and visit login page before each test
     cy.clearCookies();
     // Ensure test user exists before attempting login
-    cy.ensureTestUser('Bob', '1234');
+    cy.ensureTestUser('Cypress', 'Testing1234!');
     cy.visit('/login');
     // Wait for page to fully load
     cy.get('input[placeholder="Username"]').should('be.visible');
   });
 
   it('logs in successfully with correct credentials', () => {
-    // Fill in login form with new placeholder text
-    cy.get('input[placeholder="Username"]').clear().type('Bob');
-    cy.get('input[name="password"]').clear().type('1234');
+    // Fill in login form with updated selectors
+    cy.get('input[placeholder="Username"]').clear().type('Cypress');
+    cy.get('input[name="password"]').clear().type('Testing1234!');
 
     // Click submit button
     cy.get('button[type="submit"]').click();
 
     // Wait for and verify successful redirect to dashboard
-    cy.url().should('eq', 'http://localhost:5173/', { timeout: 10000 });
+    cy.url().should('eq', 'http://[::1]:5173/', { timeout: 10000 });
     
     // Verify we're actually logged in by checking for authenticated content
-    cy.get('body').should('not.contain', 'Log In');
+    // Look for navigation elements that appear when logged in
+    cy.get('nav').should('be.visible');
+    cy.get('.nav-item').should('exist');
   });
 
   it('shows error for invalid credentials', () => {
@@ -32,7 +34,7 @@ describe('Login Page', () => {
       cy.stub(win, 'alert').as('windowAlert');
     });
 
-    cy.get('input[placeholder="Username"]').type('Bob');
+    cy.get('input[placeholder="Username"]').type('Cypress');
     cy.get('input[name="password"]').type('wrongpass');
 
     cy.get('button[type="submit"]').click();
@@ -50,8 +52,8 @@ describe('Login Page', () => {
   });
 
   it('shows loading state during login attempt', () => {
-    cy.get('input[placeholder="Username"]').type('Bob');
-    cy.get('input[name="password"]').type('1234');
+    cy.get('input[placeholder="Username"]').type('Cypress');
+    cy.get('input[name="password"]').type('Testing1234!');
 
     // Check that button shows loading state when clicked
     cy.get('button[type="submit"]').click();

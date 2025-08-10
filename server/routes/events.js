@@ -94,18 +94,11 @@ router.get('/today', async (req, res) => {
   try {
     //const userId = req.params.id;
     const userId = req.auth._id;
-    const now = new Date();
-    const startToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0));
-    const endToday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
-
-    const events = await Event.find({
-      userId: userId,
-      date : {
-        $gte: startToday,
-        $lte: endToday
-      }
-    }).sort({ date: 1, startTime: 1 }); 
-    
+    const { start, end } = getSingaporeDayRange();
+    const events = await Event.find({ 
+      userId,
+      date: { $gte: start, $lte: end } 
+    }).sort({ date: 1, startTime: 1 });
     res.json(events);
   } catch (err) {
     console.error('Error fetching today events:', err.message);
@@ -199,6 +192,23 @@ router.post('/:id/send-reminder', async (req, res) => {
     });
   }
 });
+
+function getSingaporeDayRange() {
+  const offset = 28800000; // UTC+8
+  const now = new Date();
+  const singaporeTime = new Date(now.getTime() + offset);
+  
+  const start = new Date(Date.UTC(
+    singaporeTime.getUTCFullYear(),
+    singaporeTime.getUTCMonth(),
+    singaporeTime.getUTCDate()
+  ));
+  start.setTime(start.getTime() - offset);
+  
+  const end = new Date(start.getTime() + 86400000 - 1); // +24hrs -1ms
+  
+  return { start, end };
+}
 
 // Export the router so it can be used by the main Express app (server.js)
 module.exports = router;

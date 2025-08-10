@@ -23,7 +23,7 @@ Cypress.Commands.add('login', (username, password) => {
   cy.get('button[type="submit"]').click();
   
   // Wait for successful login (redirect to dashboard)
-  cy.url().should('eq', 'http://localhost:5173/', { timeout: 10000 });
+  cy.url().should('eq', 'http://[::1]:5173/', { timeout: 10000 });
 });
 
 // Ensure test user exists
