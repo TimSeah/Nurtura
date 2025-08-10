@@ -12,6 +12,29 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Add CSS to hide all browser password toggles
+  React.useEffect(() => {
+    const style = document.createElement("style");
+    style.textContent = `
+      input[type="password"]::-ms-reveal,
+      input[type="password"]::-ms-clear,
+      input[type="password"]::-webkit-credentials-auto-fill-button,
+      input[type="password"]::-webkit-strong-password-auto-fill-button {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+      }
+      input[type="password"] {
+        -webkit-text-security: disc !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -80,20 +103,28 @@ export default function Register() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-teal-100 flex flex-col items-center justify-center px-4">
       <div className="text-center">
-        <img 
-          alt="Nurtura logo, a cute koala" 
+        <img
+          alt="Nurtura logo, a cute koala"
           className="mx-auto h-48 w-auto"
-          src={logoBlack} 
+          src={logoBlack}
         />
-        <h1 className="mt-2 text-4xl font-bold text-slate-800 font-poppins">Join Nurtura Today!</h1>
-        <p className="mt-4 text-lg text-slate-600">Create your account and start caring.</p>
+        <h1 className="mt-2 text-4xl font-bold text-slate-800 font-poppins">
+          Join Nurtura Today!
+        </h1>
+        <p className="mt-4 text-lg text-slate-600">
+          Create your account and start caring.
+        </p>
       </div>
 
       <div className="mt-5 bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-semibold text-center text-slate-700 mb-6">Register</h2>
+        <h2 className="text-2xl font-semibold text-center text-slate-700 mb-6">
+          Register
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="sr-only" htmlFor="username">Username</label>
+            <label className="sr-only" htmlFor="username">
+              Username
+            </label>
             <input
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 transition-colors"
               id="username"
@@ -107,7 +138,9 @@ export default function Register() {
             />
           </div>
           <div className="relative">
-            <label className="sr-only" htmlFor="password">Password</label>
+            <label className="sr-only" htmlFor="password">
+              Password
+            </label>
             <input
               className="w-full px-4 py-3 pr-12 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 transition-colors"
               id="password"
@@ -127,20 +160,32 @@ export default function Register() {
             >
               {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
             </button>
-            
+
             {/* Password Requirements Info Icon */}
             <div className="absolute right-12 top-1/2 transform -translate-y-1/2 group">
-              <FiInfo 
-                size={16} 
+              <FiInfo
+                size={16}
                 className="text-slate-400 hover:text-slate-600 cursor-help transition-colors"
               />
               <div className="absolute left-6 top-1/2 transform -translate-y-1/2 w-64 p-3 bg-white border border-slate-200 text-slate-700 text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                 <div>
-                  <p className="font-medium" style={{ marginBottom: '8px' }}>Password requirements:</p>
-                  <div style={{ lineHeight: '1.3' }}>
-                    <p style={{ margin: '0', padding: '0', marginBottom: '2px' }}>• At least 8 characters long</p>
-                    <p style={{ margin: '0', padding: '0', marginBottom: '2px' }}>• Contains at least one letter</p>
-                    <p style={{ margin: '0', padding: '0', marginBottom: '0' }}>• Contains at least one number</p>
+                  <p className="font-medium" style={{ marginBottom: "8px" }}>
+                    Password requirements:
+                  </p>
+                  <div style={{ lineHeight: "1.3" }}>
+                    <p
+                      style={{ margin: "0", padding: "0", marginBottom: "2px" }}
+                    >
+                      • At least 8 characters long
+                    </p>
+                    <p
+                      style={{ margin: "0", padding: "0", marginBottom: "2px" }}
+                    >
+                      • Contains at least one letter
+                    </p>
+                    <p style={{ margin: "0", padding: "0", marginBottom: "0" }}>
+                      • Contains at least one number
+                    </p>
                   </div>
                 </div>
                 {/* Arrow pointing left */}
@@ -148,7 +193,7 @@ export default function Register() {
               </div>
             </div>
           </div>
-          
+
           {errorMessage && (
             <div className="error-message text-red-500 text-sm text-center bg-red-50 border border-red-200 rounded-lg p-3">
               {errorMessage}
@@ -157,18 +202,18 @@ export default function Register() {
 
           <button
             className={`w-full bg-gradient-to-r from-teal-400 to-cyan-500 text-white font-semibold py-3 rounded-lg hover:from-teal-500 hover:to-cyan-600 transition-all duration-300 ${
-              isLoading ? 'opacity-50 cursor-not-allowed' : ''
+              isLoading ? "opacity-50 cursor-not-allowed" : ""
             }`}
             type="submit"
             disabled={isLoading}
           >
-            {isLoading ? 'Creating account...' : 'Register'}
+            {isLoading ? "Creating account..." : "Register"}
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-slate-500">
           Already have an account?{" "}
-          <Link 
-            to="/login" 
+          <Link
+            to="/login"
             className="font-medium text-teal-600 hover:text-teal-700 transition-colors"
           >
             Log in here
@@ -178,20 +223,28 @@ export default function Register() {
 
       {/* Benefits Section */}
       <div className="mt-12 text-center max-w-4xl mx-auto">
-        <h3 className="text-2xl font-semibold text-slate-800 mb-6">What you get with Nurtura</h3>
+        <h3 className="text-2xl font-semibold text-slate-800 mb-6">
+          What you get with Nurtura
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="text-3xl text-teal-500 mb-3">📱</div>
-            <h4 className="text-lg font-semibold text-slate-700 mb-2">Easy Communication</h4>
+            <h4 className="text-lg font-semibold text-slate-700 mb-2">
+              Easy Communication
+            </h4>
             <p className="text-slate-600 text-sm">
-              Stay connected with family and caregivers through our intuitive platform.
+              Stay connected with family and caregivers through our intuitive
+              platform.
             </p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="text-3xl text-teal-500 mb-3">📊</div>
-            <h4 className="text-lg font-semibold text-slate-700 mb-2">Health Tracking</h4>
+            <h4 className="text-lg font-semibold text-slate-700 mb-2">
+              Health Tracking
+            </h4>
             <p className="text-slate-600 text-sm">
-              Monitor vital signs, medications, and health progress with detailed insights.
+              Monitor vital signs, medications, and health progress with
+              detailed insights.
             </p>
           </div>
         </div>

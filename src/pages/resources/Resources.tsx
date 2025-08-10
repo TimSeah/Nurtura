@@ -12,9 +12,13 @@ import type { Resource } from "../../types";
 import { dataService } from "../../services/dataService";
 import "./Resources.css";
 
-import caregiving1 from "../../pages/dashboard/components/pics/koala.png";
-import caregiving2 from "../../pages/dashboard/components/pics/koala.png";
-import caregiving3 from "../../pages/dashboard/components/pics/koala.png";
+import caringForYourself from "./pictures/caring_for_yourself.jpg";
+import managing_elderly_behaviour from "./pictures/managing_elderly_behaviour.jpg";
+import support_system from "./pictures/support_system.jpg";
+import support_group from "./pictures/support_groups.jpg";
+import dementia_care from "./pictures/dementia_care.jpg";
+
+//import caregiving from "../../pages/dashboard/components/pics/koala.png";
 
 const Resources: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -62,7 +66,7 @@ const Resources: React.FC = () => {
     {
       id: 1,
       title: "Caring for Yourself",
-      image: caregiving1,
+      image: caringForYourself,
       url: "https://www.caregiver.org/caregiver-resources/caring-for-yourself/",
       description:
         "As a caregiver, we often overlook our own wellbeing we deserve.",
@@ -70,23 +74,30 @@ const Resources: React.FC = () => {
     {
       id: 2,
       title: "Managing Elderly Behaviours",
-      image: caregiving2,
+      image: managing_elderly_behaviour,
       url: "https://ntuchealth.sg/elderly-care/resources/health-and-wellness/5-difficult-elderly-behaviours-and-how-to-manage-them",
       description: "Learn how to react to common elderly habits.",
     },
     {
       id: 3,
       title: "Building a Support System",
-      image: caregiving3,
+      image: support_system,
       url: "https://mentalh2o.org/how-to-build-a-support-network-the-importance-of-strong-relationships/",
       description: "Connect with others to accompany your journey.",
     },
     {
       id: 4,
       title: "Dementia Hub Singapore",
-      image: caregiving2,
+      image: dementia_care,
       url: "https://www.dementiahub.sg/",
       description: "A simple guide to caregiving practices for seniors.",
+    },
+    {
+      id: 5,
+      title: "Caregiver Support Groups",
+      image: support_group,
+      url: "https://www.caregiver.org/caregiver-support-groups/",
+      description: "Join a community of caregivers for support and resources.",
     },
   ];
 
@@ -164,7 +175,8 @@ const Resources: React.FC = () => {
 
       {/* Results count */}
       <div className="results-count">
-        {filteredResources.length} resource{filteredResources.length !== 1 ? 's' : ''} found
+        {filteredResources.length} resource
+        {filteredResources.length !== 1 ? "s" : ""} found
       </div>
 
       {/* Resources List */}
