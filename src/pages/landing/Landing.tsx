@@ -47,44 +47,41 @@ const App: React.FC = () => {
           <h2 className="text-4xl font-bold text-[#1e293b] mb-16">
             Why Nurtura?
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 mt-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 mt-10 justify-items-center">
             {/* Feature 1 */}
-            <div className="p-6 lg:p-8 bg-[#fafafa] rounded-lg shadow-lg transform transition duration-500 hover:scale-105 mx-auto max-w-sm">
-              <div className="text-5xl text-[#0c9891] mb-4 flex justify-center">
+            <div className="flex flex-col items-center justify-center p-6 lg:p-8 bg-[#fafafa] rounded-lg shadow-lg transform transition duration-500 hover:scale-105 w-full max-w-sm text-center h-full min-h-[320px]">
+              <div className="text-5xl text-[#0c9891] mb-6 flex justify-center">
                 <Activity className="h-16 w-16" />
               </div>
               <h3 className="text-2xl font-semibold text-[#1e293b] mb-4 text-center">
                 Monitor Care Recipients' Health
               </h3>
               <p className="text-[#555555] text-center">
-                All in one page to monitor your care recipients' data. Write
-                journals to ease your health tracking journey.
+                All in one page to monitor your care recipients' data. Write journals to ease your health tracking journey.
               </p>
             </div>
             {/* Feature 2 */}
-            <div className="p-6 lg:p-8 bg-[#fafafa] rounded-lg shadow-lg transform transition duration-500 hover:scale-105 mx-auto max-w-sm">
-              <div className="text-5xl text-[#0c9891] mb-4 flex justify-center">
+            <div className="flex flex-col items-center justify-center p-6 lg:p-8 bg-[#fafafa] rounded-lg shadow-lg transform transition duration-500 hover:scale-105 w-full max-w-sm text-center h-full min-h-[320px]">
+              <div className="text-5xl text-[#0c9891] mb-6 flex justify-center">
                 <Calendar className="h-16 w-16" />
               </div>
               <h3 className="text-2xl font-semibold text-[#1e293b] mb-4 text-center">
                 Manage and Schedule Tasks
               </h3>
               <p className="text-[#555555] text-center">
-                Note your to-do lists on our calendar. We can help to remind you
-                of your care giving duties.
+                Note your to-do lists on our calendar. We can help to remind you of your care giving duties.
               </p>
             </div>
             {/* Feature 3 */}
-            <div className="p-6 lg:p-8 bg-[#fafafa] rounded-lg shadow-lg transform transition duration-500 hover:scale-105 mx-auto max-w-sm">
-              <div className="text-5xl text-[#0c9891] mb-4 flex justify-center">
+            <div className="flex flex-col items-center justify-center p-6 lg:p-8 bg-[#fafafa] rounded-lg shadow-lg transform transition duration-500 hover:scale-105 w-full max-w-sm text-center h-full min-h-[320px]">
+              <div className="text-5xl text-[#0c9891] mb-6 flex justify-center">
                 <Users className="h-16 w-16" />
               </div>
               <h3 className="text-2xl font-semibold text-[#1e293b] mb-4 text-center">
                 Caregiver Forum
               </h3>
               <p className="text-[#555555] text-center">
-                Reach out for help anytime you need. In Nurtura, we connect the
-                caregiver community together.
+                Reach out for help anytime you need. In Nurtura, we connect the caregiver community together.
               </p>
             </div>
           </div>
