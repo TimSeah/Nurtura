@@ -1,8 +1,11 @@
 # Web Application Dockerfile (Optimized)
 FROM node:20-alpine
 
-# Install curl for health checks
-RUN apk add --no-cache curl
+# Install system packages (including Python) as root
+RUN apk add --no-cache curl python3 py3-pip python3-dev
+
+# Create symbolic link so 'python' command works too
+RUN ln -sf /usr/bin/python3 /usr/bin/python
 
 # Create non-root user early
 RUN addgroup -g 1001 -S nodejs && \

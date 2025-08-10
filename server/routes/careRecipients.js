@@ -39,9 +39,21 @@ router.get('/:id', async (req, res) => {
 // Create new care recipient
 router.post('/', async (req, res) => {
   try {
-    //const careRecipient = new CareRecipient(req.body);
+    // Input validation for required fields
+    if (!req.body.name || typeof req.body.name !== 'string' || !req.body.name.trim()) {
+      return res.status(400).json({ message: 'Name is required and cannot be empty' });
+    }
+
+    // Validate age if provided
+    if (req.body.age !== undefined && req.body.age !== null) {
+      if (typeof req.body.age !== 'number' || req.body.age < 0 || req.body.age > 130) {
+        return res.status(400).json({ message: 'Age must be a number between 0 and 130' });
+      }
+    }
+
     const careRecipient = new CareRecipient({
       ...req.body,
+      name: req.body.name.trim(), // Trim the name
       userId: req.auth._id
     });
     const savedCareRecipient = await careRecipient.save();

@@ -130,7 +130,33 @@ router.get('/:recipientId/:vitalType', async (req, res) => {
 // Add new vital signs reading
 router.post('/', async (req, res) => {
   try {
-    const vitalSigns = new VitalSigns(req.body);
+    // Input validation for required fields
+    if (!req.body.recipientId || typeof req.body.recipientId !== 'string' || !req.body.recipientId.trim()) {
+      return res.status(400).json({ message: 'Recipient ID is required and cannot be empty' });
+    }
+
+    if (!req.body.vitalType || typeof req.body.vitalType !== 'string') {
+      return res.status(400).json({ message: 'Vital type is required' });
+    }
+
+    if (req.body.value === undefined || req.body.value === null || typeof req.body.value !== 'number') {
+      return res.status(400).json({ message: 'Value is required and must be a number' });
+    }
+
+    // Validate ranges for specific vital types
+    const { vitalType, value } = req.body;
+    if (vitalType === 'heart_rate' && (value < 0 || value > 300)) {
+      return res.status(400).json({ message: 'Heart rate must be between 0 and 300' });
+    }
+
+    if (vitalType === 'temperature' && (value < 80 || value > 120)) {
+      return res.status(400).json({ message: 'Temperature must be between 80 and 120' });
+    }
+
+    const vitalSigns = new VitalSigns({
+      ...req.body,
+      recipientId: req.body.recipientId.trim()
+    });
     const savedVitalSigns = await vitalSigns.save();
     res.status(201).json(savedVitalSigns);
   } catch (err) {

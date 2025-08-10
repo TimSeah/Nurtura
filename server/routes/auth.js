@@ -10,22 +10,36 @@ router.post('/register', async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Username Validation 
+    // Input validation - check for missing or empty values
+    if (!username || typeof username !== 'string' || !username.trim()) {
+      return res.status(400).json({
+        message: "Username is required and cannot be empty"
+      });
+    }
 
-    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+    if (!password || typeof password !== 'string') {
+      return res.status(400).json({
+        message: "Password is required"
+      });
+    }
+
+    // Username Validation 
+    const trimmedUsername = username.trim();
+
+    if (!/^[a-zA-Z0-9_]+$/.test(trimmedUsername)) {
       return res.status(400).json({
         message: "Username can only contain letters, numbers, and underscores"
       });
     }
 
-    if (username.length < 3 || username.length > 20) {
+    if (trimmedUsername.length < 3 || trimmedUsername.length > 20) {
       return res.status(400).json({
         message: "Username must be between 3 and 20 characters"
       });
     }
 
     // Normalize username to check embedded offensive words
-    const normalized = username.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const normalized = trimmedUsername.toLowerCase().replace(/[^a-z0-9]/g, "");
     const isOffensive = bannedWords.some(word => normalized.includes(word));
 
     if (isOffensive) {
@@ -47,7 +61,7 @@ router.post('/register', async (req, res) => {
     }
 
     const hash = await bcrypt.hash(password, 10);
-    const u = await User.create({ username, passwordHash: hash });
+    const u = await User.create({ username: trimmedUsername, passwordHash: hash });
     res.status(201).json({ message: 'ok' });
   } catch (err) {
     console.error(err);
@@ -70,11 +84,11 @@ router.post('/login', async (req, res) => {
   
   // Include username in JWT payload
   const token = jwt.sign(
-    { _id: user._id, username: user.username }, 
-    process.env.JWT_SECRET, 
+    { _id: user._id, username: user.username },
+    process.env.JWT_SECRET,
     { expiresIn: '2h' }
   );
-  
+    
   res.cookie('token', token, {
     httpOnly: true,
     sameSite: 'strict',

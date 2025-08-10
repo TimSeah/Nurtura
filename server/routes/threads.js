@@ -60,6 +60,19 @@ router.post('/',
   const { title, content, date, upvotes, author } = req.body;
   //const author = req.auth?.email || req.auth?.username; 
 
+  // Input validation for required fields
+  if (!title || typeof title !== 'string' || !title.trim()) {
+    return res.status(400).json({ message: 'Title is required and cannot be empty' });
+  }
+
+  if (!content || typeof content !== 'string' || !content.trim()) {
+    return res.status(400).json({ message: 'Content is required and cannot be empty' });
+  }
+
+  if (!author || typeof author !== 'string' || !author.trim()) {
+    return res.status(400).json({ message: 'Author is required and cannot be empty' });
+  }
+
   // Log moderation results if available
   if (req.moderationResult) {
     console.log('Thread moderation result:', req.moderationResult);
@@ -68,9 +81,9 @@ router.post('/',
   // Create a new Thread instance using the Mongoose model
   // Mongoose will automatically validate the data against the schema.
   const newThread = new Thread({
-    title,
-    content,
-    author,
+    title: title.trim(),
+    content: content.trim(),
+    author: author.trim(),
     date: new Date(date), // Convert the date string from frontend to a Date object
     upvotes,
   });

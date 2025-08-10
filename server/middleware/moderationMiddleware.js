@@ -90,7 +90,7 @@ class ForumModerator {
       });
 
       this.serviceProcess.on('close', (code) => {
-        if (code !== 0) {
+        if (code !== 0 && process.env.NODE_ENV !== 'test') {
           console.log(`⚠️ Moderation service exited with code ${code}`);
         }
         this.serviceProcess = null;
@@ -100,9 +100,13 @@ class ForumModerator {
       const isHealthy = await this.waitForServiceHealth(30000);
       
       if (isHealthy) {
-        console.log('✅ Content moderation service ready');
+        if (process.env.NODE_ENV !== 'test') {
+          console.log('✅ Content moderation service ready');
+        }
       } else {
-        console.log('⚠️ Content moderation service failed to start, falling back to CLI');
+        if (process.env.NODE_ENV !== 'test') {
+          console.log('⚠️ Content moderation service failed to start, falling back to CLI');
+        }
         this.usePersistentService = false;
       }
     } catch (error) {

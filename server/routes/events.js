@@ -53,9 +53,24 @@ router.post('/', async (req, res) => {
   const { title, date, startTime, month, remark, enableReminder, reminderEmail } = req.body;
   const userId = req.auth._id;
 
+  // Input validation for required fields
+  if (!title || typeof title !== 'string' || !title.trim()) {
+    return res.status(400).json({ message: 'Title is required and cannot be empty' });
+  }
+
+  if (!date) {
+    return res.status(400).json({ message: 'Date is required' });
+  }
+
+  // Validate date is a valid date
+  const parsedDate = new Date(date);
+  if (isNaN(parsedDate.getTime())) {
+    return res.status(400).json({ message: 'Invalid date format' });
+  }
+
   const newEvent = new Event({
-    title,
-    date: new Date(date),
+    title: title.trim(),
+    date: parsedDate,
     startTime,
     month,
     remark,
