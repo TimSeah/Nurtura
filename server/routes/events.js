@@ -85,7 +85,7 @@ router.post('/', async (req, res) => {
     res.status(201).json(savedEvent);
 
   } catch (err) {
-    console.error('❌ Error creating event:', err.message);
+    console.error('Error creating event:', err.message);
     res.status(400).json({ message: err.message });
   }
 });
@@ -108,7 +108,7 @@ router.get('/today', async (req, res) => {
     
     res.json(events);
   } catch (err) {
-    console.error('❌ Error fetching today events:', err.message);
+    console.error('Error fetching today events:', err.message);
     res.status(500).json({ message: err.message });
   }
 });
@@ -122,7 +122,7 @@ router.get('/month/:month', async (req, res) => {
     const events = await Event.find({month: month, userId: userId}).sort({ date: 1, startTime: 1 });
     res.json(events);
   } catch (err) {
-    console.error('❌ Error fetching monthly events:', err.message);
+    console.error('Error fetching monthly events:', err.message);
     res.status(500).json({ message: err.message });
   }
 });
@@ -133,7 +133,7 @@ router.delete('/:id', async (req, res) => {
     await Event.findOneAndDelete({ _id: req.params.id, userId: req.auth._id });
     res.status(204).send();
   } catch (err) {
-    console.error('❌ Error deleting event:', err.message);
+    console.error('Error deleting event:', err.message);
     res.status(500).json({ message: err.message });
   }
 });
@@ -148,7 +148,7 @@ router.put('/:id', async (req, res) => {
     );
     res.json(updated);
   } catch (err) {
-    console.error('❌ Error updating event:', err.message);
+    console.error('Error updating event:', err.message);
     res.status(500).json({ message: err.message });
   }
 });
@@ -192,7 +192,7 @@ router.post('/:id/send-reminder', async (req, res) => {
       });
     }
   } catch (err) {
-    console.error('❌ Test reminder error:', err.message);
+    console.error('Test reminder error:', err.message);
     res.status(500).json({ 
       success: false, 
       message: 'Error sending test reminder: ' + err.message 
