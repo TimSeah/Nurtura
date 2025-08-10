@@ -84,11 +84,11 @@ router.post('/login', async (req, res) => {
   
   // Include username in JWT payload
   const token = jwt.sign(
-    { _id: user._id, username: user.username }, 
-    process.env.JWT_SECRET, 
+    { _id: user._id, username: user.username },
+    process.env.JWT_SECRET,
     { expiresIn: '2h' }
   );
-  
+    
   res.cookie('token', token, {
     httpOnly: true,
     sameSite: 'strict',

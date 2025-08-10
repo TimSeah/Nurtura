@@ -91,6 +91,8 @@ app.use(cookieParser());
 // from the 'public' directory.
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Mount auth routes
+app.use('/api/auth', authRoutes);
 
 // Apply JWT middleware to Auth/me
 app.use('/api/auth/me', jwtMiddleware({
@@ -119,9 +121,6 @@ app.get('/health', (req, res) => {
     uptime: process.uptime()
   });
 });
-
-// Mount auth routes
-app.use('/api/auth', authRoutes);
 
 // --- Route Definitions ---
 // Import route handlers.
@@ -230,7 +229,7 @@ app.use(function(err, req, res, next) {
 // --- Server Start ---
 // Define the port for the server to listen on.
 // It tries to use the PORT environment variable, or defaults to 3000.
-const port = process.env.PORT || 3000;
+// const port = process.env.PORT || 3000;
 module.exports = app;
 
 // If this file is run directly (e.g., `node server.js`), ensure the server starts.
