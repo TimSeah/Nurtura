@@ -5,8 +5,8 @@
 /* Sidebar fixes - fixed position, full height, with scrollable content */
 .sidebar {
   position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
+  /* top: 0 !important;
+  left: 0 !important; */
   width: 280px !important;
   height: 100vh !important;
   overflow-y: auto !important;
@@ -14,7 +14,7 @@
 }
 
 .main-content {
-  margin-left: 280px !important;
+  margin-left: 280px;
 }
 
 /* Ensure layout body works with fixed sidebar */

@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
-import { Link, useLocation,useNavigate } from "react-router-dom";
-import { Outlet } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import {
   Home,
@@ -13,7 +13,7 @@ import {
   Heart,
   Menu,
   X,
-  LogOut
+  LogOut,
 } from "lucide-react";
 import "./Layout.css";
 
@@ -25,7 +25,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const { logout } = useContext(AuthContext);
-  const navigate  = useNavigate()
+  const navigate = useNavigate();
 
   const navigationItems = [
     { path: "/", label: "Dashboard", icon: Home },
@@ -34,7 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     // { path: "/care-circle", label: "Care Circle", icon: Heart },
     { path: "/forum", label: "Forum", icon: Users },
     //{ path: "/resourcesAlt", label: "Resources", icon: MapPin }, commented out cause no longer in use
-    { path: "/resources", label: "Locations", icon: X },
+    { path: "/resources", label: "Resources", icon: MapPin },
     // { path: "/alerts", label: "Alerts", icon: Bell },
     { path: "/settings", label: "Settings", icon: Settings },
   ];
@@ -77,7 +77,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               const Icon = item.icon;
               let isActive;
               if (item.path === "/forum") {
-                isActive = location.pathname.startsWith("/forum") || location.pathname.startsWith("/threads/");
+                isActive =
+                  location.pathname.startsWith("/forum") ||
+                  location.pathname.startsWith("/threads/");
               } else {
                 isActive = location.pathname === item.path;
               }
@@ -94,10 +96,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               );
             })}
             {/* ↓ LOGOUT BUTTON ↓ */}
-            <button
-              className="nav-item logout-button"
-              onClick={handleLogout}
-            >
+            <button className="nav-item logout-button" onClick={handleLogout}>
               <LogOut className="nav-icon" />
               <span className="nav-label">Log Out</span>
             </button>
