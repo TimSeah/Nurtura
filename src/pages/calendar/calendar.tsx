@@ -138,7 +138,7 @@ const Calendar: React.FC = () => {
     };
 
     try {
-      await fetch(`http://localhost:5000/api/events/${event._id}`, {
+      await fetch(`/api/events/${event._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -178,7 +178,7 @@ const Calendar: React.FC = () => {
     };
 
     try {
-      const response = await fetch(`http://localhost:5000/api/events/`, {
+      const response = await fetch(`/api/events/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newEvent),
@@ -206,7 +206,7 @@ const Calendar: React.FC = () => {
   const deleteEvent = async (key: string, index: number) => {
     const event = events[key][index];
     try {
-      await fetch(`http://localhost:5000/api/events/${event._id}`, {
+      await fetch(`/api/events/${event._id}`, {
         method: "DELETE",
         credentials: "include",
         // headers: { "Content-Type": "application/json"},
@@ -267,10 +267,9 @@ const Calendar: React.FC = () => {
     //if (!user?.username) return;  not in use as we have an AuthContext Provider
     const fetchEventsThisMonth = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:5000/api/events/month/${monthNames[month]}`,
-          { credentials: "include" }
-        );
+        const response = await fetch(`/api/events/month/${monthNames[month]}`, {
+          credentials: "include",
+        });
         if (!response.ok)
           throw new Error("Failed to fetch events for this month");
 
@@ -398,7 +397,7 @@ const Calendar: React.FC = () => {
                         const event =
                           events[editingEvent.key][editingEvent.index];
                         const response = await fetch(
-                          `http://localhost:5000/api/events/${event._id}/send-reminder`,
+                          `/api/events/${event._id}/send-reminder`,
                           {
                             method: "POST",
                             credentials: "include",

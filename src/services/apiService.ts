@@ -5,12 +5,12 @@
 const getApiBaseUrl = (): string => {
   // Check if we have process.env (Node.js/Jest environment)
   if (typeof process !== 'undefined' && process.env) {
-    return process.env.VITE_API_URL || 'http://localhost:5000/api';
+    return process.env.VITE_API_URL || '/api';
   }
   
   // For browser environments, we'll fallback to the default
   // In actual production, Vite will have replaced import.meta.env references during build
-  return 'http://localhost:5000/api';
+  return '/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();
