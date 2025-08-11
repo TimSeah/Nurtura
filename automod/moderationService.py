@@ -32,7 +32,7 @@ class ContentModerator:
             handlers.append(logging.StreamHandler(sys.stdout))
         
         # Always log errors to file
-        handlers.append(logging.FileHandler("./moderation.log", mode="a"))
+        handlers.append(logging.FileHandler("/tmp/moderation.log", mode="a"))
         
         logging.basicConfig(
             level=getattr(logging, log_level, logging.WARNING),
