@@ -18,7 +18,7 @@ describe('UC 4&5: Leaving A Comment', () => {
     cy.wait(1000); // reduced from 2000ms
     cy.url().should('eq', 'http://[::1]:5173/threads/6898794d524574a7f2f74016');
     cy.wait(1000); // reduced from 2000ms
-    cy.get('.ml-6 > span').click();
+    cy.get('[aria-label="Add Comment"] > span').click();
     cy.get('#content').click();
     cy.get('#content').type('Maximum 8 pills in a 24 hour period!');
     cy.wait(1000); // reduced from 2000ms
@@ -36,7 +36,7 @@ describe('UC 4&5: Leaving A Comment', () => {
     cy.url().should('eq', 'http://[::1]:5173/forum');
     cy.get('[href="/threads/6898794d524574a7f2f74016"] > .flex-1 > .text-md').click();
     cy.url().should('eq', 'http://[::1]:5173/threads/6898794d524574a7f2f74016');
-    cy.get('.ml-6 > span').click();
+    cy.get('[aria-label="Add Comment"] > span').click();
     cy.get('#content').click();
     cy.get('button[type="submit"]').contains('Post comment').click();
     cy.get('.text-sm.text-red-800').should('be.visible').and('contain.text', 'Please write a comment before posting.');
