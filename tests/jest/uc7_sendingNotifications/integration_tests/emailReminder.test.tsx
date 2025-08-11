@@ -127,9 +127,7 @@ describe("Calendar Component - Email Reminder Features", () => {
 
       // Verify API call was made
       const fetchMock = fetch as jest.Mock;
-      expect(fetchMock.mock.calls[1][0]).toBe(
-        "http://localhost:5000/api/events/1/send-reminder"
-      );
+      expect(fetchMock.mock.calls[1][0]).toBe("/api/events/1/send-reminder");
       expect(fetchMock.mock.calls[1][1]).toMatchObject({
         method: "POST",
       });
@@ -244,9 +242,7 @@ describe("Calendar Component - Email Reminder Features", () => {
 
       // Verify correct API call for second event
       const fetchMock = fetch as jest.Mock;
-      expect(fetchMock.mock.calls[1][0]).toBe(
-        "http://localhost:5000/api/events/2/send-reminder"
-      );
+      expect(fetchMock.mock.calls[1][0]).toBe("/api/events/2/send-reminder");
     });
 
     test("test reminder preserves edit form state", async () => {

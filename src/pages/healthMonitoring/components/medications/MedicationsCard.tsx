@@ -8,18 +8,23 @@ interface MedicationsCardProps {
   onMedicationAdded?: () => void;
 }
 
-const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCardProps) => {
+const MedicationsCard = ({
+  selectedRecipient,
+  onMedicationAdded,
+}: MedicationsCardProps) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedMedication, setSelectedMedication] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [medications, setMedications] = useState([{
-    name: "",
-    dosage: "",
-    frequency: "",
-    startDate: "",
-    endDate: "",
-    notes: ""
-  }]);
+  const [medications, setMedications] = useState([
+    {
+      name: "",
+      dosage: "",
+      frequency: "",
+      startDate: "",
+      endDate: "",
+      notes: "",
+    },
+  ]);
   // Edit form states
   const [editName, setEditName] = useState("");
   const [editDosage, setEditDosage] = useState("");
@@ -30,14 +35,17 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
 
   // Helper functions for managing medications
   const addMedication = () => {
-    setMedications([...medications, {
-      name: "",
-      dosage: "",
-      frequency: "",
-      startDate: "",
-      endDate: "",
-      notes: ""
-    }]);
+    setMedications([
+      ...medications,
+      {
+        name: "",
+        dosage: "",
+        frequency: "",
+        startDate: "",
+        endDate: "",
+        notes: "",
+      },
+    ]);
   };
 
   const removeMedication = (index: number) => {
@@ -45,7 +53,7 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
   };
 
   const updateMedication = (index: number, field: string, value: string) => {
-    const updated = medications.map((med, i) => 
+    const updated = medications.map((med, i) =>
       i === index ? { ...med, [field]: value } : med
     );
     setMedications(updated);
@@ -54,14 +62,16 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
   const handleCloseForm = () => {
     setShowAddForm(false);
     // Reset form to initial state
-    setMedications([{
-      name: "",
-      dosage: "",
-      frequency: "",
-      startDate: "",
-      endDate: "",
-      notes: ""
-    }]);
+    setMedications([
+      {
+        name: "",
+        dosage: "",
+        frequency: "",
+        startDate: "",
+        endDate: "",
+        notes: "",
+      },
+    ]);
   };
 
   const saveMedications = async () => {
@@ -71,31 +81,34 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
     }
 
     // Filter out empty medications
-    const validMedications = medications.filter(med => med.name.trim());
-    
+    const validMedications = medications.filter((med) => med.name.trim());
+
     if (validMedications.length === 0) {
       alert("Please add at least one medication");
       return;
     }
 
-    const medicationsToSave = validMedications.map(med => ({
+    const medicationsToSave = validMedications.map((med) => ({
       ...med,
       startDate: med.startDate ? new Date(med.startDate) : new Date(),
-      endDate: med.endDate ? new Date(med.endDate) : undefined
+      endDate: med.endDate ? new Date(med.endDate) : undefined,
     }));
 
     try {
       // Update the care recipient with new medications
       const updatedRecipient = {
         ...selectedRecipient,
-        medications: [...(selectedRecipient.medications || []), ...medicationsToSave]
+        medications: [
+          ...(selectedRecipient.medications || []),
+          ...medicationsToSave,
+        ],
       };
 
       const response = await fetch(
-        `http://localhost:5000/api/care-recipients/${selectedRecipient._id}`,
+        `/api/care-recipients/${selectedRecipient._id}`,
         {
           method: "PUT",
-          credentials:"include",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -108,16 +121,18 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
       }
 
       alert("Medications added successfully!");
-      
+
       // Clear form and close
-      setMedications([{
-        name: "",
-        dosage: "",
-        frequency: "",
-        startDate: "",
-        endDate: "",
-        notes: ""
-      }]);
+      setMedications([
+        {
+          name: "",
+          dosage: "",
+          frequency: "",
+          startDate: "",
+          endDate: "",
+          notes: "",
+        },
+      ]);
       setShowAddForm(false);
 
       // Notify parent component to refresh data
@@ -136,8 +151,16 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
       setEditName(selectedMedication.name);
       setEditDosage(selectedMedication.dosage);
       setEditFrequency(selectedMedication.frequency);
-      setEditStartDate(selectedMedication.startDate ? new Date(selectedMedication.startDate).toISOString().slice(0, 10) : "");
-      setEditEndDate(selectedMedication.endDate ? new Date(selectedMedication.endDate).toISOString().slice(0, 10) : "");
+      setEditStartDate(
+        selectedMedication.startDate
+          ? new Date(selectedMedication.startDate).toISOString().slice(0, 10)
+          : ""
+      );
+      setEditEndDate(
+        selectedMedication.endDate
+          ? new Date(selectedMedication.endDate).toISOString().slice(0, 10)
+          : ""
+      );
       setEditNotes(selectedMedication.notes || "");
       setIsEditing(false);
     }
@@ -151,17 +174,17 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
       const response = await fetch(
         `http://localhost:5000/api/care-recipients/${selectedRecipient._id}/medications/${selectedMedication._id}`,
         {
-          method: 'PUT',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name: editName,
             dosage: editDosage,
             frequency: editFrequency,
             startDate: editStartDate ? new Date(editStartDate) : new Date(),
             endDate: editEndDate ? new Date(editEndDate) : undefined,
-            notes: editNotes
-          })
+            notes: editNotes,
+          }),
         }
       );
 
@@ -179,7 +202,7 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
       alert("Medication updated successfully!");
     } catch (error) {
       console.error("Error updating medication:", error);
-      alert('Error updating medication. Please try again.');
+      alert("Error updating medication. Please try again.");
     }
   };
 
@@ -187,14 +210,14 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
   const handleDeleteMedication = async () => {
     if (!selectedRecipient || !selectedMedication) return;
 
-    if (!window.confirm('Are you sure you want to delete this medication?')) {
+    if (!window.confirm("Are you sure you want to delete this medication?")) {
       return;
     }
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/care-recipients/${selectedRecipient._id}/medications/${selectedMedication._id}`,
-        { method: 'DELETE', credentials: 'include' }
+        `/api/care-recipients/${selectedRecipient._id}/medications/${selectedMedication._id}`,
+        { method: "DELETE", credentials: "include" }
       );
 
       if (!response.ok) {
@@ -210,7 +233,7 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
       alert("Medication deleted successfully!");
     } catch (error) {
       console.error("Error deleting medication:", error);
-      alert('Error deleting medication. Please try again.');
+      alert("Error deleting medication. Please try again.");
     }
   };
 
@@ -218,7 +241,7 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
     <div className="card">
       <div className="card-header">
         <h2 className="card-title">
-          Medications{selectedRecipient ? ` - ${selectedRecipient.name}` : ''}
+          Medications{selectedRecipient ? ` - ${selectedRecipient.name}` : ""}
         </h2>
         {selectedRecipient && (
           <div className="card-actions">
@@ -239,11 +262,12 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
         </div>
       ) : (
         <div className="medications-content">
-          {selectedRecipient.medications && selectedRecipient.medications.length > 0 ? (
+          {selectedRecipient.medications &&
+          selectedRecipient.medications.length > 0 ? (
             <div className="medications-grid">
               {selectedRecipient.medications.map((med, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className="medication-card"
                   onClick={() => setSelectedMedication(med)}
                 >
@@ -252,12 +276,18 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
                     <span className="medication-dosage">{med.dosage}</span>
                   </div>
                   <div className="medication-details">
-                    <p className="medication-frequency">Frequency: {med.frequency}</p>
+                    <p className="medication-frequency">
+                      Frequency: {med.frequency}
+                    </p>
                     {med.startDate && (
-                      <p className="medication-date">Started: {new Date(med.startDate).toLocaleDateString()}</p>
+                      <p className="medication-date">
+                        Started: {new Date(med.startDate).toLocaleDateString()}
+                      </p>
                     )}
                     {med.endDate && (
-                      <p className="medication-date">Ends: {new Date(med.endDate).toLocaleDateString()}</p>
+                      <p className="medication-date">
+                        Ends: {new Date(med.endDate).toLocaleDateString()}
+                      </p>
                     )}
                     {med.notes && (
                       <p className="medication-notes">Notes: {med.notes}</p>
@@ -280,7 +310,9 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Add New Medications for {selectedRecipient?.name}</h3>
-              <button className="modal-close" onClick={handleCloseForm}>×</button>
+              <button className="modal-close" onClick={handleCloseForm}>
+                ×
+              </button>
             </div>
             <div className="modal-body">
               {medications.map((medication, index) => (
@@ -290,13 +322,17 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
                       type="text"
                       placeholder="Medication Name *"
                       value={medication.name}
-                      onChange={(e) => updateMedication(index, 'name', e.target.value)}
+                      onChange={(e) =>
+                        updateMedication(index, "name", e.target.value)
+                      }
                     />
                     <input
                       type="text"
                       placeholder="Dosage *"
                       value={medication.dosage}
-                      onChange={(e) => updateMedication(index, 'dosage', e.target.value)}
+                      onChange={(e) =>
+                        updateMedication(index, "dosage", e.target.value)
+                      }
                     />
                   </div>
                   <div className="form-row">
@@ -304,13 +340,17 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
                       type="text"
                       placeholder="Frequency *"
                       value={medication.frequency}
-                      onChange={(e) => updateMedication(index, 'frequency', e.target.value)}
+                      onChange={(e) =>
+                        updateMedication(index, "frequency", e.target.value)
+                      }
                     />
                     <input
                       type="date"
                       title="Start Date"
                       value={medication.startDate}
-                      onChange={(e) => updateMedication(index, 'startDate', e.target.value)}
+                      onChange={(e) =>
+                        updateMedication(index, "startDate", e.target.value)
+                      }
                     />
                   </div>
                   <div className="form-row">
@@ -318,19 +358,23 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
                       type="date"
                       title="End Date (optional)"
                       value={medication.endDate}
-                      onChange={(e) => updateMedication(index, 'endDate', e.target.value)}
+                      onChange={(e) =>
+                        updateMedication(index, "endDate", e.target.value)
+                      }
                     />
                   </div>
                   <textarea
                     placeholder="Medication Notes (optional)"
                     value={medication.notes}
-                    onChange={(e) => updateMedication(index, 'notes', e.target.value)}
+                    onChange={(e) =>
+                      updateMedication(index, "notes", e.target.value)
+                    }
                     rows={2}
                   />
                   {medications.length > 1 && (
-                    <button 
-                      type="button" 
-                      className="btn btn-danger btn-small" 
+                    <button
+                      type="button"
+                      className="btn btn-danger btn-small"
                       onClick={() => removeMedication(index)}
                     >
                       Remove
@@ -338,9 +382,13 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
                   )}
                 </div>
               ))}
-              
+
               <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={addMedication}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={addMedication}
+                >
                   Add Another Medication
                 </button>
                 <button className="btn btn-primary" onClick={saveMedications}>
@@ -357,8 +405,14 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
 
       {/* Medication Detail Modal */}
       {selectedMedication && (
-        <div className="medication-modal-overlay" onClick={() => setSelectedMedication(null)}>
-          <div className="medication-modal" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="medication-modal-overlay"
+          onClick={() => setSelectedMedication(null)}
+        >
+          <div
+            className="medication-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
             {isEditing ? (
               <div className="edit-medication-form">
                 <h3>Edit Medication</h3>
@@ -417,10 +471,16 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
                   />
                 </div>
                 <div className="modal-actions">
-                  <button onClick={handleEditMedication} className="btn btn-primary">
+                  <button
+                    onClick={handleEditMedication}
+                    className="btn btn-primary"
+                  >
                     Save Changes
                   </button>
-                  <button onClick={() => setIsEditing(false)} className="btn btn-secondary">
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="btn btn-secondary"
+                  >
                     Cancel
                   </button>
                 </div>
@@ -429,16 +489,30 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
               <>
                 <div className="medication-detail-header">
                   <h3>{selectedMedication.name}</h3>
-                  <span className="medication-detail-dosage">{selectedMedication.dosage}</span>
+                  <span className="medication-detail-dosage">
+                    {selectedMedication.dosage}
+                  </span>
                 </div>
                 <div className="medication-detail-content">
                   <div className="medication-detail-info">
-                    <p><strong>Frequency:</strong> {selectedMedication.frequency}</p>
+                    <p>
+                      <strong>Frequency:</strong> {selectedMedication.frequency}
+                    </p>
                     {selectedMedication.startDate && (
-                      <p><strong>Started:</strong> {new Date(selectedMedication.startDate).toLocaleDateString()}</p>
+                      <p>
+                        <strong>Started:</strong>{" "}
+                        {new Date(
+                          selectedMedication.startDate
+                        ).toLocaleDateString()}
+                      </p>
                     )}
                     {selectedMedication.endDate && (
-                      <p><strong>Ends:</strong> {new Date(selectedMedication.endDate).toLocaleDateString()}</p>
+                      <p>
+                        <strong>Ends:</strong>{" "}
+                        {new Date(
+                          selectedMedication.endDate
+                        ).toLocaleDateString()}
+                      </p>
                     )}
                   </div>
                   {selectedMedication.notes && (
@@ -448,15 +522,24 @@ const MedicationsCard = ({ selectedRecipient, onMedicationAdded }: MedicationsCa
                   )}
                 </div>
                 <div className="modal-actions">
-                  <button onClick={() => setIsEditing(true)} className="btn btn-secondary">
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="btn btn-secondary"
+                  >
                     <Edit className="btn-icon" />
                     Edit
                   </button>
-                  <button onClick={handleDeleteMedication} className="btn btn-danger">
+                  <button
+                    onClick={handleDeleteMedication}
+                    className="btn btn-danger"
+                  >
                     <Trash2 className="btn-icon" />
                     Delete
                   </button>
-                  <button onClick={() => setSelectedMedication(null)} className="btn btn-secondary">
+                  <button
+                    onClick={() => setSelectedMedication(null)}
+                    className="btn btn-secondary"
+                  >
                     Close
                   </button>
                 </div>

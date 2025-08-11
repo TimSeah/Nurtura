@@ -136,7 +136,7 @@ describe("JournalEntryForm", () => {
 
     // Check fetch call
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith("http://localhost:5000/api/journal", {
+      expect(fetch).toHaveBeenCalledWith("/api/journal", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -251,7 +251,7 @@ describe("JournalEntryForm", () => {
     await waitFor(() => {
       // Verify the trimmed title was sent in the request
       expect(fetch).toHaveBeenCalledWith(
-        "http://localhost:5000/api/journal",
+        "/api/journal",
         expect.objectContaining({
           body: JSON.stringify({
             recipientId: mockRecipientId,

@@ -206,7 +206,7 @@ describe("Calendar Component", () => {
     const fetchMock = fetch as jest.Mock;
     expect(fetchMock.mock.calls[1][0]).toBe(
       // Refresh, GET method
-      "http://localhost:5000/api/events/"
+      "/api/events/"
     );
     expect(fetchMock.mock.calls[1][1]).toMatchObject({
       // POST method
@@ -272,7 +272,7 @@ describe("Calendar Component", () => {
     const fetchMock = fetch as jest.Mock;
     expect(fetchMock.mock.calls[1][0]).toBe(
       // Refresh, GET method
-      "http://localhost:5000/api/events/1"
+      "/api/events/1"
     );
     expect(fetchMock.mock.calls[1][1]).toMatchObject({
       // PUT method
@@ -322,7 +322,7 @@ describe("Calendar Component", () => {
 
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(
-        "http://localhost:5000/api/events/1",
+        "/api/events/1",
         expect.objectContaining({ method: "DELETE" })
       );
     });
