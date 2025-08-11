@@ -142,7 +142,10 @@ router.delete('/:id/medications/:medicationId', async (req, res) => {
       return res.status(404).json({ message: 'Care recipient not found' });
     }
     
-    careRecipient.medications.id(medicationId).remove();
+    // Remove medication by filtering out the one with matching _id
+    careRecipient.medications = careRecipient.medications.filter(
+      m => m._id.toString() !== medicationId
+    );
     await careRecipient.save();
     res.json({ message: 'Medication deleted successfully' });
   } catch (err) {
