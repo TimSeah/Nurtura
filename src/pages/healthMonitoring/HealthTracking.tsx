@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Info,
-} from "lucide-react";
+import { Info } from "lucide-react";
 import { apiService } from "../../services/apiService";
 import { CareRecipient } from "../../types";
 import Modal from "../../components/Modal";
@@ -50,7 +48,7 @@ const HealthTracking: React.FC = () => {
 
   const handleJournalSaved = () => {
     // Force refresh of journal entries when a new journal is saved
-    setJournalRefreshKey(prev => prev + 1);
+    setJournalRefreshKey((prev) => prev + 1);
     setIsAddingJournal(false);
   };
 
@@ -109,10 +107,10 @@ const HealthTracking: React.FC = () => {
     e.preventDefault();
 
     try {
-      const vitalData: VitalSignsData = {
+      const vitalData = {
         recipientId: selectedRecipient,
-        vitalType: selectedVitalType as VitalSignsData["vitalType"],
-        value: newVitalForm.value,
+        vitalType: selectedVitalType,
+        value: parseFloat(newVitalForm.value),
         unit: getVitalUnit(selectedVitalType),
         dateTime: newVitalForm.dateTime,
         notes: newVitalForm.notes || undefined,
@@ -122,13 +120,13 @@ const HealthTracking: React.FC = () => {
       setVitalReadings((prev) => [savedVital, ...prev]);
 
       // Reset form and close modal
-      setNewVitalForm({ 
-        value: "", 
-        dateTime: new Date().toISOString().slice(0, 16), 
-        notes: "" 
+      setNewVitalForm({
+        value: "",
+        dateTime: new Date().toISOString().slice(0, 16),
+        notes: "",
       });
       setShowAddForm(false);
-      
+
       alert("Vital signs recorded successfully!");
     } catch (error) {
       console.error("Error saving vital signs:", error);
@@ -138,10 +136,10 @@ const HealthTracking: React.FC = () => {
 
   const handleCloseAddForm = () => {
     // Reset form when closing
-    setNewVitalForm({ 
-      value: "", 
-      dateTime: new Date().toISOString().slice(0, 16), 
-      notes: "" 
+    setNewVitalForm({
+      value: "",
+      dateTime: new Date().toISOString().slice(0, 16),
+      notes: "",
     });
     setShowAddForm(false);
   };
@@ -171,43 +169,44 @@ const HealthTracking: React.FC = () => {
         return {
           placeholder: "120/80",
           hint: "Sit comfortably for 5 minutes before taking. Place cuff on upper arm at heart level. Record as systolic/diastolic (e.g., 120/80).",
-          normalRange: "Normal: Less than 120/80 mmHg"
+          normalRange: "Normal: Less than 120/80 mmHg",
         };
       case "heart_rate":
         return {
           placeholder: "72",
           hint: "Rest for 5 minutes before measuring. Place two fingers on wrist pulse point. Count beats for 60 seconds or use a heart rate monitor.",
-          normalRange: "Normal: 60-100 beats per minute"
+          normalRange: "Normal: 60-100 beats per minute",
         };
       case "temperature":
         return {
           placeholder: "98.6",
           hint: "Wait 30 minutes after eating/drinking hot/cold items. Place thermometer under tongue for oral reading or follow device instructions.",
-          normalRange: "Normal: 97.8°F - 99.1°F (36.5°C - 37.3°C)"
+          normalRange: "Normal: 97.8°F - 99.1°F (36.5°C - 37.3°C)",
         };
       case "weight":
         return {
           placeholder: "150",
           hint: "Weigh at the same time each day, preferably in the morning after using the bathroom. Use the same scale on a hard, flat surface.",
-          normalRange: "Track changes over time rather than single readings"
+          normalRange: "Track changes over time rather than single readings",
         };
       case "blood_sugar":
         return {
           placeholder: "120",
           hint: "Wash hands thoroughly. Use fresh lancet and test strip. Follow your glucose meter instructions. Record timing (fasting, before/after meals).",
-          normalRange: "Fasting: 80-100 mg/dL | After meals: Less than 140 mg/dL"
+          normalRange:
+            "Fasting: 80-100 mg/dL | After meals: Less than 140 mg/dL",
         };
       case "oxygen_saturation":
         return {
           placeholder: "98",
           hint: "Ensure finger is clean and warm. Remove nail polish if present. Place pulse oximeter on fingertip and wait for stable reading.",
-          normalRange: "Normal: 95-100%"
+          normalRange: "Normal: 95-100%",
         };
       default:
         return {
           placeholder: "",
           hint: "",
-          normalRange: ""
+          normalRange: "",
         };
     }
   };
@@ -242,8 +241,8 @@ const HealthTracking: React.FC = () => {
 
       {/* Medications Card */}
       <div data-testid="medications-card">
-        <MedicationsCard 
-          selectedRecipient={selectedRecipientData || null} 
+        <MedicationsCard
+          selectedRecipient={selectedRecipientData || null}
           onMedicationAdded={handleMedicationAdded}
         />
       </div>
@@ -267,8 +266,11 @@ const HealthTracking: React.FC = () => {
 
           {/* Journal Entries Section */}
           {selectedRecipientData && (
-            <div style={{ marginTop: '2rem' }} data-testid="journal-entries-card">
-              <JournalEntriesCard 
+            <div
+              style={{ marginTop: "2rem" }}
+              data-testid="journal-entries-card"
+            >
+              <JournalEntriesCard
                 key={`journal-${selectedRecipient}-${journalRefreshKey}`}
                 recipientId={selectedRecipient}
                 recipientName={selectedRecipientData.name}
@@ -310,7 +312,10 @@ const HealthTracking: React.FC = () => {
                 data-testid="vital-value-input"
                 value={newVitalForm.value}
                 onChange={(e) =>
-                  setNewVitalForm((prev) => ({ ...prev, value: e.target.value }))
+                  setNewVitalForm((prev) => ({
+                    ...prev,
+                    value: e.target.value,
+                  }))
                 }
                 placeholder={getVitalTypeDetails(selectedVitalType).placeholder}
                 required
@@ -323,8 +328,12 @@ const HealthTracking: React.FC = () => {
               <div className="vital-hint">
                 <Info className="hint-icon" />
                 <div className="hint-content">
-                  <p className="hint-text">{getVitalTypeDetails(selectedVitalType).hint}</p>
-                  <p className="normal-range">📊 {getVitalTypeDetails(selectedVitalType).normalRange}</p>
+                  <p className="hint-text">
+                    {getVitalTypeDetails(selectedVitalType).hint}
+                  </p>
+                  <p className="normal-range">
+                    📊 {getVitalTypeDetails(selectedVitalType).normalRange}
+                  </p>
                 </div>
               </div>
             )}
@@ -378,7 +387,7 @@ const HealthTracking: React.FC = () => {
           title="Add New Care Recipient"
           size="medium"
         >
-          <HealthMonitoring 
+          <HealthMonitoring
             onSaveSuccess={() => {
               setIsAddingRecipient(false);
               loadCareRecipients(); // Reload the care recipients list
@@ -396,7 +405,7 @@ const HealthTracking: React.FC = () => {
           title={`New Journal Entry for ${selectedRecipientData.name}`}
           size="medium"
         >
-          <JournalEntryForm 
+          <JournalEntryForm
             recipientId={selectedRecipient}
             recipientName={selectedRecipientData.name}
             onSave={handleJournalSaved}
