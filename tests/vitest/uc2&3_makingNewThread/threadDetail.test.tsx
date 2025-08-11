@@ -58,6 +58,15 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  });
+
+  beforeAll(() => {
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: vi.fn(),
+      },
+    });
+    window.alert = vi.fn();
 });
 
 describe("ThreadDetail: UI test cases", () => {

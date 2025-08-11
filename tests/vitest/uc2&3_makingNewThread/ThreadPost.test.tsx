@@ -18,6 +18,15 @@ vi.mock("@heroicons/react/24/outline", () => ({
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  });
+
+  beforeAll(() => {
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: vi.fn(),
+      },
+    });
+    window.alert = vi.fn();
 });
 
 const thread = {
