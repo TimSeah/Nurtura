@@ -58,6 +58,15 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  });
+
+  beforeAll(() => {
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: vi.fn(),
+      },
+    });
+    window.alert = vi.fn();
 });
 
 describe("ThreadDetail: UI test cases", () => {
@@ -463,6 +472,6 @@ describe("ThreadDetail: Auth/Back button test cases (UI/Integration)", () => {
     });
     await screen.findByText("Test Thread");
     fireEvent.click(screen.getByText(/Back to Forum/i));
-    expect(navigateMock).toHaveBeenCalledWith(-1);
+  expect(navigateMock).toHaveBeenCalledWith("/forum");
   });
 });

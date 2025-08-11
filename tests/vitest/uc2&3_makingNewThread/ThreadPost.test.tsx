@@ -10,11 +10,21 @@ vi.mock("@heroicons/react/24/outline", () => ({
   ChatBubbleBottomCenterIcon: () => (
     <svg data-testid="ChatBubbleBottomCenterIcon" />
   ),
+  ClipboardDocumentIcon: () => <svg data-testid="ClipboardDocumentIcon" />,
 }));
 
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  });
+
+  beforeAll(() => {
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: vi.fn(),
+      },
+    });
+    window.alert = vi.fn();
 });
 
 const thread = {
