@@ -110,7 +110,7 @@ const HealthTracking: React.FC = () => {
       const vitalData = {
         recipientId: selectedRecipient,
         vitalType: selectedVitalType,
-        value: parseFloat(newVitalForm.value),
+        value: newVitalForm.value.trim(),
         unit: getVitalUnit(selectedVitalType),
         dateTime: newVitalForm.dateTime,
         notes: newVitalForm.notes || undefined,
