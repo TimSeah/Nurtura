@@ -10,6 +10,9 @@ vi.mock("@heroicons/react/24/outline", () => ({
   ChatBubbleBottomCenterIcon: () => (
     <svg data-testid="ChatBubbleBottomCenterIcon" />
   ),
+  ClipboardDocumentIcon: () => (
+    <svg data-testid="ClipboardDocumentIcon" />
+  ),
 }));
 
 afterEach(() => {
