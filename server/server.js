@@ -91,15 +91,15 @@ app.use(cookieParser());
 // from the 'public' directory.
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Mount auth routes
-app.use('/api/auth', authRoutes);
-
-// Apply JWT middleware to Auth/me
+// Apply JWT middleware to Auth/me BEFORE mounting auth routes
 app.use('/api/auth/me', jwtMiddleware({
   secret: process.env.JWT_SECRET,
   algorithms: ['HS256'],
   getToken: req => req.cookies.token
 }));
+
+// Mount auth routes AFTER applying JWT middleware to /me
+app.use('/api/auth', authRoutes);
 
 // any route under /api that needs logi, this is MIDDLEWARE
 /*
