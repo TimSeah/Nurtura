@@ -176,7 +176,7 @@
 
 .modal input,
 .modal textarea {
-  width: 80%;
+  width: 100%;
   margin: 0.3rem 0;
   padding: 0.5rem;
   font-size: 1rem;
@@ -195,7 +195,7 @@
   padding: 0.4rem 0.8rem;
   border: none;
   cursor: pointer;
-  background-color: #007bff;
+  background-color: #0C9891;
   color: white;
   border-radius: 4px;
 }
