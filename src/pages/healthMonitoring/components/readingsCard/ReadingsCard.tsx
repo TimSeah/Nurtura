@@ -82,7 +82,7 @@ const ReadingsCard: React.FC<ReadingsCardProps> = ({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/vital-signs/${selectedReading._id}`,
+        `/api/vital-signs/${selectedReading._id}`,
         {
           method: 'PUT',
           credentials: 'include',
@@ -123,7 +123,7 @@ const ReadingsCard: React.FC<ReadingsCardProps> = ({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/vital-signs/${selectedReading._id}`,
+        `/api/vital-signs/${selectedReading._id}`,
         { method: 'DELETE', credentials: 'include' }
       );
 

@@ -172,7 +172,7 @@ const MedicationsCard = ({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/care-recipients/${selectedRecipient._id}/medications/${selectedMedication._id}`,
+        `/api/care-recipients/${selectedRecipient._id}/medications/${selectedMedication._id}`,
         {
           method: "PUT",
           credentials: "include",
