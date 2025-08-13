@@ -8,7 +8,6 @@ import {
   Activity,
   Users,
   MapPin,
-  Bell,
   Settings,
   Heart,
   Menu,
@@ -21,7 +20,7 @@ import "./Layout.css";
   children: React.ReactNode;
 } */
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const { logout } = useContext(AuthContext);
