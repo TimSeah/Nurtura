@@ -18,6 +18,20 @@ A comprehensive healthcare management platform that connects caregivers and care
 - **📧 Automated email reminders** (1 hour before appointments)
 - **Email reminder preferences** and configuration
 
+### Full Docker Containerization
+- **Multi-service architecture** with Docker Compose
+- **nginx reverse proxy** for API routing and static file serving
+- **Production-ready containers** with health checks
+- **AWS deployment ready** (ECR, ECS, Load Balancer)
+- **Environment-specific configurations**
+
+### ⚡ CI/CD Pipeline
+- **GitHub Actions workflows** for automated testing and deployment
+- **Multi-stage testing** (lint, unit, integration, E2E, security)
+- **Automated Docker builds** and ECR pushes
+- **Infrastructure as Code** with automated AWS resource creation
+- **Blue-green deployments** with health checks and rollback capability
+
 ### 👥 Community Forum & Communication  
 - **Interactive discussion forum** with threading system
 - **Real-time commenting** and thread management
@@ -138,6 +152,48 @@ EMAIL_FROM_ADDRESS=your-email@gmail.com
 
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:5000
+
+## 🚀 AWS Deployment
+
+The application includes a complete CI/CD pipeline for AWS deployment:
+
+### Prerequisites for AWS Deployment
+- AWS account with appropriate permissions
+- GitHub repository with Actions enabled
+- AWS CLI configured locally (for initial setup)
+
+### Setup AWS Deployment
+1. **Configure GitHub Secrets**:
+   ```bash
+   # Add to repository secrets:
+   AWS_ACCESS_KEY_ID=your-access-key-id
+   AWS_SECRET_ACCESS_KEY=your-secret-access-key
+   ```
+
+2. **Store secrets in AWS Parameter Store**:
+   ```bash
+   aws ssm put-parameter --name "/nurtura/mongo-uri" --value "your-mongodb-uri" --type "SecureString"
+   aws ssm put-parameter --name "/nurtura/jwt-secret" --value "your-jwt-secret" --type "SecureString"
+   aws ssm put-parameter --name "/nurtura/gmail-user" --value "your-email@gmail.com" --type "SecureString"
+   aws ssm put-parameter --name "/nurtura/gmail-app-password" --value "your-app-password" --type "SecureString"
+   ```
+
+3. **Create Infrastructure**:
+   - Go to Actions tab in GitHub
+   - Run "Create AWS Infrastructure" workflow
+   - This creates ECR repositories, ECS cluster, VPC, Load Balancer, and IAM roles
+
+4. **Deploy Application**:
+   - Push to main branch triggers automatic deployment
+   - Or manually run "Deploy to AWS ECS" workflow
+
+### AWS Architecture
+- **Amazon ECR**: Container registry for Docker images
+- **Amazon ECS**: Container orchestration with Fargate
+- **Application Load Balancer**: Traffic distribution and SSL termination
+- **VPC**: Secure network with public/private subnets
+- **CloudWatch**: Logging and monitoring
+- **Parameter Store**: Secure configuration management
 
 ## 🧪 Testing
 

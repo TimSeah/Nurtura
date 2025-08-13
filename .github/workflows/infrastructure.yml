@@ -1,0 +1,227 @@
+name: Create AWS Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+env:
+  AWS_REGION: ap-southeast-1
+
+jobs:
+  create-infrastructure:
+    name: Create AWS Infrastructure
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Create ECR repositories
+      run: |
+        # Create ECR repositories if they don't exist
+        
+        echo "Creating ECR repositories..."
+        
+        # Frontend repository
+        aws ecr describe-repositories --repository-names nurtura-frontend --region $AWS_REGION || \
+        aws ecr create-repository --repository-name nurtura-frontend --region $AWS_REGION \
+          --image-tag-mutability MUTABLE \
+          --image-scanning-configuration scanOnPush=true
+        
+        # WebApp repository
+        aws ecr describe-repositories --repository-names nurtura-webapp --region $AWS_REGION || \
+        aws ecr create-repository --repository-name nurtura-webapp --region $AWS_REGION \
+          --image-tag-mutability MUTABLE \
+          --image-scanning-configuration scanOnPush=true
+        
+        # AI Moderation repository
+        aws ecr describe-repositories --repository-names nurtura-ai-moderation --region $AWS_REGION || \
+        aws ecr create-repository --repository-name nurtura-ai-moderation --region $AWS_REGION \
+          --image-tag-mutability MUTABLE \
+          --image-scanning-configuration scanOnPush=true
+        
+        echo "✅ ECR repositories created/verified"
+
+    - name: Create ECS Cluster
+      run: |
+        # Check if cluster exists
+        if aws ecs describe-clusters --clusters nurtura-cluster --region $AWS_REGION --query 'clusters[0].status' --output text 2>/dev/null | grep -q "ACTIVE"; then
+          echo "ECS cluster already exists"
+        else
+          echo "Creating ECS cluster..."
+          aws ecs create-cluster --cluster-name nurtura-cluster --region $AWS_REGION
+          echo "✅ ECS cluster created"
+        fi
+
+    - name: Create VPC and networking (if needed)
+      run: |
+        # Check if VPC with our name tag exists
+        VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=nurtura-vpc" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION 2>/dev/null || echo "None")
+        
+        if [ "$VPC_ID" = "None" ] || [ "$VPC_ID" = "null" ]; then
+          echo "Creating VPC and networking infrastructure..."
+          
+          # Create VPC
+          VPC_ID=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 --region $AWS_REGION --query 'Vpc.VpcId' --output text)
+          aws ec2 create-tags --resources $VPC_ID --tags Key=Name,Value=nurtura-vpc --region $AWS_REGION
+          
+          # Create Internet Gateway
+          IGW_ID=$(aws ec2 create-internet-gateway --region $AWS_REGION --query 'InternetGateway.InternetGatewayId' --output text)
+          aws ec2 attach-internet-gateway --vpc-id $VPC_ID --internet-gateway-id $IGW_ID --region $AWS_REGION
+          aws ec2 create-tags --resources $IGW_ID --tags Key=Name,Value=nurtura-igw --region $AWS_REGION
+          
+          # Create public subnets in multiple AZs
+          SUBNET1_ID=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.1.0/24 --availability-zone ${AWS_REGION}a --region $AWS_REGION --query 'Subnet.SubnetId' --output text)
+          SUBNET2_ID=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.2.0/24 --availability-zone ${AWS_REGION}b --region $AWS_REGION --query 'Subnet.SubnetId' --output text)
+          
+          aws ec2 create-tags --resources $SUBNET1_ID --tags Key=Name,Value=nurtura-subnet-1 --region $AWS_REGION
+          aws ec2 create-tags --resources $SUBNET2_ID --tags Key=Name,Value=nurtura-subnet-2 --region $AWS_REGION
+          
+          # Enable auto-assign public IP
+          aws ec2 modify-subnet-attribute --subnet-id $SUBNET1_ID --map-public-ip-on-launch --region $AWS_REGION
+          aws ec2 modify-subnet-attribute --subnet-id $SUBNET2_ID --map-public-ip-on-launch --region $AWS_REGION
+          
+          # Create route table
+          ROUTE_TABLE_ID=$(aws ec2 create-route-table --vpc-id $VPC_ID --region $AWS_REGION --query 'RouteTable.RouteTableId' --output text)
+          aws ec2 create-route --route-table-id $ROUTE_TABLE_ID --destination-cidr-block 0.0.0.0/0 --gateway-id $IGW_ID --region $AWS_REGION
+          aws ec2 create-tags --resources $ROUTE_TABLE_ID --tags Key=Name,Value=nurtura-route-table --region $AWS_REGION
+          
+          # Associate subnets with route table
+          aws ec2 associate-route-table --subnet-id $SUBNET1_ID --route-table-id $ROUTE_TABLE_ID --region $AWS_REGION
+          aws ec2 associate-route-table --subnet-id $SUBNET2_ID --route-table-id $ROUTE_TABLE_ID --region $AWS_REGION
+          
+          echo "✅ VPC and networking infrastructure created"
+          echo "VPC ID: $VPC_ID"
+          echo "Subnets: $SUBNET1_ID, $SUBNET2_ID"
+        else
+          echo "VPC already exists: $VPC_ID"
+        fi
+
+    - name: Create Security Groups
+      run: |
+        VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=nurtura-vpc" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION)
+        
+        # Check if security group exists
+        SG_ID=$(aws ec2 describe-security-groups --filters "Name=group-name,Values=nurtura-sg" "Name=vpc-id,Values=$VPC_ID" --query 'SecurityGroups[0].GroupId' --output text --region $AWS_REGION 2>/dev/null || echo "None")
+        
+        if [ "$SG_ID" = "None" ] || [ "$SG_ID" = "null" ]; then
+          echo "Creating security group..."
+          
+          SG_ID=$(aws ec2 create-security-group --group-name nurtura-sg --description "Security group for Nurtura application" --vpc-id $VPC_ID --region $AWS_REGION --query 'GroupId' --output text)
+          
+          # Add inbound rules
+          aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 80 --cidr 0.0.0.0/0 --region $AWS_REGION
+          aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 443 --cidr 0.0.0.0/0 --region $AWS_REGION
+          aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 5000 --source-group $SG_ID --region $AWS_REGION
+          aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 8001 --source-group $SG_ID --region $AWS_REGION
+          
+          aws ec2 create-tags --resources $SG_ID --tags Key=Name,Value=nurtura-sg --region $AWS_REGION
+          
+          echo "✅ Security group created: $SG_ID"
+        else
+          echo "Security group already exists: $SG_ID"
+        fi
+
+    - name: Create Application Load Balancer
+      run: |
+        # Get VPC and subnets
+        VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=nurtura-vpc" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION)
+        SUBNET_IDS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" "Name=tag:Name,Values=nurtura-subnet*" --query 'Subnets[].SubnetId' --output text --region $AWS_REGION | tr '\t' ' ')
+        SG_ID=$(aws ec2 describe-security-groups --filters "Name=group-name,Values=nurtura-sg" "Name=vpc-id,Values=$VPC_ID" --query 'SecurityGroups[0].GroupId' --output text --region $AWS_REGION)
+        
+        # Check if load balancer exists
+        ALB_ARN=$(aws elbv2 describe-load-balancers --names nurtura-alb --query 'LoadBalancers[0].LoadBalancerArn' --output text --region $AWS_REGION 2>/dev/null || echo "None")
+        
+        if [ "$ALB_ARN" = "None" ] || [ "$ALB_ARN" = "null" ]; then
+          echo "Creating Application Load Balancer..."
+          
+          ALB_ARN=$(aws elbv2 create-load-balancer --name nurtura-alb \
+            --subnets $SUBNET_IDS \
+            --security-groups $SG_ID \
+            --region $AWS_REGION \
+            --query 'LoadBalancers[0].LoadBalancerArn' --output text)
+          
+          echo "✅ Application Load Balancer created: $ALB_ARN"
+        else
+          echo "Application Load Balancer already exists: $ALB_ARN"
+        fi
+
+    - name: Create IAM roles and policies
+      run: |
+        # Create ECS task execution role
+        ROLE_NAME="ecsTaskExecutionRole-nurtura"
+        
+        if aws iam get-role --role-name $ROLE_NAME --region $AWS_REGION >/dev/null 2>&1; then
+          echo "ECS task execution role already exists"
+        else
+          echo "Creating ECS task execution role..."
+          
+          # Create trust policy
+          cat > trust-policy.json << EOF
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }
+        EOF
+          
+          aws iam create-role --role-name $ROLE_NAME \
+            --assume-role-policy-document file://trust-policy.json \
+            --region $AWS_REGION
+          
+          # Attach AWS managed policies
+          aws iam attach-role-policy --role-name $ROLE_NAME \
+            --policy-arn arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy \
+            --region $AWS_REGION
+          
+          aws iam attach-role-policy --role-name $ROLE_NAME \
+            --policy-arn arn:aws:iam::aws:policy/CloudWatchLogsFullAccess \
+            --region $AWS_REGION
+          
+          echo "✅ ECS task execution role created"
+        fi
+
+    - name: Infrastructure Summary
+      run: |
+        echo "🏗️ Infrastructure Summary"
+        echo "=========================="
+        echo "Environment: ${{ github.event.inputs.environment }}"
+        echo "Region: $AWS_REGION"
+        
+        # Get resource details
+        VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=nurtura-vpc" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION)
+        CLUSTER_STATUS=$(aws ecs describe-clusters --clusters nurtura-cluster --region $AWS_REGION --query 'clusters[0].status' --output text 2>/dev/null || echo "NOT_FOUND")
+        ALB_DNS=$(aws elbv2 describe-load-balancers --names nurtura-alb --query 'LoadBalancers[0].DNSName' --output text --region $AWS_REGION 2>/dev/null || echo "NOT_FOUND")
+        
+        echo "VPC ID: $VPC_ID"
+        echo "ECS Cluster Status: $CLUSTER_STATUS"
+        echo "Load Balancer DNS: $ALB_DNS"
+        
+        echo ""
+        echo "📋 Next Steps:"
+        echo "1. Configure your domain to point to the Load Balancer"
+        echo "2. Run the deployment workflow to deploy your application"
+        echo "3. Set up SSL certificate in AWS Certificate Manager"
+        echo "4. Configure environment variables in ECS task definitions"

@@ -1,0 +1,80 @@
+{
+  "family": "nurtura-webapp-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskExecutionRole-nurtura",
+  "containerDefinitions": [
+    {
+      "name": "nurtura-webapp",
+      "image": "ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/nurtura-webapp:latest",
+      "portMappings": [
+        {
+          "containerPort": 5000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/nurtura-webapp",
+          "awslogs-region": "ap-southeast-1",
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group": "true"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:5000/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      },
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "PORT",
+          "value": "5000"
+        },
+        {
+          "name": "SERVER_HOST",
+          "value": "0.0.0.0"
+        },
+        {
+          "name": "ENABLE_MODERATION",
+          "value": "true"
+        },
+        {
+          "name": "MODERATION_SERVICE_URL",
+          "value": "http://ai-moderation:8001"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "MONGO_URI",
+          "valueFrom": "arn:aws:ssm:ap-southeast-1:ACCOUNT_ID:parameter/nurtura/mongo-uri"
+        },
+        {
+          "name": "JWT_SECRET",
+          "valueFrom": "arn:aws:ssm:ap-southeast-1:ACCOUNT_ID:parameter/nurtura/jwt-secret"
+        },
+        {
+          "name": "GMAIL_USER",
+          "valueFrom": "arn:aws:ssm:ap-southeast-1:ACCOUNT_ID:parameter/nurtura/gmail-user"
+        },
+        {
+          "name": "GMAIL_APP_PASSWORD",
+          "valueFrom": "arn:aws:ssm:ap-southeast-1:ACCOUNT_ID:parameter/nurtura/gmail-app-password"
+        }
+      ]
+    }
+  ]
+}

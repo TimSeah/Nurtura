@@ -1,0 +1,296 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop, feature/*, aws ]
+  pull_request:
+    branches: [ main, develop, aws ]
+
+jobs:
+  lint-and-format:
+    name: Lint and Format Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run ESLint
+      run: npm run lint
+
+    - name: Check TypeScript compilation
+      run: npx tsc --noEmit
+
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run Jest tests
+      run: npm test -- --coverage --watchAll=false
+
+    - name: Run Vitest tests
+      run: npm run test:vitest
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/lcov.info
+        fail_ci_if_error: false
+
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: server/package-lock.json
+
+    - name: Install backend dependencies
+      run: |
+        cd server
+        npm ci
+
+    - name: Run backend tests
+      run: |
+        cd server
+        npm test
+      env:
+        MONGO_URI: mongodb://localhost:27017/nurtura-test
+        JWT_SECRET: test-jwt-secret
+        NODE_ENV: test
+
+    - name: Run fuzz tests
+      run: |
+        cd server
+        npm run test:fuzz
+      env:
+        NODE_ENV: test
+
+  ai-service-tests:
+    name: AI Service Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+        cache-dependency-path: automod/requirements.txt
+
+    - name: Install AI service dependencies
+      run: |
+        cd automod
+        pip install -r requirements.txt
+
+    - name: Test AI service imports
+      run: |
+        cd automod
+        python -c "
+        import torch
+        import transformers
+        from moderationService import load_model, moderate_content
+        print('✅ AI service imports successful')
+        print(f'PyTorch version: {torch.__version__}')
+        print(f'Transformers version: {transformers.__version__}')
+        "
+
+    - name: Test moderation service startup
+      run: |
+        cd automod
+        timeout 30s python moderation_server.py &
+        sleep 10
+        curl -f http://localhost:8001/health || exit 1
+        echo "✅ AI moderation service health check passed"
+
+  docker-build-test:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Frontend Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile.frontend
+        push: false
+        tags: nurtura-frontend:test
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build WebApp Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./server/Dockerfile.webapp
+        push: false
+        tags: nurtura-webapp:test
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build AI Moderation Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./automod
+        file: ./automod/Dockerfile
+        push: false
+        tags: nurtura-ai:test
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Test Docker Compose
+      run: |
+        # Test docker-compose configuration
+        docker-compose config
+        echo "✅ Docker Compose configuration is valid"
+
+  e2e-tests:
+    name: End-to-End Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd server && npm ci
+
+    - name: Start backend server
+      run: |
+        cd server
+        npm start &
+        # Wait for server to start
+        npx wait-on http://localhost:5000/health
+      env:
+        MONGO_URI: mongodb://localhost:27017/nurtura-test
+        JWT_SECRET: test-jwt-secret
+        NODE_ENV: test
+        PORT: 5000
+
+    - name: Build frontend
+      run: npm run build
+
+    - name: Start frontend server
+      run: |
+        npm run preview &
+        # Wait for frontend to start
+        npx wait-on http://localhost:4173
+
+    - name: Run Cypress E2E tests
+      uses: cypress-io/github-action@v6
+      with:
+        start: npm run preview
+        wait-on: 'http://localhost:4173, http://localhost:5000/health'
+        wait-on-timeout: 120
+        browser: chrome
+        record: false
+        spec: cypress/e2e/**/*.cy.ts
+
+    - name: Upload Cypress screenshots
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: cypress-screenshots
+        path: cypress/screenshots
+
+    - name: Upload Cypress videos
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: cypress-videos
+        path: cypress/videos
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+    - name: npm audit
+      run: |
+        npm audit --audit-level high
+        cd server && npm audit --audit-level high
