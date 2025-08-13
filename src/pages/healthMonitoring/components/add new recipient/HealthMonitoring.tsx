@@ -6,7 +6,10 @@ interface HealthMonitoringProps {
   onCancel?: () => void;
 }
 
-const HealthMonitoring: React.FC<HealthMonitoringProps> = ({ onSaveSuccess, onCancel }) => {
+const HealthMonitoring: React.FC<HealthMonitoringProps> = ({
+  onSaveSuccess,
+  onCancel,
+}) => {
   const [name, setName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [relationship, setRelationship] = useState("");
@@ -17,7 +20,9 @@ const HealthMonitoring: React.FC<HealthMonitoringProps> = ({ onSaveSuccess, onCa
   const saveRecepient = async () => {
     // Validation
     if (!name.trim() || !dateOfBirth || !relationship.trim()) {
-      alert("Please fill in all required fields (Name, Date of Birth, Relationship)");
+      alert(
+        "Please fill in all required fields (Name, Date of Birth, Relationship)"
+      );
       return;
     }
 
@@ -27,25 +32,25 @@ const HealthMonitoring: React.FC<HealthMonitoringProps> = ({ onSaveSuccess, onCa
       name: name.trim(),
       dateOfBirth: new Date(dateOfBirth),
       relationship: relationship.trim(),
-      medicalConditions: medicalConditions.split(',').map(c => c.trim()).filter(c => c),
+      medicalConditions: medicalConditions
+        .split(",")
+        .map((c) => c.trim())
+        .filter((c) => c),
       medications: [], // Empty array as medications are managed separately
       emergencyContacts: [], // Empty array for now, can be added later
       caregiverNotes: caregiverNotes.trim(),
-      isActive: true
+      isActive: true,
     };
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/care-recipients`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include", // include cookies for authentication
-          body: JSON.stringify(newRecepient),
-        }
-      );
+      const response = await fetch(`/api/care-recipients`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // include cookies for authentication
+        body: JSON.stringify(newRecepient),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to save recepient");
@@ -54,14 +59,14 @@ const HealthMonitoring: React.FC<HealthMonitoringProps> = ({ onSaveSuccess, onCa
       const data = await response.json();
       console.log("Saved recepient:", data);
       alert("Care Recipient added successfully!");
-      
+
       // Clear form
       setName("");
       setDateOfBirth("");
       setRelationship("");
       setMedicalConditions("");
       setCaregiverNotes("");
-      
+
       // Call the success callback to close the modal
       if (onSaveSuccess) {
         onSaveSuccess();
@@ -115,17 +120,17 @@ const HealthMonitoring: React.FC<HealthMonitoringProps> = ({ onSaveSuccess, onCa
       </div>
 
       <div className="form-actions">
-        <button 
-          onClick={saveRecepient} 
+        <button
+          onClick={saveRecepient}
           className="save-button"
           disabled={isLoading}
         >
           {isLoading ? "Adding..." : "Add Care Recipient"}
         </button>
         {onCancel && (
-          <button 
-            type="button" 
-            onClick={onCancel} 
+          <button
+            type="button"
+            onClick={onCancel}
             className="cancel-button"
             disabled={isLoading}
           >

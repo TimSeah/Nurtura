@@ -26,19 +26,24 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
   onRetry,
   onRecipientUpdated,
 }) => {
-  const [selectedCareRecipient, setSelectedCareRecipient] = useState<CareRecipient | null>(null);
+  const [selectedCareRecipient, setSelectedCareRecipient] =
+    useState<CareRecipient | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
   const [editDateOfBirth, setEditDateOfBirth] = useState("");
   const [editRelationship, setEditRelationship] = useState("");
-  const [editMedicalConditions, setEditMedicalConditions] = useState<string[]>([]);
+  const [editMedicalConditions, setEditMedicalConditions] = useState<string[]>(
+    []
+  );
   const [editCaregiverNotes, setEditCaregiverNotes] = useState("");
 
   // Initialize edit form when a care recipient is selected
   useEffect(() => {
     if (selectedCareRecipient) {
       setEditName(selectedCareRecipient.name);
-      setEditDateOfBirth(new Date(selectedCareRecipient.dateOfBirth).toISOString().slice(0, 10));
+      setEditDateOfBirth(
+        new Date(selectedCareRecipient.dateOfBirth).toISOString().slice(0, 10)
+      );
       setEditRelationship(selectedCareRecipient.relationship);
       setEditMedicalConditions(selectedCareRecipient.medicalConditions || []);
       setEditCaregiverNotes(selectedCareRecipient.caregiverNotes || "");
@@ -52,18 +57,18 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/care-recipients/${selectedCareRecipient._id}`,
+        `/api/care-recipients/${selectedCareRecipient._id}`,
         {
-          method: 'PUT',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name: editName,
             dateOfBirth: new Date(editDateOfBirth),
             relationship: editRelationship,
             medicalConditions: editMedicalConditions,
-            caregiverNotes: editCaregiverNotes
-          })
+            caregiverNotes: editCaregiverNotes,
+          }),
         }
       );
 
@@ -81,7 +86,7 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
       alert("Care recipient updated successfully!");
     } catch (error) {
       console.error("Error updating care recipient:", error);
-      alert('Error updating care recipient. Please try again.');
+      alert("Error updating care recipient. Please try again.");
     }
   };
 
@@ -89,14 +94,18 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
   const handleDeleteCareRecipient = async () => {
     if (!selectedCareRecipient) return;
 
-    if (!window.confirm('Are you sure you want to delete this care recipient? This action cannot be undone.')) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this care recipient? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/care-recipients/${selectedCareRecipient._id}`,
-        { method: 'DELETE', credentials: 'include' }
+        `/api/care-recipients/${selectedCareRecipient._id}`,
+        { method: "DELETE", credentials: "include" }
       );
 
       if (!response.ok) {
@@ -112,7 +121,7 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
       alert("Care recipient deleted successfully!");
     } catch (error) {
       console.error("Error deleting care recipient:", error);
-      alert('Error deleting care recipient. Please try again.');
+      alert("Error deleting care recipient. Please try again.");
     }
   };
 
@@ -127,7 +136,9 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
   };
 
   const removeMedicalCondition = (index: number) => {
-    setEditMedicalConditions(editMedicalConditions.filter((_, i) => i !== index));
+    setEditMedicalConditions(
+      editMedicalConditions.filter((_, i) => i !== index)
+    );
   };
   return (
     <div className="card">
@@ -135,17 +146,14 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
         <h2 className="card-title">Select Care Recipient</h2>
         <div className="card-actions">
           {!isAddingRecipient && (
-            <button 
-              className="btn btn-primary"
-              onClick={onAddRecipient}
-            >
+            <button className="btn btn-primary" onClick={onAddRecipient}>
               <Plus className="btn-icon" />
               Add Care Recipient
             </button>
           )}
         </div>
       </div>
-      
+
       <div className="recipient-selector">
         {loading ? (
           <div className="loading-message">
@@ -154,10 +162,7 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
         ) : error ? (
           <div className="error-message">
             <p>Error loading care recipients: {error}</p>
-            <button
-              className="btn btn-secondary"
-              onClick={onRetry}
-            >
+            <button className="btn btn-secondary" onClick={onRetry}>
               Retry
             </button>
           </div>
@@ -175,7 +180,9 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
                   selectedRecipient === recipient._id ? "selected" : ""
                 }`}
                 data-testid="care-recipient-card"
-                onClick={() => recipient._id && onRecipientChange(recipient._id)}
+                onClick={() =>
+                  recipient._id && onRecipientChange(recipient._id)
+                }
               >
                 {/* Action buttons - only show when selected */}
                 {selectedRecipient === recipient._id && (
@@ -195,14 +202,18 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
                       className="action-btn delete-btn"
                       onClick={async (e) => {
                         e.stopPropagation();
-                        if (!window.confirm('Are you sure you want to delete this care recipient? This action cannot be undone.')) {
+                        if (
+                          !window.confirm(
+                            "Are you sure you want to delete this care recipient? This action cannot be undone."
+                          )
+                        ) {
                           return;
                         }
-                        
+
                         try {
                           const response = await fetch(
-                            `http://localhost:5000/api/care-recipients/${recipient._id}`,
-                            { method: 'DELETE', credentials: 'include' }
+                            `/api/care-recipients/${recipient._id}`,
+                            { method: "DELETE", credentials: "include" }
                           );
 
                           if (!response.ok) {
@@ -215,8 +226,13 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
 
                           alert("Care recipient deleted successfully!");
                         } catch (error) {
-                          console.error("Error deleting care recipient:", error);
-                          alert('Error deleting care recipient. Please try again.');
+                          console.error(
+                            "Error deleting care recipient:",
+                            error
+                          );
+                          alert(
+                            "Error deleting care recipient. Please try again."
+                          );
                         }
                       }}
                       title="Delete recipient"
@@ -233,8 +249,11 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
                   </p>
                   <p>Relationship: {recipient.relationship}</p>
                   <div className="medical-conditions">
-                    <span className="conditions-label">Medical Conditions:</span>
-                    {recipient.medicalConditions && recipient.medicalConditions.length > 0 ? (
+                    <span className="conditions-label">
+                      Medical Conditions:
+                    </span>
+                    {recipient.medicalConditions &&
+                    recipient.medicalConditions.length > 0 ? (
                       <div className="conditions-list">
                         {recipient.medicalConditions.map((condition, index) => (
                           <span key={index} className="condition-tag">
@@ -261,7 +280,10 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
 
       {/* Care Recipient Detail Modal */}
       {selectedCareRecipient && (
-        <div className="recipient-modal-overlay" onClick={() => setSelectedCareRecipient(null)}>
+        <div
+          className="recipient-modal-overlay"
+          onClick={() => setSelectedCareRecipient(null)}
+        >
           <div className="recipient-modal" onClick={(e) => e.stopPropagation()}>
             {isEditing ? (
               <div className="edit-recipient-form">
@@ -299,7 +321,9 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
                       <input
                         type="text"
                         value={condition}
-                        onChange={(e) => handleMedicalConditionChange(index, e.target.value)}
+                        onChange={(e) =>
+                          handleMedicalConditionChange(index, e.target.value)
+                        }
                         placeholder="Medical condition"
                       />
                       <button
@@ -328,10 +352,16 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
                   />
                 </div>
                 <div className="modal-actions">
-                  <button onClick={handleEditCareRecipient} className="btn btn-primary">
+                  <button
+                    onClick={handleEditCareRecipient}
+                    className="btn btn-primary"
+                  >
                     Save Changes
                   </button>
-                  <button onClick={() => setIsEditing(false)} className="btn btn-secondary">
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="btn btn-secondary"
+                  >
                     Cancel
                   </button>
                 </div>
@@ -343,17 +373,28 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
                 </div>
                 <div className="recipient-detail-content">
                   <div className="recipient-detail-info">
-                    <p><strong>Date of Birth:</strong> {new Date(selectedCareRecipient.dateOfBirth).toLocaleDateString()}</p>
-                    <p><strong>Relationship:</strong> {selectedCareRecipient.relationship}</p>
+                    <p>
+                      <strong>Date of Birth:</strong>{" "}
+                      {new Date(
+                        selectedCareRecipient.dateOfBirth
+                      ).toLocaleDateString()}
+                    </p>
+                    <p>
+                      <strong>Relationship:</strong>{" "}
+                      {selectedCareRecipient.relationship}
+                    </p>
                     <div className="recipient-detail-conditions">
                       <strong>Medical Conditions:</strong>
-                      {selectedCareRecipient.medicalConditions && selectedCareRecipient.medicalConditions.length > 0 ? (
+                      {selectedCareRecipient.medicalConditions &&
+                      selectedCareRecipient.medicalConditions.length > 0 ? (
                         <div className="conditions-list">
-                          {selectedCareRecipient.medicalConditions.map((condition, index) => (
-                            <span key={index} className="condition-tag">
-                              {condition}
-                            </span>
-                          ))}
+                          {selectedCareRecipient.medicalConditions.map(
+                            (condition, index) => (
+                              <span key={index} className="condition-tag">
+                                {condition}
+                              </span>
+                            )
+                          )}
                         </div>
                       ) : (
                         <span className="no-conditions">None reported</span>
@@ -362,20 +403,30 @@ const CareRecipientSelector: React.FC<CareRecipientSelectorProps> = ({
                   </div>
                   {selectedCareRecipient.caregiverNotes && (
                     <div className="recipient-detail-notes">
-                      <strong>Caregiver Notes:</strong> {selectedCareRecipient.caregiverNotes}
+                      <strong>Caregiver Notes:</strong>{" "}
+                      {selectedCareRecipient.caregiverNotes}
                     </div>
                   )}
                 </div>
                 <div className="modal-actions">
-                  <button onClick={() => setIsEditing(true)} className="btn btn-secondary">
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="btn btn-secondary"
+                  >
                     <Edit className="btn-icon" />
                     Edit
                   </button>
-                  <button onClick={handleDeleteCareRecipient} className="btn btn-danger">
+                  <button
+                    onClick={handleDeleteCareRecipient}
+                    className="btn btn-danger"
+                  >
                     <Trash2 className="btn-icon" />
                     Delete
                   </button>
-                  <button onClick={() => setSelectedCareRecipient(null)} className="btn btn-secondary">
+                  <button
+                    onClick={() => setSelectedCareRecipient(null)}
+                    className="btn btn-secondary"
+                  >
                     Close
                   </button>
                 </div>

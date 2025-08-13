@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import './JournalEntryForm.css';
+import React, { useState } from "react";
+import "./JournalEntryForm.css";
 
 interface JournalEntryFormProps {
   recipientId: string;
@@ -7,10 +7,10 @@ interface JournalEntryFormProps {
   onSave?: () => void;
 }
 
-const JournalEntryForm: React.FC<JournalEntryFormProps> = ({ 
-  recipientId, 
+const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
+  recipientId,
   recipientName,
-  onSave 
+  onSave,
 }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -26,12 +26,12 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
 
   const saveJournal = async () => {
     if (!title.trim() || !description.trim()) {
-      alert('Please fill in both title and description');
+      alert("Please fill in both title and description");
       return;
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/journal", {
+      const response = await fetch("/api/journal", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -66,10 +66,10 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
         onSave();
       }
 
-      alert('Journal entry saved successfully!');
+      alert("Journal entry saved successfully!");
     } catch (error) {
       console.error("Error saving journal:", error);
-      alert('Error saving journal entry. Please try again.');
+      alert("Error saving journal entry. Please try again.");
     }
   };
 
@@ -112,9 +112,9 @@ const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
       </div>
 
       <div className="modal-buttons">
-        <button 
-          type="button" 
-          className="btn btn-primary" 
+        <button
+          type="button"
+          className="btn btn-primary"
           onClick={saveJournal}
           disabled={!title.trim() || !description.trim()}
         >

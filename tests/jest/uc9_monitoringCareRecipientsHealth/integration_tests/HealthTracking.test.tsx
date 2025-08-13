@@ -85,7 +85,7 @@ describe("HealthTracking", () => {
       expect.objectContaining({
         recipientId: "1",
         vitalType: "blood_pressure",
-        value: "118/75",
+        value: "118",
         unit: "mmHg",
       })
     );

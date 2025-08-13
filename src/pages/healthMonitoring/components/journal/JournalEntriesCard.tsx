@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, BookOpen, Edit, Trash2, Plus } from 'lucide-react';
-import './JournalEntriesCard.css';
+import React, { useState, useEffect } from "react";
+import { Calendar, BookOpen, Edit, Trash2, Plus } from "lucide-react";
+import "./JournalEntriesCard.css";
 
 interface Journal {
   _id: string;
@@ -17,10 +17,10 @@ interface JournalEntriesCardProps {
   onAddJournal?: () => void;
 }
 
-const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({ 
-  recipientId, 
+const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({
+  recipientId,
   recipientName,
-  onAddJournal
+  onAddJournal,
 }) => {
   const [journalList, setJournalList] = useState<Journal[]>([]);
   const [selectedJournal, setSelectedJournal] = useState<Journal | null>(null);
@@ -45,14 +45,13 @@ const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({
 
   const fetchJournals = async () => {
     if (!recipientId) return;
-    
+
     setLoading(true);
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/journal?recipientId=${recipientId}`,
-        { credentials: 'include' }
-      );
-      
+      const response = await fetch(`/api/journal?recipientId=${recipientId}`, {
+        credentials: "include",
+      });
+
       if (response.ok) {
         const data: Journal[] = await response.json();
         setJournalList(data);
@@ -72,15 +71,16 @@ const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({
     if (!selectedJournal) return;
 
     try {
-      const response = await fetch(
-   `http://localhost:5000/api/journal/${selectedJournal._id}`,
-      {
-        method: 'PUT',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: editTitle, description: editDescription, date: editDate })
-      }
-    );
+      const response = await fetch(`/api/journal/${selectedJournal._id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: editTitle,
+          description: editDescription,
+          date: editDate,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to update journal");
@@ -98,22 +98,24 @@ const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating journal:", error);
-      alert('Error updating journal entry. Please try again.');
+      alert("Error updating journal entry. Please try again.");
     }
   };
 
   const handleDeleteJournal = async () => {
     if (!selectedJournal) return;
 
-    if (!window.confirm('Are you sure you want to delete this journal entry?')) {
+    if (
+      !window.confirm("Are you sure you want to delete this journal entry?")
+    ) {
       return;
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/journal/${selectedJournal._id}`,
-        { method: 'DELETE', credentials: 'include' }
-      );
+      const response = await fetch(`/api/journal/${selectedJournal._id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
       if (!response.ok) {
         throw new Error("Failed to delete journal");
@@ -124,7 +126,7 @@ const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({
       setSelectedJournal(null);
     } catch (error) {
       console.error("Error deleting journal:", error);
-      alert('Error deleting journal entry. Please try again.');
+      alert("Error deleting journal entry. Please try again.");
     }
   };
 
@@ -138,10 +140,7 @@ const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({
           </h2>
           {onAddJournal && (
             <div className="card-actions">
-              <button
-                className="btn btn-primary"
-                onClick={onAddJournal}
-              >
+              <button className="btn btn-primary" onClick={onAddJournal}>
                 <Plus className="btn-icon" />
                 Add New Journal
               </button>
@@ -164,23 +163,22 @@ const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({
         </h2>
         {onAddJournal && (
           <div className="card-actions">
-            <button
-              className="btn btn-primary"
-              onClick={onAddJournal}
-            >
+            <button className="btn btn-primary" onClick={onAddJournal}>
               <Plus className="btn-icon" />
               Add New Journal
             </button>
           </div>
         )}
       </div>
-      
+
       <div className="journal-entries-content">
         {journalList.length === 0 ? (
           <div className="no-entries">
             <BookOpen className="no-entries-icon" />
             <p>No journal entries found for {recipientName}</p>
-            <p className="no-entries-subtitle">Use the "Add New Journal" button above to get started</p>
+            <p className="no-entries-subtitle">
+              Use the "Add New Journal" button above to get started
+            </p>
           </div>
         ) : (
           <div className="journal-entries-grid">
@@ -196,8 +194,8 @@ const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({
                 </div>
                 <h4 className="journal-card-title">{journal.title}</h4>
                 <p className="journal-card-preview">
-                  {journal.description.length > 100 
-                    ? `${journal.description.substring(0, 100)}...` 
+                  {journal.description.length > 100
+                    ? `${journal.description.substring(0, 100)}...`
                     : journal.description}
                 </p>
               </div>
@@ -208,7 +206,10 @@ const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({
 
       {/* Journal Detail Modal */}
       {selectedJournal && (
-        <div className="journal-modal-overlay" onClick={() => setSelectedJournal(null)}>
+        <div
+          className="journal-modal-overlay"
+          onClick={() => setSelectedJournal(null)}
+        >
           <div className="journal-modal" onClick={(e) => e.stopPropagation()}>
             {isEditing ? (
               <div className="edit-journal-form">
@@ -238,10 +239,16 @@ const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({
                   />
                 </div>
                 <div className="modal-actions">
-                  <button onClick={handleEditJournal} className="btn btn-primary">
+                  <button
+                    onClick={handleEditJournal}
+                    className="btn btn-primary"
+                  >
                     Save Changes
                   </button>
-                  <button onClick={() => setIsEditing(false)} className="btn btn-secondary">
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="btn btn-secondary"
+                  >
                     Cancel
                   </button>
                 </div>
@@ -259,15 +266,24 @@ const JournalEntriesCard: React.FC<JournalEntriesCardProps> = ({
                   <p>{selectedJournal.description}</p>
                 </div>
                 <div className="modal-actions">
-                  <button onClick={() => setIsEditing(true)} className="btn btn-secondary">
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="btn btn-secondary"
+                  >
                     <Edit className="btn-icon" />
                     Edit
                   </button>
-                  <button onClick={handleDeleteJournal} className="btn btn-danger">
+                  <button
+                    onClick={handleDeleteJournal}
+                    className="btn btn-danger"
+                  >
                     <Trash2 className="btn-icon" />
                     Delete
                   </button>
-                  <button onClick={() => setSelectedJournal(null)} className="btn btn-secondary">
+                  <button
+                    onClick={() => setSelectedJournal(null)}
+                    className="btn btn-secondary"
+                  >
                     Close
                   </button>
                 </div>
