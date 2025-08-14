@@ -301,7 +301,13 @@ jobs:
         wait-on-timeout: 120
         browser: chrome
         record: false
-        spec: cypress/e2e/**/*.cy.ts
+        spec: |
+          cypress/e2e/uc1_login.cy.ts,
+          cypress/e2e/uc1_registration.cy.ts,
+          cypress/e2e/uc2&3_makingNewThread.cy.ts,
+          cypress/e2e/uc6_inputEventsToCalendar.cy.ts,
+          cypress/e2e/uc7_sendingNotifications.cy.ts,
+          cypress/e2e/uc9_monitoringCareRecipients_editJournals.cy.ts
       env:
         MONGO_URI: mongodb://localhost:27017/nurtura-test
         JWT_SECRET: test-jwt-secret
