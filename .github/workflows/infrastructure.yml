@@ -490,19 +490,19 @@ jobs:
               "secrets": [
                 {
                   "name": "MONGO_URI",
-                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/mongodb/connection-string"
+                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/mongo-uri"
                 },
                 {
                   "name": "JWT_SECRET",
-                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/jwt/secret-key"
+                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/jwt-secret"
                 },
                 {
                   "name": "GMAIL_USER",
-                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/email/gmail-user"
+                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/gmail-user"
                 },
                 {
                   "name": "GMAIL_APP_PASSWORD",
-                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/email/gmail-app-password"
+                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/gmail-app-password"
                 }
               ],
               "environment": [
