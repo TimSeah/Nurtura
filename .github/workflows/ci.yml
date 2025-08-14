@@ -103,6 +103,8 @@ jobs:
         cd server
         npm run test:fuzz
       env:
+        MONGO_URI: mongodb://localhost:27017/nurtura-test
+        JWT_SECRET: test-jwt-secret
         NODE_ENV: test
 
   ai-service-tests:
