@@ -1,0 +1,54 @@
+{
+  "timestamp": "2025-08-11T12:39:03.380Z",
+  "summary": {
+    "totalTests": 25,
+    "passedTests": 18,
+    "failedTests": 7,
+    "skippedTests": 0,
+    "successRate": "72.00%",
+    "duration": "3.04s"
+  },
+  "security": {
+    "vulnerabilitiesFound": 0,
+    "vulnerabilities": []
+  },
+  "performance": {
+    "testsRun": 3,
+    "results": [
+      {
+        "name": "High Concurrent Users",
+        "status": "passed",
+        "metrics": {
+          "responseTime": 33.434078085732956,
+          "throughput": 66.23717969289025,
+          "errorRate": 0.014629780779959656
+        }
+      },
+      {
+        "name": "Large Payload Processing",
+        "status": "passed",
+        "metrics": {
+          "responseTime": 499.173833404853,
+          "throughput": 23.340130547599692,
+          "errorRate": 0.037671032662355275
+        }
+      },
+      {
+        "name": "Database Query Stress",
+        "status": "passed",
+        "metrics": {
+          "responseTime": 871.6215062940405,
+          "throughput": 71.01183729408103,
+          "errorRate": 0.0190429511384566
+        }
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "priority": "MEDIUM",
+      "category": "Reliability",
+      "message": "High test failure rate (28.0%). Consider improving error handling."
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom"; // Removed unused import
 import { AuthContext } from "../../contexts/AuthContext";
 import {
   Activity,
@@ -13,11 +13,12 @@ import {
 } from "lucide-react";
 import "./Dashboard.css";
 import { apiService } from "../../services/apiService";
-import type {
-  VitalSignsData,
-  AppointmentData,
-  CareNoteData,
-} from "../../types";
+// Removed unused type imports - can be added back when needed
+// import type {
+//   VitalSignsData,
+//   AppointmentData,
+//   CareNoteData,
+// } from "../../types";
 
 import koala from "./components/pics/koala.png";
 
@@ -43,35 +44,32 @@ interface RecentActivity {
 }
 
 const Dashboard: React.FC = () => {
-  const navigate = useNavigate();
-  const [showVitalSignsModal, setShowVitalSignsModal] = useState(false);
-  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
-  const [showCareNoteModal, setShowCareNoteModal] = useState(false);
+  // const navigate = useNavigate(); // Removed unused variable
+  // const [showVitalSignsModal, setShowVitalSignsModal] = useState(false); // Removed unused state
+  // const [showAppointmentModal, setShowAppointmentModal] = useState(false); // Removed unused state
+  // const [showCareNoteModal, setShowCareNoteModal] = useState(false); // Removed unused state
   const { user } = useContext(AuthContext);
 
-  const handleVitalSignsSave = async (data: VitalSignsData) => {
-    try {
-      console.log("Saving vital signs to backend:", data);
-      const savedVitalSigns = await apiService.addVitalSigns(data);
-      console.log("Vital signs saved successfully:", savedVitalSigns);
+  // Removed unused handler functions - can be added back when modals are implemented
+  // const handleVitalSignsSave = async (data: VitalSignsData) => {
+  //   try {
+  //     console.log("Saving vital signs to backend:", data);
+  //     const savedVitalSigns = await apiService.addVitalSigns(data);
+  //     console.log("Vital signs saved successfully:", savedVitalSigns);
+  //     alert("Vital signs recorded successfully!");
+  //   } catch (error) {
+  //     console.error("Error saving vital signs:", error);
+  //     alert("Failed to save vital signs. Please try again.");
+  //   }
+  // };
 
-      // You could add a toast notification here
-      alert("Vital signs recorded successfully!");
-    } catch (error) {
-      console.error("Error saving vital signs:", error);
-      alert("Failed to save vital signs. Please try again.");
-    }
-  };
+  // const handleAppointmentSave = (data: AppointmentData) => {
+  //   console.log("Appointment saved:", data);
+  // };
 
-  const handleAppointmentSave = (data: AppointmentData) => {
-    console.log("Appointment saved:", data);
-    // In a real app, this would save to backend/state management
-  };
-
-  const handleCareNoteSave = (data: CareNoteData) => {
-    console.log("Care note saved:", data);
-    // In a real app, this would save to backend/state management
-  };
+  // const handleCareNoteSave = (data: CareNoteData) => {
+  //   console.log("Care note saved:", data);
+  // };
 
   const stats: DashboardStat[] = [
     {

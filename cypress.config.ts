@@ -3,7 +3,7 @@ import { defineConfig } from "cypress";
 export default defineConfig({
   e2e: {
     experimentalStudio: true,
-    baseUrl: 'http://[::1]:5173',
+    baseUrl: 'http://localhost:4173',
     chromeWebSecurity: false,
     env: {
       apiUrl: "http://localhost:5000"

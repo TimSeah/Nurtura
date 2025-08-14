@@ -1,0 +1,716 @@
+name: Create AWS Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+permissions:
+  contents: read
+  id-token: write  # For OIDC authentication if needed
+
+env:
+  AWS_REGION: ap-southeast-1
+  ACCOUNT_ID: 022941610455
+
+jobs:
+  create-infrastructure:
+    name: Create AWS Infrastructure
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Create ECR repositories
+      run: |
+        echo "🏗️ Creating ECR repositories..."
+        
+        # Frontend repository
+        if aws ecr describe-repositories --repository-names nurtura-frontend --region $AWS_REGION >/dev/null 2>&1; then
+          echo "✅ nurtura-frontend repository already exists"
+        else
+          echo "Creating nurtura-frontend repository..."
+          aws ecr create-repository --repository-name nurtura-frontend --region $AWS_REGION \
+            --image-tag-mutability MUTABLE \
+            --image-scanning-configuration scanOnPush=true
+          echo "✅ nurtura-frontend repository created"
+        fi
+        
+        # WebApp repository
+        if aws ecr describe-repositories --repository-names nurtura-webapp --region $AWS_REGION >/dev/null 2>&1; then
+          echo "✅ nurtura-webapp repository already exists"
+        else
+          echo "Creating nurtura-webapp repository..."
+          aws ecr create-repository --repository-name nurtura-webapp --region $AWS_REGION \
+            --image-tag-mutability MUTABLE \
+            --image-scanning-configuration scanOnPush=true
+          echo "✅ nurtura-webapp repository created"
+        fi
+        
+        # AI Moderation repository
+        if aws ecr describe-repositories --repository-names nurtura-ai-moderation --region $AWS_REGION >/dev/null 2>&1; then
+          echo "✅ nurtura-ai-moderation repository already exists"
+        else
+          echo "Creating nurtura-ai-moderation repository..."
+          aws ecr create-repository --repository-name nurtura-ai-moderation --region $AWS_REGION \
+            --image-tag-mutability MUTABLE \
+            --image-scanning-configuration scanOnPush=true
+          echo "✅ nurtura-ai-moderation repository created"
+        fi
+        
+        # Set lifecycle policies to prevent repository from growing too large
+        echo "Setting up ECR lifecycle policies..."
+        for repo in nurtura-frontend nurtura-webapp nurtura-ai-moderation; do
+          cat > lifecycle-policy.json << 'EOF'
+        {
+          "rules": [
+            {
+              "rulePriority": 1,
+              "description": "Keep last 10 images",
+              "selection": {
+                "tagStatus": "any",
+                "countType": "imageCountMoreThan",
+                "countNumber": 10
+              },
+              "action": {
+                "type": "expire"
+              }
+            }
+          ]
+        }
+        EOF
+          aws ecr put-lifecycle-policy --repository-name $repo --lifecycle-policy-text file://lifecycle-policy.json --region $AWS_REGION || echo "Lifecycle policy already exists for $repo"
+        done
+        
+        echo "✅ All ECR repositories created/verified with lifecycle policies"
+
+    - name: Create ECS Cluster
+      run: |
+        echo "🏗️ Setting up ECS cluster..."
+        if aws ecs describe-clusters --clusters nurtura-cluster --region $AWS_REGION --query 'clusters[0].status' --output text 2>/dev/null | grep -q "ACTIVE"; then
+          echo "✅ ECS cluster 'nurtura-cluster' already exists and is active"
+        else
+          echo "Creating ECS cluster with Fargate capacity..."
+          aws ecs create-cluster \
+            --cluster-name nurtura-cluster \
+            --region $AWS_REGION \
+            --capacity-providers FARGATE FARGATE_SPOT \
+            --default-capacity-provider-strategy capacityProvider=FARGATE,weight=1 \
+            --tags key=Environment,value=${{ github.event.inputs.environment }} key=Project,value=Nurtura
+          
+          echo "Waiting for cluster to be active..."
+          aws ecs wait cluster-active --cluster nurtura-cluster --region $AWS_REGION
+          echo "✅ ECS cluster created successfully"
+        fi
+
+    - name: Create VPC and networking
+      run: |
+        VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=nurtura-vpc" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION 2>/dev/null || echo "None")
+        
+        if [ "$VPC_ID" = "None" ] || [ "$VPC_ID" = "null" ]; then
+          echo "🏗️ Creating VPC and networking infrastructure..."
+          
+          # Create VPC
+          VPC_ID=$(aws ec2 create-vpc --cidr-block 10.0.0.0/16 --region $AWS_REGION --query 'Vpc.VpcId' --output text)
+          aws ec2 create-tags --resources $VPC_ID --tags Key=Name,Value=nurtura-vpc --region $AWS_REGION
+          
+          # Create Internet Gateway
+          IGW_ID=$(aws ec2 create-internet-gateway --region $AWS_REGION --query 'InternetGateway.InternetGatewayId' --output text)
+          aws ec2 attach-internet-gateway --vpc-id $VPC_ID --internet-gateway-id $IGW_ID --region $AWS_REGION
+          aws ec2 create-tags --resources $IGW_ID --tags Key=Name,Value=nurtura-igw --region $AWS_REGION
+          
+          # Create public subnets in multiple AZs
+          SUBNET1_ID=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.1.0/24 --availability-zone ${AWS_REGION}a --region $AWS_REGION --query 'Subnet.SubnetId' --output text)
+          SUBNET2_ID=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 10.0.2.0/24 --availability-zone ${AWS_REGION}b --region $AWS_REGION --query 'Subnet.SubnetId' --output text)
+          
+          aws ec2 create-tags --resources $SUBNET1_ID --tags Key=Name,Value=nurtura-subnet-1 --region $AWS_REGION
+          aws ec2 create-tags --resources $SUBNET2_ID --tags Key=Name,Value=nurtura-subnet-2 --region $AWS_REGION
+          
+          # Enable auto-assign public IP
+          aws ec2 modify-subnet-attribute --subnet-id $SUBNET1_ID --map-public-ip-on-launch --region $AWS_REGION
+          aws ec2 modify-subnet-attribute --subnet-id $SUBNET2_ID --map-public-ip-on-launch --region $AWS_REGION
+          
+          # Create route table
+          ROUTE_TABLE_ID=$(aws ec2 create-route-table --vpc-id $VPC_ID --region $AWS_REGION --query 'RouteTable.RouteTableId' --output text)
+          aws ec2 create-route --route-table-id $ROUTE_TABLE_ID --destination-cidr-block 0.0.0.0/0 --gateway-id $IGW_ID --region $AWS_REGION
+          aws ec2 create-tags --resources $ROUTE_TABLE_ID --tags Key=Name,Value=nurtura-route-table --region $AWS_REGION
+          
+          # Associate subnets with route table
+          aws ec2 associate-route-table --subnet-id $SUBNET1_ID --route-table-id $ROUTE_TABLE_ID --region $AWS_REGION
+          aws ec2 associate-route-table --subnet-id $SUBNET2_ID --route-table-id $ROUTE_TABLE_ID --region $AWS_REGION
+          
+          echo "✅ VPC and networking infrastructure created"
+          echo "VPC ID: $VPC_ID"
+          echo "Subnets: $SUBNET1_ID, $SUBNET2_ID"
+        else
+          echo "✅ VPC already exists: $VPC_ID"
+        fi
+
+    - name: Create Security Groups
+      run: |
+        VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=nurtura-vpc" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION)
+        
+        SG_ID=$(aws ec2 describe-security-groups --filters "Name=group-name,Values=nurtura-sg" "Name=vpc-id,Values=$VPC_ID" --query 'SecurityGroups[0].GroupId' --output text --region $AWS_REGION 2>/dev/null || echo "None")
+        
+        if [ "$SG_ID" = "None" ] || [ "$SG_ID" = "null" ]; then
+          echo "🏗️ Creating security group..."
+          
+          SG_ID=$(aws ec2 create-security-group --group-name nurtura-sg --description "Security group for Nurtura application" --vpc-id $VPC_ID --region $AWS_REGION --query 'GroupId' --output text)
+          
+          # Add inbound rules
+          aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 80 --cidr 0.0.0.0/0 --region $AWS_REGION
+          aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 443 --cidr 0.0.0.0/0 --region $AWS_REGION
+          aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 5000 --source-group $SG_ID --region $AWS_REGION
+          aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 8001 --source-group $SG_ID --region $AWS_REGION
+          
+          aws ec2 create-tags --resources $SG_ID --tags Key=Name,Value=nurtura-sg --region $AWS_REGION
+          
+          echo "✅ Security group created: $SG_ID"
+        else
+          echo "✅ Security group already exists: $SG_ID"
+        fi
+
+    - name: Create Target Groups and Load Balancer
+      run: |
+        echo "🏗️ Setting up Load Balancer and Target Groups..."
+        VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=nurtura-vpc" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION)
+        SUBNET_IDS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" "Name=tag:Name,Values=nurtura-subnet*" --query 'Subnets[].SubnetId' --output text --region $AWS_REGION | tr '\t' ' ')
+        SG_ID=$(aws ec2 describe-security-groups --filters "Name=group-name,Values=nurtura-sg" "Name=vpc-id,Values=$VPC_ID" --query 'SecurityGroups[0].GroupId' --output text --region $AWS_REGION)
+        
+        # Create Target Groups
+        echo "Creating target groups..."
+        
+        # Frontend Target Group
+        if aws elbv2 describe-target-groups --names nurtura-frontend-tg --region $AWS_REGION >/dev/null 2>&1; then
+          echo "✅ Frontend target group already exists"
+        else
+          aws elbv2 create-target-group \
+            --name nurtura-frontend-tg \
+            --protocol HTTP \
+            --port 80 \
+            --vpc-id $VPC_ID \
+            --target-type ip \
+            --health-check-path / \
+            --health-check-interval-seconds 30 \
+            --health-check-timeout-seconds 10 \
+            --healthy-threshold-count 2 \
+            --unhealthy-threshold-count 3 \
+            --region $AWS_REGION
+          echo "✅ Frontend target group created"
+        fi
+        
+        # WebApp Target Group
+        if aws elbv2 describe-target-groups --names nurtura-webapp-tg --region $AWS_REGION >/dev/null 2>&1; then
+          echo "✅ WebApp target group already exists"
+        else
+          aws elbv2 create-target-group \
+            --name nurtura-webapp-tg \
+            --protocol HTTP \
+            --port 5000 \
+            --vpc-id $VPC_ID \
+            --target-type ip \
+            --health-check-path /health \
+            --health-check-interval-seconds 30 \
+            --health-check-timeout-seconds 10 \
+            --healthy-threshold-count 2 \
+            --unhealthy-threshold-count 3 \
+            --region $AWS_REGION
+          echo "✅ WebApp target group created"
+        fi
+        
+        # AI Service Target Group
+        if aws elbv2 describe-target-groups --names nurtura-ai-tg --region $AWS_REGION >/dev/null 2>&1; then
+          echo "✅ AI service target group already exists"
+        else
+          aws elbv2 create-target-group \
+            --name nurtura-ai-tg \
+            --protocol HTTP \
+            --port 8001 \
+            --vpc-id $VPC_ID \
+            --target-type ip \
+            --health-check-path /health \
+            --health-check-interval-seconds 30 \
+            --health-check-timeout-seconds 10 \
+            --healthy-threshold-count 2 \
+            --unhealthy-threshold-count 3 \
+            --region $AWS_REGION
+          echo "✅ AI service target group created"
+        fi
+        
+        # Create Application Load Balancer
+        ALB_ARN=$(aws elbv2 describe-load-balancers --names nurtura-alb --query 'LoadBalancers[0].LoadBalancerArn' --output text --region $AWS_REGION 2>/dev/null || echo "None")
+        
+        if [ "$ALB_ARN" = "None" ] || [ "$ALB_ARN" = "null" ]; then
+          echo "Creating Application Load Balancer..."
+          
+          ALB_ARN=$(aws elbv2 create-load-balancer --name nurtura-alb \
+            --subnets $SUBNET_IDS \
+            --security-groups $SG_ID \
+            --scheme internet-facing \
+            --type application \
+            --ip-address-type ipv4 \
+            --region $AWS_REGION \
+            --tags Key=Environment,Value=${{ github.event.inputs.environment }} Key=Project,Value=Nurtura \
+            --query 'LoadBalancers[0].LoadBalancerArn' --output text)
+          
+          echo "Waiting for load balancer to be available..."
+          aws elbv2 wait load-balancer-available --load-balancer-arns $ALB_ARN --region $AWS_REGION
+          
+          echo "✅ Application Load Balancer created: $ALB_ARN"
+        else
+          echo "✅ Application Load Balancer already exists"
+        fi
+        
+        # Create listeners
+        echo "Setting up load balancer listeners..."
+        FRONTEND_TG_ARN=$(aws elbv2 describe-target-groups --names nurtura-frontend-tg --query 'TargetGroups[0].TargetGroupArn' --output text --region $AWS_REGION)
+        
+        # Create HTTP listener (port 80) for frontend
+        if aws elbv2 describe-listeners --load-balancer-arn $ALB_ARN --query 'Listeners[?Port==`80`]' --output text --region $AWS_REGION | grep -q "80"; then
+          echo "✅ HTTP listener already exists"
+        else
+          aws elbv2 create-listener \
+            --load-balancer-arn $ALB_ARN \
+            --protocol HTTP \
+            --port 80 \
+            --default-actions Type=forward,TargetGroupArn=$FRONTEND_TG_ARN \
+            --region $AWS_REGION
+          echo "✅ HTTP listener created"
+        fi
+
+    - name: Create IAM roles and policies
+      run: |
+        echo "🏗️ Setting up IAM roles and policies..."
+        
+        EXECUTION_ROLE_NAME="ecsTaskExecutionRole-nurtura"
+        TASK_ROLE_NAME="ecsTaskRole-nurtura"
+        
+        # ECS Task Execution Role
+        if aws iam get-role --role-name $EXECUTION_ROLE_NAME >/dev/null 2>&1; then
+          echo "✅ ECS task execution role already exists"
+        else
+          echo "Creating ECS task execution role..."
+          
+          cat > ecs-trust-policy.json << 'EOF'
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }
+        EOF
+          
+          aws iam create-role --role-name $EXECUTION_ROLE_NAME \
+            --assume-role-policy-document file://ecs-trust-policy.json \
+            --description "ECS Task Execution Role for Nurtura"
+          
+          # Attach AWS managed policies
+          aws iam attach-role-policy --role-name $EXECUTION_ROLE_NAME \
+            --policy-arn arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+          
+          aws iam attach-role-policy --role-name $EXECUTION_ROLE_NAME \
+            --policy-arn arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+          
+          # Custom policy for Parameter Store access
+          cat > parameter-store-policy.json << 'EOF'
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ssm:GetParameter",
+                "ssm:GetParameters",
+                "ssm:GetParametersByPath"
+              ],
+              "Resource": [
+                "arn:aws:ssm:*:022941610455:parameter/nurtura/*"
+              ]
+            }
+          ]
+        }
+        EOF
+          
+          aws iam put-role-policy --role-name $EXECUTION_ROLE_NAME \
+            --policy-name ParameterStoreAccess \
+            --policy-document file://parameter-store-policy.json
+          
+          echo "✅ ECS task execution role created"
+        fi
+        
+        # ECS Task Role (for application permissions)
+        if aws iam get-role --role-name $TASK_ROLE_NAME >/dev/null 2>&1; then
+          echo "✅ ECS task role already exists"
+        else
+          echo "Creating ECS task role..."
+          
+          aws iam create-role --role-name $TASK_ROLE_NAME \
+            --assume-role-policy-document file://ecs-trust-policy.json \
+            --description "ECS Task Role for Nurtura application"
+          
+          # Policy for CloudWatch Logs and other services
+          cat > task-role-policy.json << 'EOF'
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams",
+                "logs:DescribeLogGroups"
+              ],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ssm:GetParameter",
+                "ssm:GetParameters"
+              ],
+              "Resource": [
+                "arn:aws:ssm:*:022941610455:parameter/nurtura/*"
+              ]
+            }
+          ]
+        }
+        EOF
+          
+          aws iam put-role-policy --role-name $TASK_ROLE_NAME \
+            --policy-name NurturaTaskPolicy \
+            --policy-document file://task-role-policy.json
+          
+          echo "✅ ECS task role created"
+        fi
+
+    - name: Create ECS Task Definitions
+      run: |
+        echo "🏗️ Creating ECS Task Definitions..."
+        
+        # Get necessary ARNs
+        EXECUTION_ROLE_ARN=$(aws iam get-role --role-name ecsTaskExecutionRole-nurtura --query 'Role.Arn' --output text)
+        TASK_ROLE_ARN=$(aws iam get-role --role-name ecsTaskRole-nurtura --query 'Role.Arn' --output text)
+        
+        # Frontend Task Definition
+        echo "Creating frontend task definition..."
+        cat > frontend-task-def.json << EOF
+        {
+          "family": "nurtura-frontend-task",
+          "networkMode": "awsvpc",
+          "requiresCompatibilities": ["FARGATE"],
+          "cpu": "256",
+          "memory": "512",
+          "executionRoleArn": "$EXECUTION_ROLE_ARN",
+          "taskRoleArn": "$TASK_ROLE_ARN",
+          "containerDefinitions": [
+            {
+              "name": "nurtura-frontend",
+              "image": "022941610455.dkr.ecr.$AWS_REGION.amazonaws.com/nurtura-frontend:latest",
+              "portMappings": [
+                {
+                  "containerPort": 80,
+                  "protocol": "tcp"
+                }
+              ],
+              "essential": true,
+              "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                  "awslogs-group": "/ecs/nurtura-frontend",
+                  "awslogs-region": "$AWS_REGION",
+                  "awslogs-stream-prefix": "ecs",
+                  "awslogs-create-group": "true"
+                }
+              },
+              "environment": [
+                {
+                  "name": "NODE_ENV",
+                  "value": "production"
+                }
+              ]
+            }
+          ]
+        }
+        EOF
+        
+        # WebApp Task Definition
+        echo "Creating webapp task definition..."
+        cat > webapp-task-def.json << EOF
+        {
+          "family": "nurtura-webapp-task",
+          "networkMode": "awsvpc",
+          "requiresCompatibilities": ["FARGATE"],
+          "cpu": "512",
+          "memory": "1024",
+          "executionRoleArn": "$EXECUTION_ROLE_ARN",
+          "taskRoleArn": "$TASK_ROLE_ARN",
+          "containerDefinitions": [
+            {
+              "name": "nurtura-webapp",
+              "image": "022941610455.dkr.ecr.$AWS_REGION.amazonaws.com/nurtura-webapp:latest",
+              "portMappings": [
+                {
+                  "containerPort": 5000,
+                  "protocol": "tcp"
+                }
+              ],
+              "essential": true,
+              "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                  "awslogs-group": "/ecs/nurtura-webapp",
+                  "awslogs-region": "$AWS_REGION",
+                  "awslogs-stream-prefix": "ecs",
+                  "awslogs-create-group": "true"
+                }
+              },
+              "secrets": [
+                {
+                  "name": "MONGO_URI",
+                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/mongodb/connection-string"
+                },
+                {
+                  "name": "JWT_SECRET",
+                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/jwt/secret-key"
+                },
+                {
+                  "name": "GMAIL_USER",
+                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/email/gmail-user"
+                },
+                {
+                  "name": "GMAIL_APP_PASSWORD",
+                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/email/gmail-app-password"
+                }
+              ],
+              "environment": [
+                {
+                  "name": "NODE_ENV",
+                  "value": "production"
+                },
+                {
+                  "name": "PORT",
+                  "value": "5000"
+                },
+                {
+                  "name": "SERVER_HOST",
+                  "value": "0.0.0.0"
+                }
+              ]
+            }
+          ]
+        }
+        EOF
+        
+        # AI Moderation Task Definition
+        echo "Creating AI moderation task definition..."
+        cat > ai-task-def.json << EOF
+        {
+          "family": "nurtura-ai-task",
+          "networkMode": "awsvpc",
+          "requiresCompatibilities": ["FARGATE"],
+          "cpu": "1024",
+          "memory": "2048",
+          "executionRoleArn": "$EXECUTION_ROLE_ARN",
+          "taskRoleArn": "$TASK_ROLE_ARN",
+          "containerDefinitions": [
+            {
+              "name": "nurtura-ai-moderation",
+              "image": "022941610455.dkr.ecr.$AWS_REGION.amazonaws.com/nurtura-ai-moderation:latest",
+              "portMappings": [
+                {
+                  "containerPort": 8001,
+                  "protocol": "tcp"
+                }
+              ],
+              "essential": true,
+              "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                  "awslogs-group": "/ecs/nurtura-ai",
+                  "awslogs-region": "$AWS_REGION",
+                  "awslogs-stream-prefix": "ecs",
+                  "awslogs-create-group": "true"
+                }
+              },
+              "environment": [
+                {
+                  "name": "MODEL",
+                  "value": "irlab-udc/MetaHateBERT"
+                },
+                {
+                  "name": "HATE_THRESHOLD",
+                  "value": "0.7"
+                },
+                {
+                  "name": "MODERATION_SERVICE_PORT",
+                  "value": "8001"
+                }
+              ]
+            }
+          ]
+        }
+        EOF
+        
+        # Register task definitions
+        echo "Registering task definitions..."
+        aws ecs register-task-definition --cli-input-json file://frontend-task-def.json --region $AWS_REGION
+        aws ecs register-task-definition --cli-input-json file://webapp-task-def.json --region $AWS_REGION
+        aws ecs register-task-definition --cli-input-json file://ai-task-def.json --region $AWS_REGION
+        
+        echo "✅ ECS task definitions created successfully"
+
+    - name: Create ECS Services
+      run: |
+        echo "🏗️ Creating ECS Services..."
+        
+        # Get necessary information
+        VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=nurtura-vpc" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION)
+        SUBNET_IDS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$VPC_ID" "Name=tag:Name,Values=nurtura-subnet*" --query 'Subnets[].SubnetId' --output text --region $AWS_REGION | tr '\t' ',')
+        SG_ID=$(aws ec2 describe-security-groups --filters "Name=group-name,Values=nurtura-sg" "Name=vpc-id,Values=$VPC_ID" --query 'SecurityGroups[0].GroupId' --output text --region $AWS_REGION)
+        
+        # Get target group ARNs
+        FRONTEND_TG_ARN=$(aws elbv2 describe-target-groups --names nurtura-frontend-tg --query 'TargetGroups[0].TargetGroupArn' --output text --region $AWS_REGION)
+        WEBAPP_TG_ARN=$(aws elbv2 describe-target-groups --names nurtura-webapp-tg --query 'TargetGroups[0].TargetGroupArn' --output text --region $AWS_REGION)
+        AI_TG_ARN=$(aws elbv2 describe-target-groups --names nurtura-ai-tg --query 'TargetGroups[0].TargetGroupArn' --output text --region $AWS_REGION)
+        
+        # Create Frontend Service
+        if aws ecs describe-services --cluster nurtura-cluster --services nurtura-frontend-service --region $AWS_REGION >/dev/null 2>&1; then
+          echo "✅ Frontend service already exists"
+        else
+          echo "Creating frontend service..."
+          aws ecs create-service \
+            --cluster nurtura-cluster \
+            --service-name nurtura-frontend-service \
+            --task-definition nurtura-frontend-task \
+            --desired-count 1 \
+            --launch-type FARGATE \
+            --platform-version LATEST \
+            --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],securityGroups=[$SG_ID],assignPublicIp=ENABLED}" \
+            --load-balancers "targetGroupArn=$FRONTEND_TG_ARN,containerName=nurtura-frontend,containerPort=80" \
+            --health-check-grace-period-seconds 300 \
+            --region $AWS_REGION
+          echo "✅ Frontend service created"
+        fi
+        
+        # Create WebApp Service
+        if aws ecs describe-services --cluster nurtura-cluster --services nurtura-webapp-service --region $AWS_REGION >/dev/null 2>&1; then
+          echo "✅ WebApp service already exists"
+        else
+          echo "Creating webapp service..."
+          aws ecs create-service \
+            --cluster nurtura-cluster \
+            --service-name nurtura-webapp-service \
+            --task-definition nurtura-webapp-task \
+            --desired-count 1 \
+            --launch-type FARGATE \
+            --platform-version LATEST \
+            --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],securityGroups=[$SG_ID],assignPublicIp=ENABLED}" \
+            --load-balancers "targetGroupArn=$WEBAPP_TG_ARN,containerName=nurtura-webapp,containerPort=5000" \
+            --health-check-grace-period-seconds 300 \
+            --region $AWS_REGION
+          echo "✅ WebApp service created"
+        fi
+        
+        # Create AI Service
+        if aws ecs describe-services --cluster nurtura-cluster --services nurtura-ai-service --region $AWS_REGION >/dev/null 2>&1; then
+          echo "✅ AI service already exists"
+        else
+          echo "Creating AI moderation service..."
+          aws ecs create-service \
+            --cluster nurtura-cluster \
+            --service-name nurtura-ai-service \
+            --task-definition nurtura-ai-task \
+            --desired-count 1 \
+            --launch-type FARGATE \
+            --platform-version LATEST \
+            --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_IDS],securityGroups=[$SG_ID],assignPublicIp=ENABLED}" \
+            --load-balancers "targetGroupArn=$AI_TG_ARN,containerName=nurtura-ai-moderation,containerPort=8001" \
+            --health-check-grace-period-seconds 600 \
+            --region $AWS_REGION
+          echo "✅ AI service created"
+        fi
+
+    - name: Infrastructure Summary
+      run: |
+        echo "🏗️ AWS Infrastructure Summary"
+        echo "=============================="
+        echo "Environment: ${{ github.event.inputs.environment }}"
+        echo "Region: $AWS_REGION"
+        echo "Account ID: $ACCOUNT_ID"
+        echo ""
+        
+        # Get resource details
+        VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=nurtura-vpc" --query 'Vpcs[0].VpcId' --output text --region $AWS_REGION 2>/dev/null || echo "NOT_FOUND")
+        CLUSTER_STATUS=$(aws ecs describe-clusters --clusters nurtura-cluster --region $AWS_REGION --query 'clusters[0].status' --output text 2>/dev/null || echo "NOT_FOUND")
+        ALB_DNS=$(aws elbv2 describe-load-balancers --names nurtura-alb --query 'LoadBalancers[0].DNSName' --output text --region $AWS_REGION 2>/dev/null || echo "NOT_FOUND")
+        
+        echo "🌐 Network Infrastructure:"
+        echo "   VPC ID: $VPC_ID"
+        echo "   Load Balancer DNS: $ALB_DNS"
+        echo ""
+        
+        echo "🐳 Container Infrastructure:"
+        echo "   ECS Cluster Status: $CLUSTER_STATUS"
+        echo "   ECR Repositories: nurtura-frontend, nurtura-webapp, nurtura-ai-moderation"
+        echo ""
+        
+        echo "📊 Services Status:"
+        aws ecs describe-services --cluster nurtura-cluster --services nurtura-frontend-service nurtura-webapp-service nurtura-ai-service --region $AWS_REGION --query 'services[*].[serviceName,status,runningCount,desiredCount]' --output table 2>/dev/null || echo "   Services not yet created"
+        
+        echo ""
+        echo "🎯 Target Groups:"
+        echo "   Frontend: nurtura-frontend-tg (Port 80)"
+        echo "   WebApp: nurtura-webapp-tg (Port 5000)"
+        echo "   AI Service: nurtura-ai-tg (Port 8001)"
+        echo ""
+        
+        echo "🔐 IAM Roles:"
+        echo "   Task Execution: ecsTaskExecutionRole-nurtura"
+        echo "   Task Role: ecsTaskRole-nurtura"
+        echo ""
+        
+        echo "📋 Next Steps:"
+        echo "=============="
+        echo "1. 🌐 Configure your domain DNS to point to: $ALB_DNS"
+        echo "2. 🔒 Set up SSL certificate in AWS Certificate Manager"
+        echo "3. 🚀 Run the deployment workflow to deploy your application:"
+        echo "   - Push to 'aws' or 'production' branch"
+        echo "   - Or trigger deploy-to-aws.yml workflow manually"
+        echo "4. 📧 Verify all environment variables in Parameter Store"
+        echo "5. 🔍 Monitor services in ECS Console"
+        echo ""
+        
+        echo "🎉 Infrastructure setup complete!"
+        echo "Your Nurtura application infrastructure is ready for deployment."
+        
+        # Show URLs that will be available
+        if [ "$ALB_DNS" != "NOT_FOUND" ]; then
+          echo ""
+          echo "🔗 Application URLs (after deployment):"
+          echo "   Frontend: http://$ALB_DNS"
+          echo "   API: http://$ALB_DNS/api"
+          echo "   AI Service: http://$ALB_DNS:8001"
+        fi

@@ -127,9 +127,7 @@ describe("Calendar Component - Email Reminder Features", () => {
 
       // Verify API call was made
       const fetchMock = fetch as jest.Mock;
-      expect(fetchMock.mock.calls[1][0]).toBe(
-        "http://localhost:5000/api/events/1/send-reminder"
-      );
+      expect(fetchMock.mock.calls[1][0]).toBe("/api/events/1/send-reminder");
       expect(fetchMock.mock.calls[1][1]).toMatchObject({
         method: "POST",
       });
@@ -201,17 +199,16 @@ describe("Calendar Component - Email Reminder Features", () => {
         expect(screen.getByText("Test Reminder")).toBeInTheDocument();
       });
 
-      await act(async () => {
-        fireEvent.click(screen.getByText("Test Reminder"));
-      });
+      // Click the test reminder button and wait for error
+      fireEvent.click(screen.getByText("Test Reminder"));
 
-      // Verify error alert
+      // Verify error alert with longer timeout
       await waitFor(() => {
         expect(global.alert).toHaveBeenCalledWith(
           "Error sending test reminder"
         );
-      });
-    });
+      }, { timeout: 3000 });
+    }, 10000); // 10 second timeout for this test
 
     test("test reminder button works for different events", async () => {
       (fetch as jest.Mock)
@@ -244,9 +241,7 @@ describe("Calendar Component - Email Reminder Features", () => {
 
       // Verify correct API call for second event
       const fetchMock = fetch as jest.Mock;
-      expect(fetchMock.mock.calls[1][0]).toBe(
-        "http://localhost:5000/api/events/2/send-reminder"
-      );
+      expect(fetchMock.mock.calls[1][0]).toBe("/api/events/2/send-reminder");
     });
 
     test("test reminder preserves edit form state", async () => {

@@ -139,18 +139,55 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Vital type is required' });
     }
 
-    if (req.body.value === undefined || req.body.value === null || typeof req.body.value !== 'number') {
-      return res.status(400).json({ message: 'Value is required and must be a number' });
+    if (!req.body.value || typeof req.body.value !== 'string' || !req.body.value.trim()) {
+      return res.status(400).json({ message: 'Value is required and cannot be empty' });
     }
 
-    // Validate ranges for specific vital types
+    // Validate ranges for specific vital types (convert to number for numeric types)
     const { vitalType, value } = req.body;
-    if (vitalType === 'heart_rate' && (value < 0 || value > 300)) {
-      return res.status(400).json({ message: 'Heart rate must be between 0 and 300' });
+    
+    // For numeric vital types, validate the numeric value
+    if (vitalType === 'heart_rate') {
+      const numValue = parseFloat(value);
+      if (isNaN(numValue) || numValue < 0 || numValue > 300) {
+        return res.status(400).json({ message: 'Heart rate must be a valid number between 0 and 300' });
+      }
     }
 
-    if (vitalType === 'temperature' && (value < 80 || value > 120)) {
-      return res.status(400).json({ message: 'Temperature must be between 80 and 120' });
+    if (vitalType === 'temperature') {
+      const numValue = parseFloat(value);
+      if (isNaN(numValue) || numValue < 80 || numValue > 120) {
+        return res.status(400).json({ message: 'Temperature must be a valid number between 80 and 120' });
+      }
+    }
+
+    if (vitalType === 'weight') {
+      const numValue = parseFloat(value);
+      if (isNaN(numValue) || numValue < 0 || numValue > 1000) {
+        return res.status(400).json({ message: 'Weight must be a valid number between 0 and 1000' });
+      }
+    }
+
+    if (vitalType === 'blood_sugar') {
+      const numValue = parseFloat(value);
+      if (isNaN(numValue) || numValue < 0 || numValue > 1000) {
+        return res.status(400).json({ message: 'Blood sugar must be a valid number between 0 and 1000' });
+      }
+    }
+
+    if (vitalType === 'oxygen_saturation') {
+      const numValue = parseFloat(value);
+      if (isNaN(numValue) || numValue < 0 || numValue > 100) {
+        return res.status(400).json({ message: 'Oxygen saturation must be a valid number between 0 and 100' });
+      }
+    }
+
+    // For blood pressure, validate format (e.g., "120/80")
+    if (vitalType === 'blood_pressure') {
+      const bpPattern = /^\d{2,3}\/\d{2,3}$/;
+      if (!bpPattern.test(value.trim())) {
+        return res.status(400).json({ message: 'Blood pressure must be in format like "120/80"' });
+      }
     }
 
     const vitalSigns = new VitalSigns({

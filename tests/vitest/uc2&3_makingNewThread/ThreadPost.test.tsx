@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import ThreadPost from "../../../src/pages/forum/threadPost";
-import { afterEach, describe, test, expect, vi } from "vitest";
+import { afterEach, describe, test, expect, vi, beforeAll } from "vitest";
 import { cleanup } from "@testing-library/react";
 
 // Mock icons to avoid SVG issues
@@ -10,9 +10,7 @@ vi.mock("@heroicons/react/24/outline", () => ({
   ChatBubbleBottomCenterIcon: () => (
     <svg data-testid="ChatBubbleBottomCenterIcon" />
   ),
-  ClipboardDocumentIcon: () => (
-    <svg data-testid="ClipboardDocumentIcon" />
-  ),
+  ClipboardDocumentIcon: (props: any) => <div {...props} />,
 }));
 
 afterEach(() => {

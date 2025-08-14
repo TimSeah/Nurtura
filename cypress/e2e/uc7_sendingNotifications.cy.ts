@@ -10,7 +10,7 @@ describe('UC 7: Sending Notifications for Events', () => {
     cy.get('button[type="submit"]').click();
     
     // Verify successful login
-    cy.url().should('eq', 'http://[::1]:5173/');
+    cy.url().should('eq', 'http://localhost:4173/');
   });
 
   it('uses seeded events and tests notification functionality', () => {

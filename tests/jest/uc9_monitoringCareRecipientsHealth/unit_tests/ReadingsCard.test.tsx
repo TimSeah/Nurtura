@@ -296,7 +296,7 @@ describe("ReadingsCard", () => {
     // Check API call
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(
-        "http://localhost:5000/api/vital-signs/r1",
+        "/api/vital-signs/r1",
         expect.objectContaining({
           method: "PUT",
           credentials: "include",
@@ -375,7 +375,7 @@ describe("ReadingsCard", () => {
     // Check API call
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(
-        "http://localhost:5000/api/vital-signs/r1",
+        "/api/vital-signs/r1",
         expect.objectContaining({
           method: "DELETE",
           credentials: "include",
