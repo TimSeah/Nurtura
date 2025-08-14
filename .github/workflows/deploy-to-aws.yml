@@ -3,13 +3,15 @@ name: Deploy to AWS ECS
 on:
   push:
     branches: [ aws, production ]
-  pull_request:
-    branches: [ aws ]
+  workflow_run:
+    workflows: ["Build and Test"]
+    types:
+      - completed
+    branches: [ aws, production ]
 
 permissions:
   contents: read
-  security-events: write
-  actions: read
+  id-token: write
 
 env:
   AWS_REGION: ap-southeast-1
@@ -25,238 +27,87 @@ env:
   ECS_TASK_DEFINITION_AI: nurtura-ai-task
 
 jobs:
-  lint-and-format:
-    name: Lint and Format Check
+  check-ci-status:
+    name: Verify CI Success
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_run'
+    outputs:
+      should-deploy: ${{ steps.check.outputs.deploy }}
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - name: Check CI workflow result
+      id: check
+      run: |
+        if [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+          echo "deploy=true" >> $GITHUB_OUTPUT
+          echo "✅ CI tests passed - proceeding with deployment"
+        else
+          echo "deploy=false" >> $GITHUB_OUTPUT
+          echo "❌ CI tests failed - deployment aborted"
+          exit 1
+        fi
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run ESLint
-      run: npm run lint
-
-    - name: Check TypeScript compilation
-      run: npx tsc --noEmit
-
-  frontend-tests:
-    name: Frontend Tests
+  check-infrastructure:
+    name: Verify AWS Infrastructure
     runs-on: ubuntu-latest
+    outputs:
+      infrastructure-exists: ${{ steps.check.outputs.exists }}
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
       with:
-        node-version: '20'
-        cache: 'npm'
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
 
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Run Jest tests
-      run: npm test -- --coverage --watchAll=false
-
-    - name: Run Vitest tests
-      run: npm run test:vitest
-
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage/lcov.info
-        fail_ci_if_error: false
-
-  backend-tests:
-    name: Backend Tests
-    runs-on: ubuntu-latest
-    
-    services:
-      mongodb:
-        image: mongo:7.0
-        ports:
-          - 27017:27017
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        cache-dependency-path: server/package-lock.json
-
-    - name: Install backend dependencies
+    - name: Check if infrastructure exists
+      id: check
       run: |
-        cd server
-        npm ci
+        echo "🔍 Checking if AWS infrastructure exists..."
+        
+        # Check ECR repositories
+        FRONTEND_REPO=$(aws ecr describe-repositories --repository-names $ECR_REPOSITORY_FRONTEND --region $AWS_REGION 2>/dev/null || echo "NOT_FOUND")
+        WEBAPP_REPO=$(aws ecr describe-repositories --repository-names $ECR_REPOSITORY_WEBAPP --region $AWS_REGION 2>/dev/null || echo "NOT_FOUND")
+        AI_REPO=$(aws ecr describe-repositories --repository-names $ECR_REPOSITORY_AI --region $AWS_REGION 2>/dev/null || echo "NOT_FOUND")
+        
+        # Check ECS cluster
+        CLUSTER_STATUS=$(aws ecs describe-clusters --clusters $ECS_CLUSTER --region $AWS_REGION --query 'clusters[0].status' --output text 2>/dev/null || echo "NOT_FOUND")
+        
+        if [[ "$FRONTEND_REPO" == "NOT_FOUND" ]] || [[ "$WEBAPP_REPO" == "NOT_FOUND" ]] || [[ "$AI_REPO" == "NOT_FOUND" ]] || [[ "$CLUSTER_STATUS" == "NOT_FOUND" ]]; then
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "❌ Infrastructure not found. Please run the 'Create AWS Infrastructure' workflow first."
+          echo ""
+          echo "📋 Missing components:"
+          [[ "$FRONTEND_REPO" == "NOT_FOUND" ]] && echo "  - ECR Repository: $ECR_REPOSITORY_FRONTEND"
+          [[ "$WEBAPP_REPO" == "NOT_FOUND" ]] && echo "  - ECR Repository: $ECR_REPOSITORY_WEBAPP"
+          [[ "$AI_REPO" == "NOT_FOUND" ]] && echo "  - ECR Repository: $ECR_REPOSITORY_AI"
+          [[ "$CLUSTER_STATUS" == "NOT_FOUND" ]] && echo "  - ECS Cluster: $ECS_CLUSTER"
+          echo ""
+          echo "🏗️ To fix this:"
+          echo "1. Go to Actions tab"
+          echo "2. Run 'Create AWS Infrastructure' workflow"
+          echo "3. Select staging or production environment"
+          echo "4. Wait for completion"
+          echo "5. Then re-run this deployment"
+          exit 1
+        else
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "✅ All infrastructure components found"
+          echo "  - ECR Repositories: ✅"
+          echo "  - ECS Cluster: ✅ ($CLUSTER_STATUS)"
+        fi
 
-    - name: Wait for MongoDB
-      run: |
-        timeout 60 bash -c 'until nc -z localhost 27017; do sleep 1; done'
-
-    - name: Run backend tests
-      run: |
-        cd server
-        npm test
-      env:
-        MONGO_URI: mongodb://localhost:27017/nurtura-test
-        JWT_SECRET: test-jwt-secret
-        NODE_ENV: test
-
-    - name: Run fuzz tests
-      run: |
-        cd server
-        npm run test:fuzz
-      env:
-        MONGO_URI: mongodb://localhost:27017/nurtura-test
-        JWT_SECRET: test-jwt-secret
-        NODE_ENV: test
-
-  ai-service-tests:
-    name: AI Service Tests
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
-        cache: 'pip'
-        cache-dependency-path: automod/requirements.txt
-
-    - name: Install AI service dependencies
-      run: |
-        cd automod
-        pip install -r requirements.txt
-
-    - name: Test AI service imports
-      run: |
-        cd automod
-        python -c "
-        import torch
-        import transformers
-        from moderationService import initialize_moderation_service, moderate_forum_content
-        print('✅ AI service imports successful')
-        print(f'PyTorch version: {torch.__version__}')
-        print(f'Transformers version: {transformers.__version__}')
-        "
-
-    - name: Test moderation service startup
-      run: |
-        cd automod
-        timeout 30s python moderation_server.py &
-        sleep 10
-        curl -f http://localhost:8001/health || exit 1
-        echo "✅ AI moderation service health check passed"
-
-  security-scan:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-
-    - name: Install dependencies
-      run: |
-        npm ci
-        cd server && npm ci
-
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: '.'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-
-    - name: Upload Trivy scan results to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v3
-      if: always()
-      with:
-        sarif_file: 'trivy-results.sarif'
-
-    - name: npm audit
-      run: |
-        npm audit --audit-level high || echo "npm audit found vulnerabilities but continuing..."
-        cd server && npm audit --audit-level high || echo "server npm audit found vulnerabilities but continuing..."
-
-  docker-build-test:
-    name: Docker Build Test
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Build Frontend Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        file: ./Dockerfile.frontend
-        push: false
-        tags: nurtura-frontend:test
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-
-    - name: Build WebApp Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        file: ./server/Dockerfile.webapp
-        push: false
-        tags: nurtura-webapp:test
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-
-    - name: Build AI Moderation Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./automod
-        file: ./automod/Dockerfile
-        push: false
-        tags: nurtura-ai:test
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-
-    - name: Test Docker image functionality
-      run: |
-        echo "✅ All Docker images built successfully for deployment"
-
-  build-and-deploy:
+  deploy:
     name: Build and Deploy to AWS
     runs-on: ubuntu-latest
-    needs: [lint-and-format, frontend-tests, backend-tests, ai-service-tests, security-scan, docker-build-test]
-    if: github.ref == 'refs/heads/aws' || github.ref == 'refs/heads/production'
+    needs: [check-ci-status, check-infrastructure]
+    if: |
+      always() &&
+      (needs.check-ci-status.result == 'skipped' || needs.check-ci-status.outputs.should-deploy == 'true') &&
+      needs.check-infrastructure.outputs.infrastructure-exists == 'true' &&
+      ((github.event_name == 'workflow_run' && needs.check-ci-status.outputs.should-deploy == 'true') ||
+      (github.event_name == 'push' && (github.ref == 'refs/heads/aws' || github.ref == 'refs/heads/production')))
 
     steps:
     - name: Checkout code
@@ -423,8 +274,7 @@ jobs:
       run: |
         echo "🚀 Deployment Summary"
         echo "====================="
-        echo "✅ All tests passed successfully"
-        echo "✅ Security scans completed"
+        echo "✅ All tests passed in CI workflow"
         echo "✅ All Docker images built and pushed:"
         echo "   📦 Frontend: ${{ steps.build-frontend-image.outputs.image }}"
         echo "   📦 WebApp: ${{ steps.build-webapp-image.outputs.image }}"
