@@ -114,7 +114,7 @@ jobs:
             --tags key=Environment,value=${{ github.event.inputs.environment }} key=Project,value=Nurtura
           
           echo "Waiting for cluster to be active..."
-          aws ecs wait clusters-active --clusters nurtura-cluster --region $AWS_REGION
+          aws ecs wait cluster-active --cluster nurtura-cluster --region $AWS_REGION
           echo "✅ ECS cluster created successfully"
         fi
 
