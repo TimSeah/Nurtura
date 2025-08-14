@@ -8,7 +8,7 @@ describe('UC 2&3: Making A New Thread', () => {
     cy.get('button[type="submit"]').click();
     
     // Verify successful login
-    cy.url().should('eq', 'http://[::1]:5173/');
+    cy.url().should('eq', 'http://localhost:4173/');
   });
 
   it('Making a thread, viewing and deleting it', function() {

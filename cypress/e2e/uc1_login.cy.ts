@@ -4,8 +4,11 @@ describe('Login Page', () => {
   beforeEach(() => {
     // Clear cookies and visit login page before each test
     cy.clearCookies();
+    
     // Ensure test user exists before attempting login
+    // This will create the user if it doesn't exist, or silently continue if it does
     cy.ensureTestUser('Cypress', 'Testing1234!');
+    
     cy.visit('/login');
     // Wait for page to fully load
     cy.get('input[placeholder="Username"]').should('be.visible');
@@ -20,7 +23,7 @@ describe('Login Page', () => {
     cy.get('button[type="submit"]').click();
 
     // Wait for and verify successful redirect to dashboard
-    cy.url().should('eq', 'http://[::1]:5173/', { timeout: 10000 });
+    cy.url().should('eq', 'http://localhost:4173/', { timeout: 10000 });
     
     // Verify we're actually logged in by checking for authenticated content
     // Look for navigation elements that appear when logged in

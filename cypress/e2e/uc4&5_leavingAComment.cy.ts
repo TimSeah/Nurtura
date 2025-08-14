@@ -6,17 +6,17 @@ describe('UC 4&5: Leaving A Comment', () => {
     cy.get('[placeholder="Username"]').type('Cypress');
     cy.get('input[name="password"]').type('Testing1234!');
     cy.get('button[type="submit"]').click();
-    cy.url().should('eq', 'http://[::1]:5173/');
+    cy.url().should('eq', 'http://localhost:4173/');
   });
   
   it('Logging in, navigating to forum, selecting a thread, leaving a comment', () => {
     cy.get('[href="/forum"] > .nav-label').click();
     cy.wait(1000); // reduced from 2000ms
-    cy.url().should('eq', 'http://[::1]:5173/forum');
+    cy.url().should('eq', 'http://localhost:4173/forum');
     cy.wait(1000); // reduced from 2000ms
     cy.get('[href="/threads/6898794d524574a7f2f74016"] > .flex-1 > .text-md').click();
     cy.wait(1000); // reduced from 2000ms
-    cy.url().should('eq', 'http://[::1]:5173/threads/6898794d524574a7f2f74016');
+    cy.url().should('eq', 'http://localhost:4173/threads/6898794d524574a7f2f74016');
     cy.wait(1000); // reduced from 2000ms
     cy.get('[aria-label="Add Comment"] > span').click();
     cy.get('#content').click();
@@ -33,9 +33,9 @@ describe('UC 4&5: Leaving A Comment', () => {
   
   it('Display error message when posting empty comment', () => {
     cy.get('[href="/forum"] > .nav-label').click();
-    cy.url().should('eq', 'http://[::1]:5173/forum');
+    cy.url().should('eq', 'http://localhost:4173/forum');
     cy.get('[href="/threads/6898794d524574a7f2f74016"] > .flex-1 > .text-md').click();
-    cy.url().should('eq', 'http://[::1]:5173/threads/6898794d524574a7f2f74016');
+    cy.url().should('eq', 'http://localhost:4173/threads/6898794d524574a7f2f74016');
     cy.get('[aria-label="Add Comment"] > span').click();
     cy.get('#content').click();
     cy.get('button[type="submit"]').contains('Post comment').click();
@@ -45,9 +45,9 @@ describe('UC 4&5: Leaving A Comment', () => {
 
   it('Upvoting and undoing upvote', () => {
     cy.get('[href="/forum"] > .nav-label').click();
-    cy.url().should('eq', 'http://[::1]:5173/forum');
+    cy.url().should('eq', 'http://localhost:4173/forum');
     cy.get('[href="/threads/6898794d524574a7f2f74016"] > .flex-1 > .text-md').click();
-    cy.url().should('eq', 'http://[::1]:5173/threads/6898794d524574a7f2f74016');
+    cy.url().should('eq', 'http://localhost:4173/threads/6898794d524574a7f2f74016');
     cy.wait(1000); // reduced from 2000ms
     
     // Get the current vote count before clicking
@@ -72,9 +72,9 @@ describe('UC 4&5: Leaving A Comment', () => {
 
   it('Downvoting and undoing downvote', () => {
     cy.get('[href="/forum"] > .nav-label').click();
-    cy.url().should('eq', 'http://[::1]:5173/forum');
+    cy.url().should('eq', 'http://localhost:4173/forum');
     cy.get('[href="/threads/6898794d524574a7f2f74016"] > .flex-1 > .text-md').click();
-    cy.url().should('eq', 'http://[::1]:5173/threads/6898794d524574a7f2f74016');
+    cy.url().should('eq', 'http://localhost:4173/threads/6898794d524574a7f2f74016');
     cy.wait(1000); // reduced from 2000ms
     
     // Get the current vote count before clicking

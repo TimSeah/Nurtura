@@ -11,7 +11,7 @@ describe('UC 9: Monitoring Care Recipients\' Health', () => {
     cy.get('button[type="submit"]').click();
 
     // Step 3: Should redirect to dashboard
-    cy.url().should('eq', 'http://[::1]:5173/');
+    cy.url().should('eq', 'http://localhost:4173/');
 
     // Step 4: Click "Health Tracking" from navbar
     cy.contains('Health Tracking').click();
