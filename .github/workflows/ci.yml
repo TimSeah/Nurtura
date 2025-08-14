@@ -68,11 +68,6 @@ jobs:
         image: mongo:7.0
         ports:
           - 27017:27017
-        options: >-
-          --health-cmd mongo
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
     - name: Checkout code
@@ -89,6 +84,10 @@ jobs:
       run: |
         cd server
         npm ci
+
+    - name: Wait for MongoDB
+      run: |
+        timeout 60 bash -c 'until nc -z localhost 27017; do sleep 1; done'
 
     - name: Run backend tests
       run: |
@@ -202,11 +201,6 @@ jobs:
         image: mongo:7.0
         ports:
           - 27017:27017
-        options: >-
-          --health-cmd mongo
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
     - name: Checkout code
@@ -222,6 +216,10 @@ jobs:
       run: |
         npm ci
         cd server && npm ci
+
+    - name: Wait for MongoDB
+      run: |
+        timeout 60 bash -c 'until nc -z localhost 27017; do sleep 1; done'
 
     - name: Start backend server
       run: |
