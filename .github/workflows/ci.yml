@@ -133,7 +133,7 @@ jobs:
         python -c "
         import torch
         import transformers
-        from moderationService import load_model, moderate_content
+        from moderationService import initialize_moderation_service, moderate_forum_content
         print('✅ AI service imports successful')
         print(f'PyTorch version: {torch.__version__}')
         print(f'Transformers version: {transformers.__version__}')
