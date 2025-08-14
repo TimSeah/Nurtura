@@ -209,13 +209,37 @@ jobs:
         container-name: nurtura-ai-moderation
         image: ${{ steps.build-ai-image.outputs.image }}
 
+    - name: Register Frontend task definition
+      id: register-frontend-task-def
+      run: |
+        echo "📋 Registering Frontend task definition..."
+        TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json file://${{ steps.frontend-task-def.outputs.task-definition }} --region $AWS_REGION --query 'taskDefinition.taskDefinitionArn' --output text)
+        echo "task-definition-arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
+        echo "✅ Frontend task definition registered: $TASK_DEF_ARN"
+
+    - name: Register WebApp task definition  
+      id: register-webapp-task-def
+      run: |
+        echo "📋 Registering WebApp task definition..."
+        TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json file://${{ steps.webapp-task-def.outputs.task-definition }} --region $AWS_REGION --query 'taskDefinition.taskDefinitionArn' --output text)
+        echo "task-definition-arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
+        echo "✅ WebApp task definition registered: $TASK_DEF_ARN"
+
+    - name: Register AI Moderation task definition
+      id: register-ai-task-def  
+      run: |
+        echo "📋 Registering AI Moderation task definition..."
+        TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json file://${{ steps.ai-task-def.outputs.task-definition }} --region $AWS_REGION --query 'taskDefinition.taskDefinitionArn' --output text)
+        echo "task-definition-arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
+        echo "✅ AI Moderation task definition registered: $TASK_DEF_ARN"
+
     - name: Deploy Frontend service to Amazon ECS
       run: |
         echo "🚀 Deploying Frontend service..."
         aws ecs update-service \
           --cluster $ECS_CLUSTER \
           --service $ECS_SERVICE_FRONTEND \
-          --task-definition ${{ steps.frontend-task-def.outputs.task-definition }} \
+          --task-definition ${{ steps.register-frontend-task-def.outputs.task-definition-arn }} \
           --region $AWS_REGION
         
         echo "⏳ Waiting for Frontend service stability..."
@@ -231,7 +255,7 @@ jobs:
         aws ecs update-service \
           --cluster $ECS_CLUSTER \
           --service $ECS_SERVICE_WEBAPP \
-          --task-definition ${{ steps.webapp-task-def.outputs.task-definition }} \
+          --task-definition ${{ steps.register-webapp-task-def.outputs.task-definition-arn }} \
           --region $AWS_REGION
         
         echo "⏳ Waiting for WebApp service stability..."
@@ -247,7 +271,7 @@ jobs:
         aws ecs update-service \
           --cluster $ECS_CLUSTER \
           --service $ECS_SERVICE_AI \
-          --task-definition ${{ steps.ai-task-def.outputs.task-definition }} \
+          --task-definition ${{ steps.register-ai-task-def.outputs.task-definition-arn }} \
           --region $AWS_REGION
         
         echo "⏳ Waiting for AI service stability..."
