@@ -428,7 +428,7 @@ jobs:
           "containerDefinitions": [
             {
               "name": "nurtura-frontend",
-              "image": "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/nurtura-frontend:latest",
+              "image": "022941610455.dkr.ecr.$AWS_REGION.amazonaws.com/nurtura-frontend:latest",
               "portMappings": [
                 {
                   "containerPort": 80,
@@ -470,7 +470,7 @@ jobs:
           "containerDefinitions": [
             {
               "name": "nurtura-webapp",
-              "image": "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/nurtura-webapp:latest",
+              "image": "022941610455.dkr.ecr.$AWS_REGION.amazonaws.com/nurtura-webapp:latest",
               "portMappings": [
                 {
                   "containerPort": 5000,
@@ -490,19 +490,19 @@ jobs:
               "secrets": [
                 {
                   "name": "MONGO_URI",
-                  "valueFrom": "arn:aws:ssm:$AWS_REGION:$ACCOUNT_ID:parameter/nurtura/mongodb/connection-string"
+                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/mongodb/connection-string"
                 },
                 {
                   "name": "JWT_SECRET",
-                  "valueFrom": "arn:aws:ssm:$AWS_REGION:$ACCOUNT_ID:parameter/nurtura/jwt/secret-key"
+                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/jwt/secret-key"
                 },
                 {
                   "name": "GMAIL_USER",
-                  "valueFrom": "arn:aws:ssm:$AWS_REGION:$ACCOUNT_ID:parameter/nurtura/email/gmail-user"
+                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/email/gmail-user"
                 },
                 {
                   "name": "GMAIL_APP_PASSWORD",
-                  "valueFrom": "arn:aws:ssm:$AWS_REGION:$ACCOUNT_ID:parameter/nurtura/email/gmail-app-password"
+                  "valueFrom": "arn:aws:ssm:$AWS_REGION:022941610455:parameter/nurtura/email/gmail-app-password"
                 }
               ],
               "environment": [
@@ -538,7 +538,7 @@ jobs:
           "containerDefinitions": [
             {
               "name": "nurtura-ai-moderation",
-              "image": "$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/nurtura-ai-moderation:latest",
+              "image": "022941610455.dkr.ecr.$AWS_REGION.amazonaws.com/nurtura-ai-moderation:latest",
               "portMappings": [
                 {
                   "containerPort": 8001,
