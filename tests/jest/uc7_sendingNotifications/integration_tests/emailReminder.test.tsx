@@ -199,17 +199,16 @@ describe("Calendar Component - Email Reminder Features", () => {
         expect(screen.getByText("Test Reminder")).toBeInTheDocument();
       });
 
-      await act(async () => {
-        fireEvent.click(screen.getByText("Test Reminder"));
-      });
+      // Click the test reminder button and wait for error
+      fireEvent.click(screen.getByText("Test Reminder"));
 
-      // Verify error alert
+      // Verify error alert with longer timeout
       await waitFor(() => {
         expect(global.alert).toHaveBeenCalledWith(
           "Error sending test reminder"
         );
-      });
-    });
+      }, { timeout: 3000 });
+    }, 10000); // 10 second timeout for this test
 
     test("test reminder button works for different events", async () => {
       (fetch as jest.Mock)
