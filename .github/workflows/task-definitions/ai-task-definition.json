@@ -4,11 +4,11 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "1024",
   "memory": "2048",
-  "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskExecutionRole-nurtura",
+  "executionRoleArn": "arn:aws:iam::022941610455:role/ecsTaskExecutionRole-nurtura",
   "containerDefinitions": [
     {
       "name": "nurtura-ai-moderation",
-      "image": "ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/nurtura-ai-moderation:latest",
+      "image": "022941610455.dkr.ecr.ap-southeast-1.amazonaws.com/nurtura-ai-moderation:latest",
       "portMappings": [
         {
           "containerPort": 8001,

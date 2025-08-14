@@ -4,11 +4,11 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "512",
   "memory": "1024",
-  "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskExecutionRole-nurtura",
+  "executionRoleArn": "arn:aws:iam::022941610455:role/ecsTaskExecutionRole-nurtura",
   "containerDefinitions": [
     {
       "name": "nurtura-webapp",
-      "image": "ACCOUNT_ID.dkr.ecr.ap-southeast-1.amazonaws.com/nurtura-webapp:latest",
+      "image": "022941610455.dkr.ecr.ap-southeast-1.amazonaws.com/nurtura-webapp:latest",
       "portMappings": [
         {
           "containerPort": 5000,
@@ -60,19 +60,19 @@
       "secrets": [
         {
           "name": "MONGO_URI",
-          "valueFrom": "arn:aws:ssm:ap-southeast-1:ACCOUNT_ID:parameter/nurtura/mongo-uri"
+          "valueFrom": "arn:aws:ssm:ap-southeast-1:022941610455:parameter/nurtura/mongo-uri"
         },
         {
           "name": "JWT_SECRET",
-          "valueFrom": "arn:aws:ssm:ap-southeast-1:ACCOUNT_ID:parameter/nurtura/jwt-secret"
+          "valueFrom": "arn:aws:ssm:ap-southeast-1:022941610455:parameter/nurtura/jwt-secret"
         },
         {
           "name": "GMAIL_USER",
-          "valueFrom": "arn:aws:ssm:ap-southeast-1:ACCOUNT_ID:parameter/nurtura/gmail-user"
+          "valueFrom": "arn:aws:ssm:ap-southeast-1:022941610455:parameter/nurtura/gmail-user"
         },
         {
           "name": "GMAIL_APP_PASSWORD",
-          "valueFrom": "arn:aws:ssm:ap-southeast-1:ACCOUNT_ID:parameter/nurtura/gmail-app-password"
+          "valueFrom": "arn:aws:ssm:ap-southeast-1:022941610455:parameter/nurtura/gmail-app-password"
         }
       ]
     }

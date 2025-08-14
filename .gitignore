@@ -102,3 +102,7 @@ automod/.env
 *.log
 automod/*.log
 moderation.log
+
+# AWS Setup
+*.ps1
+aws-setup.bat
