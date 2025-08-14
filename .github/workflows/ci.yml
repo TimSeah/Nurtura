@@ -190,8 +190,8 @@ jobs:
 
     - name: Test Docker Compose
       run: |
-        # Test docker-compose configuration
-        docker-compose config
+        # Test docker compose configuration (V2 syntax)
+        docker compose config
         echo "✅ Docker Compose configuration is valid"
 
   e2e-tests:
