@@ -209,77 +209,29 @@ jobs:
         container-name: nurtura-ai-moderation
         image: ${{ steps.build-ai-image.outputs.image }}
 
-    - name: Register Frontend task definition
-      id: register-frontend-task-def
-      run: |
-        echo "📋 Registering Frontend task definition..."
-        TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json file://${{ steps.frontend-task-def.outputs.task-definition }} --region $AWS_REGION --query 'taskDefinition.taskDefinitionArn' --output text)
-        echo "task-definition-arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
-        echo "✅ Frontend task definition registered: $TASK_DEF_ARN"
-
-    - name: Register WebApp task definition  
-      id: register-webapp-task-def
-      run: |
-        echo "📋 Registering WebApp task definition..."
-        TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json file://${{ steps.webapp-task-def.outputs.task-definition }} --region $AWS_REGION --query 'taskDefinition.taskDefinitionArn' --output text)
-        echo "task-definition-arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
-        echo "✅ WebApp task definition registered: $TASK_DEF_ARN"
-
-    - name: Register AI Moderation task definition
-      id: register-ai-task-def  
-      run: |
-        echo "📋 Registering AI Moderation task definition..."
-        TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json file://${{ steps.ai-task-def.outputs.task-definition }} --region $AWS_REGION --query 'taskDefinition.taskDefinitionArn' --output text)
-        echo "task-definition-arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
-        echo "✅ AI Moderation task definition registered: $TASK_DEF_ARN"
-
     - name: Deploy Frontend service to Amazon ECS
-      run: |
-        echo "🚀 Deploying Frontend service..."
-        aws ecs update-service \
-          --cluster $ECS_CLUSTER \
-          --service $ECS_SERVICE_FRONTEND \
-          --task-definition ${{ steps.register-frontend-task-def.outputs.task-definition-arn }} \
-          --region $AWS_REGION
-        
-        echo "⏳ Waiting for Frontend service stability..."
-        aws ecs wait services-stable \
-          --cluster $ECS_CLUSTER \
-          --services $ECS_SERVICE_FRONTEND \
-          --region $AWS_REGION
-        echo "✅ Frontend service deployed successfully"
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.frontend-task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE_FRONTEND }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
 
     - name: Deploy WebApp service to Amazon ECS
-      run: |
-        echo "🚀 Deploying WebApp service..."
-        aws ecs update-service \
-          --cluster $ECS_CLUSTER \
-          --service $ECS_SERVICE_WEBAPP \
-          --task-definition ${{ steps.register-webapp-task-def.outputs.task-definition-arn }} \
-          --region $AWS_REGION
-        
-        echo "⏳ Waiting for WebApp service stability..."
-        aws ecs wait services-stable \
-          --cluster $ECS_CLUSTER \
-          --services $ECS_SERVICE_WEBAPP \
-          --region $AWS_REGION
-        echo "✅ WebApp service deployed successfully"
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.webapp-task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE_WEBAPP }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
 
-    - name: Deploy AI Moderation service to Amazon ECS
-      run: |
-        echo "🚀 Deploying AI Moderation service..."
-        aws ecs update-service \
-          --cluster $ECS_CLUSTER \
-          --service $ECS_SERVICE_AI \
-          --task-definition ${{ steps.register-ai-task-def.outputs.task-definition-arn }} \
-          --region $AWS_REGION
-        
-        echo "⏳ Waiting for AI service stability..."
-        aws ecs wait services-stable \
-          --cluster $ECS_CLUSTER \
-          --services $ECS_SERVICE_AI \
-          --region $AWS_REGION
-        echo "✅ AI Moderation service deployed successfully"
+    - name: Deploy AI service to Amazon ECS
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.ai-task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE_AI }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
 
     - name: Verify Deployments
       run: |
