@@ -269,7 +269,7 @@ class ForumFuzzer {
   }
 
   async fuzzThreadEndpoints(iterations = 30) {
-    console.log('\n🎯 Fuzzing Thread Endpoints...');
+    console.log('Fuzzing Thread Endpoints...');
     
     // Create test user for authenticated requests
     const testAuth = await this.createTestUser();
@@ -281,7 +281,7 @@ class ForumFuzzer {
   }
 
   async fuzzCommentEndpoints(iterations = 30) {
-    console.log('\n🎯 Fuzzing Comment Endpoints...');
+    console.log('Fuzzing Comment Endpoints...');
     
     const testAuth = await this.createTestUser();
     const testThreadId = testAuth ? await this.createTestThread(testAuth.token) : this.validObjectId;
@@ -292,7 +292,7 @@ class ForumFuzzer {
   }
 
   async fuzzBusinessLogic(iterations = 20) {
-    console.log('\n🎯 Fuzzing Business Logic...');
+    console.log('Fuzzing Business Logic...');
     
     const testAuth = await this.createTestUser();
     if (!testAuth) return;
@@ -450,7 +450,7 @@ class ForumFuzzer {
   }
 
   async runComprehensiveTest(iterations = 25) {
-    console.log('🚀 Starting Comprehensive Forum Fuzz Testing...\n');
+    console.log(' Starting Comprehensive Forum Fuzz Testing...\n');
     
     await this.fuzzThreadEndpoints(iterations);
     await this.fuzzCommentEndpoints(iterations);
@@ -477,7 +477,7 @@ class ForumFuzzer {
       }, {})
     };
     
-    console.log('\n📊 Comprehensive Forum Fuzz Results:');
+    console.log('Comprehensive Forum Fuzz Results:');
     console.log('=========================================');
     console.log(`Total Requests: ${report.summary.totalRequests}`);
     console.log(`Crashes: ${report.summary.totalCrashes} (${report.summary.crashRate})`);
@@ -486,21 +486,21 @@ class ForumFuzzer {
     console.log(`Status Distribution:`, report.statusDistribution);
     
     if (this.results.securityIssues.length > 0) {
-      console.log('\n🚨 Security Issues Found:');
+      console.log('Security Issues Found:');
       this.results.securityIssues.forEach((issue, i) => {
         console.log(`${i + 1}. ${issue.type} in ${issue.endpoint}: ${issue.evidence}`);
       });
     }
     
     if (this.results.businessLogicFlaws.length > 0) {
-      console.log('\n⚠️ Business Logic Issues:');
+      console.log('Business Logic Issues:');
       this.results.businessLogicFlaws.forEach((issue, i) => {
         console.log(`${i + 1}. ${issue.issue}`);
       });
     }
     
     if (this.results.errors.length > 0) {
-      console.log('\n💥 Critical Errors:');
+      console.log('Critical Errors:');
       this.results.errors.slice(0, 5).forEach((error, i) => {
         console.log(`${i + 1}. ${error.endpoint}: ${typeof error.error === 'string' ? error.error : JSON.stringify(error.error)}`);
       });
