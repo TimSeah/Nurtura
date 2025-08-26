@@ -96,7 +96,9 @@ const Comment: React.FC<CommentDetailProps> = ({ comment, onDelete }) => {
     };
 
     const handleCopyLink = () => {
-        const commentUrl = `${window.location.origin}${window.location.pathname}#comment-${comment._id}`;
+        const url = new URL(window.location.href);
+        url.hash = `comment-${comment._id}`;
+        const commentUrl = url.toString();
         navigator.clipboard.writeText(commentUrl);
         alert("Comment link copied to clipboard!");
     };
@@ -105,11 +107,10 @@ const Comment: React.FC<CommentDetailProps> = ({ comment, onDelete }) => {
         <article
             ref={commentRef}
             id={`comment-${comment._id}`}
-            className={`p-6 text-base bg-white rounded-lg transition-all duration-300 ${
-                isHighlighted
+            className={`p-6 text-base bg-white rounded-lg transition-all duration-300 ${isHighlighted
                     ? "ring-2 ring-blue-400 bg-blue-50 shadow-lg"
                     : "hover:shadow-sm"
-            }`}
+                }`}
         >
             <div className="flex justify-between items-start mb-2">
                 <div className="flex-1 text-left text-sm text-gray-500 dark:text-gray-400">

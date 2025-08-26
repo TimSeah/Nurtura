@@ -29,8 +29,8 @@ const ThreadPost: React.FC<ThreadDetailProps> = ({
     userVote
 }) => {
     const handleCopyLink = () => {
-        const threadUrl = `${window.location.origin}${window.location.pathname}`;
-        navigator.clipboard.writeText(threadUrl);
+        const threadUrl = new URL(window.location.href);
+        navigator.clipboard.writeText(threadUrl.toString());
         alert("Thread link copied to clipboard!");
     };
 
